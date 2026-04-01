@@ -33,39 +33,47 @@
             overflow-x: hidden;
         }
         body::before {
-            content: "?\00a0\00a0\00a0\00a0?\00a0\00a0\00a0\00a0?\00a0\00a0\00a0\00a0?\00a0\00a0\00a0\00a0?\A?\00a0\00a0\00a0\00a0?\00a0\00a0\00a0\00a0?\00a0\00a0\00a0\00a0?\00a0\00a0\00a0\00a0?\A?\00a0\00a0\00a0\00a0?\00a0\00a0\00a0\00a0?\00a0\00a0\00a0\00a0?\00a0\00a0\00a0\00a0?";
+            content: "?\00a0?\00a0?\00a0?\00a0?\A?\00a0?\00a0QUIZ\00a0?\00a0?\A?\00a0?\00a0?\00a0?\00a0?\A?\00a0CARD\00a0?\00a0?\00a0?\A?\00a0?\00a0?\00a0?\00a0?\A?\00a0?\00a0SCORE\00a0?\00a0?";
             position: fixed;
             inset: 0;
-            font-size: clamp(5.8rem, 13vw, 10rem);
-            line-height: 1.12;
-            letter-spacing: 2.1rem;
+            font-size: clamp(4.4rem, 9.6vw, 7.8rem);
+            line-height: 1.02;
+            letter-spacing: 1.3rem;
             white-space: pre-wrap;
             word-break: break-word;
             font-weight: 900;
-            color: rgba(255, 255, 255, 0.14);
+            background:
+                radial-gradient(circle at 10% 18%, rgba(255,255,255,0.18) 0 10%, transparent 11%),
+                radial-gradient(circle at 30% 76%, rgba(245,158,11,0.18) 0 10%, transparent 11%),
+                radial-gradient(circle at 68% 24%, rgba(34,197,94,0.18) 0 10%, transparent 11%),
+                radial-gradient(circle at 88% 70%, rgba(14,165,233,0.18) 0 10%, transparent 11%),
+                radial-gradient(circle at 52% 52%, rgba(255,255,255,0.15) 0 8%, transparent 9%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
             text-shadow:
-                0 0 10px rgba(255, 255, 255, 0.08),
-                0 0 24px rgba(255, 255, 255, 0.04);
+                0 0 10px rgba(255, 255, 255, 0.05),
+                0 0 24px rgba(255, 255, 255, 0.02);
             z-index: 0;
             pointer-events: none;
-            transform: rotate(-14deg) scale(1.22) translate(-1%, -4%);
+            transform: rotate(-11deg) scale(1.12) translate(-1%, -3%);
             opacity: 1;
         }
         body::after {
-            content: "Quiz Nights";
+            content: "Quiz K-nights";
             position: fixed;
             top: 3.5vh;
             left: 0;
             right: 0;
             display: flex;
             justify-content: center;
-            font-size: clamp(2.8rem, 7vw, 5.8rem);
+            font-size: clamp(2.8rem, 6.4vw, 5.4rem);
             font-weight: 900;
-            letter-spacing: 0.22em;
+            letter-spacing: 0.18em;
             text-transform: uppercase;
-            color: rgba(245, 158, 11, 0.2);
+            color: rgba(245, 158, 11, 0.26);
             text-shadow:
-                0 0 10px rgba(245, 158, 11, 0.12),
+                0 0 10px rgba(245, 158, 11, 0.16),
                 0 10px 30px rgba(0, 0, 0, 0.28);
             z-index: 0;
             pointer-events: none;
@@ -119,10 +127,23 @@
         button:hover:not(:disabled) { transform: translateY(-1px); }
         button:disabled { opacity: 0.45; cursor: not-allowed; }
         .secondary { background: var(--nav); }
-        .next-active { background: var(--primary) !important; box-shadow: 0 0 18px rgba(14, 165, 233, 0.35); }
+        .lifeline-container .secondary:not(:disabled) {
+            background: #c026d3;
+            box-shadow: 0 0 14px rgba(192, 38, 211, 0.18);
+        }
+        .next-active,
+        .prev-active {
+            background: var(--primary) !important;
+            box-shadow: 0 0 18px rgba(14, 165, 233, 0.35);
+        }
         .top-actions, .leaderboard-actions, .nav-controls, .lifeline-container {
             display: flex;
             gap: 10px;
+        }
+        .lifeline-container {
+            margin-top: 14px;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
         }
         .quiz-header {
             display: flex;
@@ -168,6 +189,7 @@
             text-align: center;
             color: var(--muted);
             font-style: italic;
+            font-weight: 600;
             margin-bottom: 8px;
         }
         #q-text {
@@ -377,6 +399,9 @@
             .quiz-header, .top-actions, .leaderboard-actions, .nav-controls, .lifeline-container {
                 flex-direction: column;
             }
+            .lifeline-container {
+                grid-template-columns: 1fr;
+            }
             .summary-grid { grid-template-columns: 1fr; }
         }
     </style>
@@ -386,7 +411,7 @@
 
     <div id="scr-login">
         <h1>Quiz 12 - General</h1>
-        <p class="sub">Quiz Γενικών Γνώσεων Υψηλού Επιπέδου.</p>
+        <p class="sub">Quiz Γενικών Γνώσεων Υψηλού Επιπέδου</p>
         <input type="text" id="fname" placeholder="Όνομα">
         <input type="text" id="lname" placeholder="Επώνυμο">
         <button onclick="startQuiz()">Έναρξη Παιχνιδιού</button>
@@ -401,13 +426,8 @@
             <span>Ερώτηση <span id="q-num">1</span>/<span id="q-total"></span> · <span id="score-display">0</span> πόντοι</span>
         </div>
 
-        <div class="lifeline-container">
-            <button id="btn-5050" class="secondary" onclick="use5050()">50:50</button>
-            <button id="btn-audience" class="secondary" onclick="useAudience()">Κοινό</button>
-        </div>
-
         <div class="timer-info">
-            <span id="timer-count" class="timer-count">15s</span>
+            <span id="timer-count" class="timer-count">45s</span>
         </div>
         <div id="timer-wrap"><div id="timer-bar"></div></div>
 
@@ -418,6 +438,10 @@
         <div id="q-hint"></div>
         <h2 id="q-text"></h2>
         <div id="options-box"></div>
+        <div class="lifeline-container">
+            <button id="btn-5050" class="secondary" onclick="use5050()">50:50</button>
+            <button id="btn-audience" class="secondary" onclick="useAudience()">Κοινό</button>
+        </div>
         <div id="rationale-box" class="hidden"></div>
 
         <div class="nav-controls">
@@ -448,7 +472,7 @@
 
     <div id="scr-leaderboard" class="hidden">
         <h1>Leaderboard</h1>
-        <p class="leaderboard-note">Top Players.</p>
+        <p class="leaderboard-note">Top Players</p>
         <div class="table-wrap">
             <table>
                 <thead>
@@ -485,7 +509,7 @@
 const QUIZ_TITLE = 'Quiz 12';
 const FIREBASE_SDK_VERSION = '12.7.0';
 const FIREBASE_COLLECTION = 'quiz12_leaderboard';
-const QUESTION_TIME = 15;
+const QUESTION_TIME = 45;
 const ADMIN_CONFIG = window.QUIZ_ADMIN || { username: '', password: '' };
 
 const questions = window.QUIZ12_QUESTIONS;
@@ -867,7 +891,7 @@ function loadQuestion() {
 
     document.getElementById('q-num').textContent = cur + 1;
     document.getElementById('q-text').textContent = q.q;
-    document.getElementById('q-hint').textContent = q.h || '';
+    document.getElementById('q-hint').textContent = q.h ? `💡 Υπόδειξη: ${q.h}` : '';
 
     const imgCont = document.getElementById('q-image-container');
     const imgEl = document.getElementById('q-image');
@@ -878,7 +902,9 @@ function loadQuestion() {
         imgCont.classList.add('hidden');
     }
 
-    document.getElementById('btn-prev').disabled = cur === 0;
+    const btnPrev = document.getElementById('btn-prev');
+    btnPrev.disabled = cur === 0;
+    btnPrev.classList.toggle('prev-active', cur > 0);
     const btnNext = document.getElementById('btn-next');
     btnNext.disabled = true;
     btnNext.classList.remove('next-active');
@@ -982,17 +1008,31 @@ function useAudience() {
     const q = questions[cur];
     const btns = [...document.querySelectorAll('.option-btn')];
     const visible = btns.map((btn, i) => ({ btn, i })).filter(x => !x.btn.classList.contains('hidden-by-5050'));
-    const correctPct = Math.floor(Math.random() * 25) + 60;
-    const others = visible.filter(x => x.i !== q.a);
-    let leftover = 100 - correctPct;
+    const correctPct = Math.floor(Math.random() * 5) + 32;
+    const rivals = visible.filter(x => x.i !== q.a);
+    const rivalLeader = rivals[Math.floor(Math.random() * rivals.length)];
+    let rivalPct = Math.floor(Math.random() * 5) + 30;
 
-    others.forEach(({ btn }, index) => {
-        const p = index === others.length - 1 ? leftover : Math.min(Math.floor(Math.random() * leftover), leftover);
+    if (rivalPct >= correctPct) {
+        rivalPct = Math.max(28, correctPct - (Math.floor(Math.random() * 2) + 1));
+    }
+
+    let leftover = 100 - correctPct - rivalPct;
+    const remainingRivals = rivals.filter(x => x.i !== rivalLeader.i);
+
+    remainingRivals.forEach(({ btn }, index) => {
+        const p = index === remainingRivals.length - 1
+            ? leftover
+            : Math.max(0, Math.min(Math.floor(Math.random() * Math.max(1, leftover - 8)), leftover));
         leftover -= p;
         const pct = btn.querySelector('.audience-pct');
         pct.textContent = `${p}%`;
         pct.style.display = 'inline';
     });
+
+    const rivalPctEl = rivalLeader.btn.querySelector('.audience-pct');
+    rivalPctEl.textContent = `${rivalPct}%`;
+    rivalPctEl.style.display = 'inline';
 
     const correctBtn = btns[q.a].querySelector('.audience-pct');
     correctBtn.textContent = `${correctPct}%`;

@@ -173,6 +173,77 @@
         .player-profile-banner strong {
             color: var(--accent);
         }
+        .profile-editor {
+            margin-top: 0.35rem;
+            padding-top: 0.35rem;
+            border-top: 1px solid rgba(148, 163, 184, 0.18);
+            display: grid;
+            gap: 8px;
+        }
+        .profile-editor.hidden {
+            display: none !important;
+        }
+        .profile-editor input {
+            margin-bottom: 0;
+            padding: 10px 12px;
+        }
+        .profile-editor-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .profile-editor-status {
+            color: var(--muted);
+            font-size: 0.82rem;
+            line-height: 1.4;
+        }
+        .player-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .player-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            background: rgba(15, 23, 42, 0.9);
+            flex: 0 0 auto;
+        }
+        .player-avatar-fallback {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(14, 165, 233, 0.16);
+            color: #e2e8f0;
+            font-size: 0.78rem;
+            font-weight: 800;
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            flex: 0 0 auto;
+        }
+        .player-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+        .player-name {
+            font-weight: 700;
+            color: var(--text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .player-nickname {
+            color: var(--muted);
+            font-size: 0.78rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
         input, button {
             width: 100%;
             border-radius: 12px;
@@ -533,8 +604,20 @@
                 <button class="salmon-btn" onclick="loginMainAccount()">Login</button>
                 <button class="google-btn" onclick="loginMainWithGoogle()">Google</button>
             </div>
+            <button class="secondary hidden" id="btn-main-edit-profile" onclick="toggleMainProfileEditor()">Επεξεργασία Προφίλ</button>
             <button class="secondary hidden" id="btn-main-logout" onclick="logoutMainAccount()">Logout</button>
             <div id="main-auth-status" class="auth-status-mini">Συνδέσου για να παίξεις με το αποθηκευμένο προφίλ σου χωρίς να ξαναγράψεις στοιχεία.</div>
+            <div id="main-profile-editor" class="profile-editor hidden">
+                <input id="main-profile-first" type="text" placeholder="Όνομα">
+                <input id="main-profile-last" type="text" placeholder="Επώνυμο">
+                <input id="main-profile-nickname" type="text" placeholder="Nickname">
+                <input id="main-profile-photo" type="file" accept="image/*">
+                <div class="profile-editor-actions">
+                    <button onclick="saveMainProfile()">Αποθήκευση</button>
+                    <button class="secondary" onclick="toggleMainProfileEditor(false)">Κλείσιμο</button>
+                </div>
+                <div id="main-profile-editor-status" class="profile-editor-status">Μπορείς να αλλάξεις όνομα, nickname και φωτογραφία προφίλ.</div>
+            </div>
         </div>
         <h1>Quiz 12 - General</h1>
         <p class="sub">Quiz Γενικών Γνώσεων Υψηλού Επιπέδου</p>
@@ -676,6 +759,7 @@ let firebaseAuth = null;
 let authApi = null;
 let currentAuthUser = null;
 let currentAuthProfile = null;
+let mainProfileEditorOpen = false;
 let selectedEntryId = null;
 let adminUnlocked = sessionStorage.getItem('quiz11_admin_unlocked') === 'true';
 let leaderboardSort = { key: 'score', direction: 'desc' };
@@ -734,16 +818,69 @@ function deriveProfileFromAuth(userAccount) {
         id: userAccount.uid,
         firstName,
         lastName,
-        nickname: display || emailName
+        nickname: display || emailName,
+        photoUrl: userAccount?.photoURL || ''
     };
 }
+
+function getInitials(name) {
+    return (name || 'P')
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map(part => part[0]?.toUpperCase() || '')
+        .join('') || 'P';
+}
+
+function renderPlayerCell(entry) {
+    const fullName = entry.name || `${entry.firstName || ''} ${entry.lastName || ''}`.trim() || 'Παίκτης';
+    const nickname = entry.nickname ? `@${entry.nickname}` : '';
+    const avatar = entry.photoUrl
+        ? `<img class="player-avatar" src="${entry.photoUrl}" alt="${fullName}">`
+        : `<span class="player-avatar-fallback">${getInitials(fullName)}</span>`;
+    return `
+        <div class="player-cell">
+            ${avatar}
+            <div class="player-meta">
+                <span class="player-name">${fullName}</span>
+                ${nickname ? `<span class="player-nickname">${nickname}</span>` : ''}
+            </div>
+        </div>
+    `;
+}
+
+function populateMainProfileEditor() {
+    if (!currentAuthProfile) return;
+    document.getElementById('main-profile-first').value = currentAuthProfile.firstName || '';
+    document.getElementById('main-profile-last').value = currentAuthProfile.lastName || '';
+    document.getElementById('main-profile-nickname').value = currentAuthProfile.nickname || '';
+    document.getElementById('main-profile-photo').value = '';
+}
+
+function fileToDataUrl(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : '');
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+window.toggleMainProfileEditor = function toggleMainProfileEditor(forceState) {
+    const editor = document.getElementById('main-profile-editor');
+    if (!editor || !currentAuthProfile) return;
+    mainProfileEditorOpen = typeof forceState === 'boolean' ? forceState : !mainProfileEditorOpen;
+    editor.classList.toggle('hidden', !mainProfileEditorOpen);
+    if (mainProfileEditorOpen) populateMainProfileEditor();
+};
 
 function updateMainAuthUi() {
     const manualFields = document.getElementById('manual-player-fields');
     const profileBanner = document.getElementById('main-profile-banner');
     const status = document.getElementById('main-auth-status');
     const logoutBtn = document.getElementById('btn-main-logout');
-    if (!manualFields || !profileBanner || !status || !logoutBtn) return;
+    const editBtn = document.getElementById('btn-main-edit-profile');
+    if (!manualFields || !profileBanner || !status || !logoutBtn || !editBtn) return;
 
     if (currentAuthProfile) {
         manualFields.classList.add('hidden');
@@ -751,12 +888,16 @@ function updateMainAuthUi() {
         profileBanner.innerHTML = `<strong>Παίζεις ως:</strong> ${currentAuthProfile.nickname} · ${currentAuthProfile.firstName} ${currentAuthProfile.lastName}`;
         status.textContent = 'Το προφίλ σου είναι συνδεδεμένο. Μπορείς να ξεκινήσεις αμέσως παιχνίδι ή μονομαχία.';
         logoutBtn.classList.remove('hidden');
+        editBtn.classList.remove('hidden');
     } else {
         manualFields.classList.remove('hidden');
         profileBanner.classList.add('hidden');
         profileBanner.textContent = '';
         status.textContent = 'Συνδέσου για να παίξεις με το αποθηκευμένο προφίλ σου χωρίς να ξαναγράψεις στοιχεία.';
         logoutBtn.classList.add('hidden');
+        editBtn.classList.add('hidden');
+        mainProfileEditorOpen = false;
+        document.getElementById('main-profile-editor')?.classList.add('hidden');
     }
 }
 
@@ -822,6 +963,46 @@ window.loginMainWithGoogle = async function loginMainWithGoogle() {
 
 window.logoutMainAccount = async function logoutMainAccount() {
     await authApi.signOut(firebaseAuth);
+};
+
+window.saveMainProfile = async function saveMainProfile() {
+    if (!firebaseReady || !currentAuthUser) return;
+    const status = document.getElementById('main-profile-editor-status');
+    const firstName = document.getElementById('main-profile-first').value.trim();
+    const lastName = document.getElementById('main-profile-last').value.trim();
+    const nickname = document.getElementById('main-profile-nickname').value.trim();
+    const photoFile = document.getElementById('main-profile-photo').files?.[0];
+
+    if (firstName.length < 2 || lastName.length < 2 || nickname.length < 2) {
+        status.textContent = 'Συμπλήρωσε σωστά όνομα, επώνυμο και nickname.';
+        return;
+    }
+
+    try {
+        let photoUrl = currentAuthProfile?.photoUrl || '';
+        if (photoFile) {
+            photoUrl = await fileToDataUrl(photoFile);
+        }
+
+        const nextProfile = {
+            id: currentAuthUser.uid,
+            firstName,
+            lastName,
+            nickname,
+            photoUrl,
+            updatedAt: new Date().toISOString()
+        };
+
+        await firebaseApi.setDoc(firebaseApi.doc(firebaseDb, PROFILE_COLLECTION, currentAuthUser.uid), nextProfile, { merge: true });
+        currentAuthProfile = { ...currentAuthProfile, ...nextProfile };
+        document.getElementById('fname').value = firstName;
+        document.getElementById('lname').value = lastName;
+        updateMainAuthUi();
+        status.textContent = 'Το προφίλ σου αποθηκεύτηκε.';
+        await renderLeaderboard(selectedEntryId || user.id);
+    } catch (error) {
+        status.textContent = `Σφάλμα αποθήκευσης: ${error.message}`;
+    }
 };
 
 function createAttemptId() {
@@ -1020,6 +1201,11 @@ function normalizeRemoteEntries(entries) {
         return {
             id: entry.id || createAttemptId(),
             name: `${entry.first_name || ''} ${entry.last_name || ''}`.trim(),
+            firstName: entry.first_name || '',
+            lastName: entry.last_name || '',
+            nickname: entry.nickname || '',
+            photoUrl: entry.photo_url || '',
+            authUid: entry.auth_uid || '',
             score: Number(entry.score || entry.high_score || 0),
             acc: `${accValue}%`,
             accValue,
@@ -1043,6 +1229,9 @@ async function submitRemoteScore(payload) {
         player_id: normalizePlayerId(payload.first_name, payload.last_name),
         first_name: payload.first_name,
         last_name: payload.last_name,
+        nickname: payload.nickname || '',
+        photo_url: payload.photo_url || '',
+        auth_uid: payload.auth_uid || '',
         score: Number(payload.score || 0),
         total_correct: Number(payload.correct || 0),
         total_wrong: Number(payload.wrong || 0),
@@ -1068,7 +1257,7 @@ function renderLeaderboardEntries(entries, targetId = user.id) {
     document.getElementById('lb-body').innerHTML = previewRows.length ? previewRows.map((p, i) => `
         <tr class="${p.id === targetId ? 'highlight' : ''}">
             <td><span class="rank-badge">${medals[i] || (i + 1)}</span></td>
-            <td>${p.name}</td>
+            <td>${renderPlayerCell(p)}</td>
             <td>${p.score}</td>
             <td>${p.acc}</td>
             <td>${formatDate(p.lastPlayed)}</td>
@@ -1077,7 +1266,7 @@ function renderLeaderboardEntries(entries, targetId = user.id) {
     document.getElementById('leaderboard-full-body').innerHTML = entries.length ? entries.map((p, i) => `
         <tr class="entry-row ${p.id === targetId ? 'highlight' : ''}" onclick="showEntryDetails('${p.id}')">
             <td><span class="rank-badge">${medals[i] || (i + 1)}</span></td>
-            <td>${p.name}</td>
+            <td>${renderPlayerCell(p)}</td>
             <td>${p.score}</td>
             <td>${p.acc}</td>
             <td>${formatDate(p.lastPlayed)}</td>
@@ -1463,6 +1652,9 @@ async function endQuiz() {
         await submitRemoteScore({
             first_name: user.f,
             last_name: user.l,
+            nickname: currentAuthProfile?.nickname || '',
+            photo_url: currentAuthProfile?.photoUrl || '',
+            auth_uid: currentAuthUser?.uid || '',
             score,
             correct,
             wrong: questions.length - correct,

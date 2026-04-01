@@ -196,6 +196,37 @@
             font-size: 0.82rem;
             line-height: 1.4;
         }
+        .avatar-choice-label {
+            color: var(--muted);
+            font-size: 0.82rem;
+            line-height: 1.35;
+        }
+        .avatar-picker {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 8px;
+        }
+        .avatar-choice {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: #172234;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+        }
+        .avatar-choice:hover {
+            transform: translateY(-1px);
+            border-color: rgba(14, 165, 233, 0.45);
+        }
+        .avatar-choice.active {
+            border-color: rgba(14, 165, 233, 0.72);
+            box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2) inset;
+        }
         .player-cell {
             display: flex;
             align-items: center;
@@ -611,6 +642,8 @@
                 <input id="main-profile-first" type="text" placeholder="Όνομα">
                 <input id="main-profile-last" type="text" placeholder="Επώνυμο">
                 <input id="main-profile-nickname" type="text" placeholder="Nickname">
+                <div class="avatar-choice-label">Διάλεξε ένα από τα default avatars ή ανέβασε δική σου φωτογραφία.</div>
+                <div id="main-default-avatar-picker" class="avatar-picker"></div>
                 <input id="main-profile-photo" type="file" accept="image/*">
                 <div class="profile-editor-actions">
                     <button onclick="saveMainProfile()">Αποθήκευση</button>
@@ -737,6 +770,28 @@ const DUEL_MODE_URL = 'https://vapostolakos.github.io/quiz12-duel/';
 const ADMIN_CONFIG = window.QUIZ_ADMIN || { username: '', password: '' };
 const QUESTION_POOL = Array.isArray(window.QUIZ12_QUESTIONS) ? window.QUIZ12_QUESTIONS : [];
 const QUESTIONS_PER_GAME = 10;
+const DEFAULT_AVATAR_OPTIONS = [
+    { key: 'man-1', emoji: '👨', bg: '#1d4ed8' },
+    { key: 'man-2', emoji: '🧔', bg: '#0f766e' },
+    { key: 'man-3', emoji: '👨‍🦱', bg: '#7c3aed' },
+    { key: 'man-4', emoji: '👨‍💼', bg: '#b45309' },
+    { key: 'man-5', emoji: '👨‍🔬', bg: '#0369a1' },
+    { key: 'woman-1', emoji: '👩', bg: '#db2777' },
+    { key: 'woman-2', emoji: '👩‍🦰', bg: '#dc2626' },
+    { key: 'woman-3', emoji: '👩‍💼', bg: '#9333ea' },
+    { key: 'woman-4', emoji: '👩‍🔬', bg: '#0891b2' },
+    { key: 'woman-5', emoji: '👩‍🦱', bg: '#c2410c' },
+    { key: 'boy-1', emoji: '👦', bg: '#2563eb' },
+    { key: 'boy-2', emoji: '🧒', bg: '#0d9488' },
+    { key: 'boy-3', emoji: '👦🏽', bg: '#4f46e5' },
+    { key: 'boy-4', emoji: '🧑‍🚀', bg: '#7c2d12' },
+    { key: 'boy-5', emoji: '🧑‍💻', bg: '#166534' },
+    { key: 'girl-1', emoji: '👧', bg: '#ea580c' },
+    { key: 'girl-2', emoji: '👧🏽', bg: '#be185d' },
+    { key: 'girl-3', emoji: '🧒🏻', bg: '#7e22ce' },
+    { key: 'girl-4', emoji: '🧑‍🎨', bg: '#0f766e' },
+    { key: 'girl-5', emoji: '🧑‍🎓', bg: '#334155' }
+];
 const FIFTY_FIFTY_PENALTY = 0.5;
 const AUDIENCE_PENALTY = 0.75;
 const SWAP_PENALTY = 0.25;
@@ -849,12 +904,40 @@ function renderPlayerCell(entry) {
     `;
 }
 
+function makeDefaultAvatarUrl(option) {
+    const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+            <rect width="160" height="160" rx="36" fill="${option.bg}"/>
+            <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="76">${option.emoji}</text>
+        </svg>
+    `.trim();
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
+function renderMainDefaultAvatarPicker() {
+    const mount = document.getElementById('main-default-avatar-picker');
+    if (!mount) return;
+    mount.innerHTML = DEFAULT_AVATAR_OPTIONS.map(option => {
+        const active = (currentAuthProfile?.photoUrl || '') === makeDefaultAvatarUrl(option) ? 'active' : '';
+        return `<button type="button" class="avatar-choice ${active}" onclick="selectMainDefaultAvatar('${option.key}')">${option.emoji}</button>`;
+    }).join('');
+}
+
+window.selectMainDefaultAvatar = function selectMainDefaultAvatar(key) {
+    const option = DEFAULT_AVATAR_OPTIONS.find(item => item.key === key);
+    if (!option) return;
+    currentAuthProfile = { ...(currentAuthProfile || {}), photoUrl: makeDefaultAvatarUrl(option) };
+    document.getElementById('main-profile-photo').value = '';
+    renderMainDefaultAvatarPicker();
+};
+
 function populateMainProfileEditor() {
     if (!currentAuthProfile) return;
     document.getElementById('main-profile-first').value = currentAuthProfile.firstName || '';
     document.getElementById('main-profile-last').value = currentAuthProfile.lastName || '';
     document.getElementById('main-profile-nickname').value = currentAuthProfile.nickname || '';
     document.getElementById('main-profile-photo').value = '';
+    renderMainDefaultAvatarPicker();
 }
 
 function fileToDataUrl(file) {
@@ -998,6 +1081,7 @@ window.saveMainProfile = async function saveMainProfile() {
         document.getElementById('fname').value = firstName;
         document.getElementById('lname').value = lastName;
         updateMainAuthUi();
+        renderMainDefaultAvatarPicker();
         status.textContent = 'Το προφίλ σου αποθηκεύτηκε.';
         await renderLeaderboard(selectedEntryId || user.id);
     } catch (error) {

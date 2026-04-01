@@ -103,6 +103,19 @@
             color: var(--muted);
             margin-bottom: 1.25rem;
         }
+        .intro-guide {
+            background: rgba(15, 23, 42, 0.88);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 14px 16px;
+            margin: 0 0 1rem;
+            color: #cbd5e1;
+            line-height: 1.65;
+            font-size: 0.95rem;
+        }
+        .intro-guide strong {
+            color: var(--accent);
+        }
         input, button {
             width: 100%;
             border-radius: 12px;
@@ -143,7 +156,7 @@
         .lifeline-container {
             margin-top: 14px;
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(3, minmax(0, 1fr));
         }
         .quiz-header {
             display: flex;
@@ -293,6 +306,24 @@
         }
         .entry-row { cursor: pointer; }
         .entry-row:hover td { background: rgba(14, 165, 233, 0.08); }
+        .delete-cell {
+            width: 74px;
+            text-align: right;
+        }
+        .delete-entry-btn {
+            display: none;
+            width: auto;
+            padding: 8px 10px;
+            border-radius: 10px;
+            background: #b91c1c;
+            font-size: 0.8rem;
+            line-height: 1;
+        }
+        .delete-entry-btn.visible {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
         .details-panel {
             margin-top: 16px;
             border: 1px solid var(--border);
@@ -370,6 +401,15 @@
             filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.35));
             animation: sad-pop 1.2s ease-out forwards;
         }
+        .help-badge {
+            position: fixed;
+            left: 50%;
+            top: 24%;
+            transform: translateX(-50%) scale(0.7);
+            font-size: clamp(3.5rem, 8vw, 5rem);
+            filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.35));
+            animation: sad-pop 1.2s ease-out forwards;
+        }
         @keyframes confetti-fall {
             0% {
                 transform: translateY(0) rotate(0deg);
@@ -412,6 +452,12 @@
     <div id="scr-login">
         <h1>Quiz 12 - General</h1>
         <p class="sub">Quiz Γενικών Γνώσεων Υψηλού Επιπέδου</p>
+        <div class="intro-guide">
+            <strong>Οδηγίες:</strong> Σε κάθε ερώτηση υπάρχει υπόδειξη και διαθέσιμες βοήθειες.
+            Το <strong>50:50</strong> κοστίζει το 50% της αξίας της ερώτησης, το <strong>Κοινό</strong> κοστίζει 75%
+            και η <strong>Αλλαγή Ερώτησης</strong> κοστίζει 25%. Οι ποινές αφαιρούνται αμέσως από το σκορ σου, οπότε
+            μπορείς να πέσεις και σε αρνητικό σκορ αν χρησιμοποιήσεις βοήθεια πολύ νωρίς.
+        </div>
         <input type="text" id="fname" placeholder="Όνομα">
         <input type="text" id="lname" placeholder="Επώνυμο">
         <button onclick="startQuiz()">Έναρξη Παιχνιδιού</button>
@@ -439,8 +485,9 @@
         <h2 id="q-text"></h2>
         <div id="options-box"></div>
         <div class="lifeline-container">
-            <button id="btn-5050" class="secondary" onclick="use5050()">50:50</button>
-            <button id="btn-audience" class="secondary" onclick="useAudience()">Κοινό</button>
+            <button id="btn-5050" class="secondary" onclick="use5050()">50:50 (-50%)</button>
+            <button id="btn-audience" class="secondary" onclick="useAudience()">Κοινό (-75%)</button>
+            <button id="btn-swap" class="secondary" onclick="useSwapQuestion()">Αλλαγή (-25%)</button>
         </div>
         <div id="rationale-box" class="hidden"></div>
 
@@ -482,6 +529,7 @@
                         <th class="sortable" onclick="changeSort('score')">Score</th>
                         <th class="sortable" onclick="changeSort('accValue')">Accuracy</th>
                         <th class="sortable" onclick="changeSort('lastPlayedTs')">Last Played</th>
+                        <th class="delete-cell">Admin</th>
                     </tr>
                 </thead>
                 <tbody id="leaderboard-full-body"></tbody>
@@ -511,15 +559,22 @@ const FIREBASE_SDK_VERSION = '12.7.0';
 const FIREBASE_COLLECTION = 'quiz12_leaderboard';
 const QUESTION_TIME = 45;
 const ADMIN_CONFIG = window.QUIZ_ADMIN || { username: '', password: '' };
-
-const questions = window.QUIZ12_QUESTIONS;
+const QUESTION_POOL = Array.isArray(window.QUIZ12_QUESTIONS) ? window.QUIZ12_QUESTIONS : [];
+const QUESTIONS_PER_GAME = 10;
+const FIFTY_FIFTY_PENALTY = 0.5;
+const AUDIENCE_PENALTY = 0.75;
+const SWAP_PENALTY = 0.25;
+const AUDIENCE_PATTERN_KEY = 'quiz12_audience_pattern_count';
 
 const LEADERBOARD_KEY = FIREBASE_COLLECTION;
+let questions = [];
+let reserveQuestions = [];
 let user = { f: "", l: "", id: "" };
 let cur = 0, score = 0, correct = 0;
 let timeLeft = QUESTION_TIME, timer = null;
 let answersStatus = [];
 let lifeline5050Used = false, lifelineAudienceUsed = false;
+let lifelineSwapUsed = false;
 let firebaseReady = false;
 let firebaseDb = null;
 let firebaseApi = null;
@@ -562,6 +617,44 @@ function updateAdminUi() {
 
 function createAttemptId() {
     return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function shuffleArray(items) {
+    const copy = [...items];
+    for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+}
+
+function initializeQuestionSet() {
+    const shuffled = shuffleArray(QUESTION_POOL);
+    const totalQuestions = Math.min(QUESTIONS_PER_GAME, shuffled.length);
+    questions = shuffled.slice(0, totalQuestions);
+    reserveQuestions = shuffled.slice(totalQuestions);
+}
+
+function getCurrentQuestionPoints() {
+    return 100 + Math.round(timeLeft * 10);
+}
+
+function applyLifelinePenalty(rate) {
+    const penalty = Math.round(getCurrentQuestionPoints() * rate);
+    score -= penalty;
+    document.getElementById('score-display').textContent = score;
+    return penalty;
+}
+
+function getAudiencePatternCount() {
+    const raw = Number(localStorage.getItem(AUDIENCE_PATTERN_KEY) || 0);
+    return Number.isFinite(raw) ? raw : 0;
+}
+
+function bumpAudiencePatternCount() {
+    const next = getAudiencePatternCount() + 1;
+    localStorage.setItem(AUDIENCE_PATTERN_KEY, String(next));
+    return next;
 }
 
 function buildAnswerReview() {
@@ -658,6 +751,16 @@ function showSadFace() {
     setTimeout(() => badge.remove(), 1300);
 }
 
+function showHelpBadge() {
+    const layer = document.getElementById('effect-layer');
+    if (!layer) return;
+    const badge = document.createElement('div');
+    badge.className = 'help-badge';
+    badge.textContent = '🩹';
+    layer.appendChild(badge);
+    setTimeout(() => badge.remove(), 1300);
+}
+
 function formatDate(ts) {
     if (!ts) return '-';
     return new Date(ts).toLocaleString('el-GR', {
@@ -716,6 +819,10 @@ async function resetRemoteLeaderboard() {
     await Promise.all(snapshot.docs.map(item => firebaseApi.deleteDoc(firebaseApi.doc(firebaseDb, FIREBASE_COLLECTION, item.id))));
 }
 
+async function deleteRemoteEntry(entryId) {
+    await firebaseApi.deleteDoc(firebaseApi.doc(firebaseDb, FIREBASE_COLLECTION, entryId));
+}
+
 function renderLeaderboardEntries(entries, targetId = user.id) {
     const medals = ['🥇', '🥈', '🥉'];
     const previewRows = entries.slice(0, Math.min(entries.length, 10));
@@ -736,6 +843,9 @@ function renderLeaderboardEntries(entries, targetId = user.id) {
             <td>${p.score}</td>
             <td>${p.acc}</td>
             <td>${formatDate(p.lastPlayed)}</td>
+            <td class="delete-cell">
+                <button class="delete-entry-btn ${adminUnlocked ? 'visible' : ''}" onclick="event.stopPropagation(); deleteLeaderboardEntry('${p.id}')">🗑</button>
+            </td>
         </tr>`).join('') : '<tr><td colspan="5">Δεν υπάρχουν παίκτες ακόμα.</td></tr>';
 
     if (!selectedEntryId && entries.length) {
@@ -823,6 +933,8 @@ function resetQuizState() {
     answersStatus = [];
     lifeline5050Used = false;
     lifelineAudienceUsed = false;
+    lifelineSwapUsed = false;
+    initializeQuestionSet();
 }
 
 function show(id) {
@@ -842,10 +954,12 @@ function startQuiz() {
     const f = document.getElementById('fname').value.trim();
     const l = document.getElementById('lname').value.trim();
     if (f.length < 2 || l.length < 2) { alert('Συμπλήρωσε τα στοιχεία σου.'); return; }
+    if (!QUESTION_POOL.length) { alert('Δεν υπάρχουν διαθέσιμες ερωτήσεις για το quiz.'); return; }
     resetQuizState();
     user = { f, l, id: normalizePlayerId(f, l) };
     document.getElementById('user-display').textContent = `👤 ${f} ${l}`;
     document.getElementById('q-total').textContent = questions.length;
+    document.getElementById('score-display').textContent = '0';
     show('scr-quiz');
     loadQuestion();
 }
@@ -883,6 +997,26 @@ async function clearLeaderboard() {
     renderLeaderboardEntries([], user.id);
 }
 
+async function deleteLeaderboardEntry(entryId) {
+    if (!adminUnlocked) {
+        alert('Μόνο ο διαχειριστής μπορεί να διαγράψει εγγραφές.');
+        return;
+    }
+    if (!confirm('Θέλεις να διαγραφεί αυτή η συμμετοχή;')) return;
+
+    if (firebaseReady) {
+        await deleteRemoteEntry(entryId);
+        if (selectedEntryId === entryId) selectedEntryId = null;
+        await renderLeaderboard();
+        return;
+    }
+
+    const filtered = getLeaderboard().filter(entry => entry.id !== entryId);
+    saveLeaderboard(filtered);
+    if (selectedEntryId === entryId) selectedEntryId = null;
+    renderLeaderboardEntries(sortLeaderboard(filtered), user.id);
+}
+
 function loadQuestion() {
     clearInterval(timer);
     const q = questions[cur];
@@ -910,6 +1044,7 @@ function loadQuestion() {
     btnNext.classList.remove('next-active');
     document.getElementById('btn-5050').disabled = lifeline5050Used || isAnswered;
     document.getElementById('btn-audience').disabled = lifelineAudienceUsed || isAnswered;
+    document.getElementById('btn-swap').disabled = lifelineSwapUsed || isAnswered || reserveQuestions.length === 0;
     document.getElementById('rationale-box').classList.add('hidden');
 
     const box = document.getElementById('options-box');
@@ -967,7 +1102,7 @@ function checkAnswer(idx) {
 
     if (isCorrect) {
         btns[idx].classList.add('correct');
-        score += 100 + Math.round(timeLeft * 10);
+        score += getCurrentQuestionPoints();
         correct++;
         launchConfetti();
     } else {
@@ -989,8 +1124,10 @@ function showRationale(text) {
 }
 
 function use5050() {
-    if (lifeline5050Used) return;
+    if (lifeline5050Used || answersStatus[cur] !== undefined) return;
     lifeline5050Used = true;
+    applyLifelinePenalty(FIFTY_FIFTY_PENALTY);
+    showHelpBadge();
     document.getElementById('btn-5050').disabled = true;
     const q = questions[cur];
     const btns = [...document.querySelectorAll('.option-btn')];
@@ -1002,20 +1139,24 @@ function use5050() {
 }
 
 function useAudience() {
-    if (lifelineAudienceUsed) return;
+    if (lifelineAudienceUsed || answersStatus[cur] !== undefined) return;
     lifelineAudienceUsed = true;
+    applyLifelinePenalty(AUDIENCE_PENALTY);
+    showHelpBadge();
     document.getElementById('btn-audience').disabled = true;
     const q = questions[cur];
     const btns = [...document.querySelectorAll('.option-btn')];
     const visible = btns.map((btn, i) => ({ btn, i })).filter(x => !x.btn.classList.contains('hidden-by-5050'));
-    const correctPct = Math.floor(Math.random() * 5) + 32;
     const rivals = visible.filter(x => x.i !== q.a);
     const rivalLeader = rivals[Math.floor(Math.random() * rivals.length)];
-    let rivalPct = Math.floor(Math.random() * 5) + 30;
+    const audienceCount = bumpAudiencePatternCount();
+    const shouldMislead = audienceCount % 3 === 0;
+    let leaderPct = Math.floor(Math.random() * 3) + 35;
+    let runnerUpPct = leaderPct - (Math.floor(Math.random() * 2) + 1);
+    if (runnerUpPct < 32) runnerUpPct = 32;
 
-    if (rivalPct >= correctPct) {
-        rivalPct = Math.max(28, correctPct - (Math.floor(Math.random() * 2) + 1));
-    }
+    let correctPct = shouldMislead ? runnerUpPct : leaderPct;
+    let rivalPct = shouldMislead ? leaderPct : runnerUpPct;
 
     let leftover = 100 - correctPct - rivalPct;
     const remainingRivals = rivals.filter(x => x.i !== rivalLeader.i);
@@ -1023,7 +1164,7 @@ function useAudience() {
     remainingRivals.forEach(({ btn }, index) => {
         const p = index === remainingRivals.length - 1
             ? leftover
-            : Math.max(0, Math.min(Math.floor(Math.random() * Math.max(1, leftover - 8)), leftover));
+            : Math.max(0, Math.min(Math.floor(Math.random() * Math.max(1, leftover - 4)), leftover));
         leftover -= p;
         const pct = btn.querySelector('.audience-pct');
         pct.textContent = `${p}%`;
@@ -1037,6 +1178,19 @@ function useAudience() {
     const correctBtn = btns[q.a].querySelector('.audience-pct');
     correctBtn.textContent = `${correctPct}%`;
     correctBtn.style.display = 'inline';
+}
+
+function useSwapQuestion() {
+    if (lifelineSwapUsed || answersStatus[cur] !== undefined || !reserveQuestions.length) return;
+    lifelineSwapUsed = true;
+    applyLifelinePenalty(SWAP_PENALTY);
+    showHelpBadge();
+    const nextQuestion = reserveQuestions.shift();
+    if (!nextQuestion) return;
+
+    questions[cur] = nextQuestion;
+    document.getElementById('btn-swap').disabled = true;
+    loadQuestion();
 }
 
 function goNext() {

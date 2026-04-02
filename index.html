@@ -139,6 +139,9 @@
             font-size: 0.95rem;
             margin: 0;
         }
+        .auth-form.hidden {
+            display: none !important;
+        }
         .auth-mini-actions {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -162,6 +165,44 @@
             font-size: 0.88rem;
             line-height: 1.45;
         }
+        .auth-user-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: rgba(30, 41, 59, 0.78);
+        }
+        .auth-user-card.hidden {
+            display: none !important;
+        }
+        .auth-user-meta {
+            min-width: 0;
+        }
+        .auth-user-name {
+            font-weight: 800;
+            color: var(--accent);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .auth-user-sub {
+            color: var(--muted);
+            font-size: 0.8rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .audio-controls {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+        }
+        .audio-toggle.active {
+            background: #0f766e;
+            box-shadow: 0 0 14px rgba(16, 185, 129, 0.18);
+        }
         .player-profile-banner {
             margin: 0 0 1rem;
             background: rgba(15, 23, 42, 0.88);
@@ -172,6 +213,28 @@
         }
         .player-profile-banner strong {
             color: var(--accent);
+        }
+        .playing-as {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .playing-as-meta {
+            min-width: 0;
+        }
+        .playing-as-label {
+            color: var(--muted);
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+        .playing-as-name {
+            color: var(--accent);
+            font-weight: 800;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .profile-editor {
             margin-top: 0.35rem;
@@ -274,6 +337,16 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+        }
+        .player-nickname.primary {
+            color: var(--text);
+            font-size: 0.92rem;
+            font-weight: 800;
+        }
+        .player-name.secondary {
+            color: var(--muted);
+            font-size: 0.76rem;
+            font-weight: 600;
         }
         input, button {
             width: 100%;
@@ -633,16 +706,23 @@
     <div id="scr-login">
         <div class="login-auth-panel">
             <h3>Login / Δημιουργία Λογαριασμού</h3>
-            <input id="main-auth-email" type="email" placeholder="Email">
-            <input id="main-auth-password" type="password" placeholder="Password">
-            <div class="auth-mini-actions">
-                <button onclick="registerMainAccount()">Register</button>
-                <button class="salmon-btn" onclick="loginMainAccount()">Login</button>
-                <button class="google-btn" onclick="loginMainWithGoogle()">Google</button>
+            <div id="main-auth-form" class="auth-form">
+                <input id="main-auth-email" type="email" placeholder="Email">
+                <input id="main-auth-password" type="password" placeholder="Password">
+                <div class="auth-mini-actions">
+                    <button onclick="registerMainAccount()">Register</button>
+                    <button class="salmon-btn" onclick="loginMainAccount()">Login</button>
+                    <button class="google-btn" onclick="loginMainWithGoogle()">Google</button>
+                </div>
             </div>
+            <div id="main-auth-user-card" class="auth-user-card hidden"></div>
             <button class="secondary hidden" id="btn-main-edit-profile" onclick="toggleMainProfileEditor()">Επεξεργασία Προφίλ</button>
             <button class="secondary hidden" id="btn-main-logout" onclick="logoutMainAccount()">Logout</button>
             <div id="main-auth-status" class="auth-status-mini">Συνδέσου για να παίξεις με το αποθηκευμένο προφίλ σου χωρίς να ξαναγράψεις στοιχεία.</div>
+            <div class="audio-controls">
+                <button id="btn-sound-toggle" class="secondary audio-toggle" onclick="toggleSoundEffects()">Ήχοι: On</button>
+                <button id="btn-music-toggle" class="secondary audio-toggle" onclick="toggleMusic()">Μουσική: On</button>
+            </div>
             <div id="main-profile-editor" class="profile-editor hidden">
                 <input id="main-profile-first" type="text" placeholder="Όνομα">
                 <input id="main-profile-last" type="text" placeholder="Επώνυμο">
@@ -823,6 +903,11 @@ let mainProfileEditorOpen = false;
 let selectedEntryId = null;
 let adminUnlocked = sessionStorage.getItem('quiz11_admin_unlocked') === 'true';
 let leaderboardSort = { key: 'score', direction: 'desc' };
+let soundEffectsEnabled = localStorage.getItem('quiz12_sound_enabled') !== 'false';
+let musicEnabled = localStorage.getItem('quiz12_music_enabled') !== 'false';
+let audioContext = null;
+let audioUnlocked = false;
+let musicLoopTimer = null;
 
 function normalizePlayerId(firstName, lastName) {
     return `${firstName.trim().toLowerCase()}::${lastName.trim().toLowerCase()}`;
@@ -883,6 +968,19 @@ function deriveProfileFromAuth(userAccount) {
     };
 }
 
+function getPreferredDisplayName(entry = {}) {
+    const nickname = String(entry.nickname || '').trim();
+    if (nickname) return nickname;
+    const fullName = String(entry.name || `${entry.firstName || ''} ${entry.lastName || ''}`).trim();
+    return fullName || 'Παίκτης';
+}
+
+function getSecondaryDisplayName(entry = {}) {
+    const nickname = String(entry.nickname || '').trim();
+    if (nickname) return '';
+    return '';
+}
+
 function getInitials(name) {
     return (name || 'P')
         .split(/\s+/)
@@ -894,7 +992,8 @@ function getInitials(name) {
 
 function renderPlayerCell(entry) {
     const fullName = entry.name || `${entry.firstName || ''} ${entry.lastName || ''}`.trim() || 'Παίκτης';
-    const nickname = entry.nickname ? `@${entry.nickname}` : '';
+    const preferredName = getPreferredDisplayName(entry);
+    const secondaryName = getSecondaryDisplayName(entry);
     const avatar = entry.photoUrl
         ? `<img class="player-avatar" src="${entry.photoUrl}" alt="${fullName}">`
         : `<span class="player-avatar-fallback">${getInitials(fullName)}</span>`;
@@ -902,8 +1001,8 @@ function renderPlayerCell(entry) {
         <div class="player-cell">
             ${avatar}
             <div class="player-meta">
-                <span class="player-name">${fullName}</span>
-                ${nickname ? `<span class="player-nickname">${nickname}</span>` : ''}
+                <span class="${entry.nickname ? 'player-nickname primary' : 'player-name'}">${preferredName}</span>
+                ${secondaryName ? `<span class="player-name secondary">${secondaryName}</span>` : ''}
             </div>
         </div>
     `;
@@ -954,6 +1053,115 @@ function fileToDataUrl(file) {
     });
 }
 
+async function ensureAudioContext() {
+    if (audioContext) {
+        if (audioContext.state === 'suspended') {
+            await audioContext.resume();
+        }
+        audioUnlocked = true;
+        return audioContext;
+    }
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return null;
+    audioContext = new AudioCtx();
+    if (audioContext.state === 'suspended') {
+        await audioContext.resume();
+    }
+    audioUnlocked = true;
+    return audioContext;
+}
+
+function pulseTone(ctx, frequency, startAt, duration, type = 'sine', gainValue = 0.05) {
+    const oscillator = ctx.createOscillator();
+    const gain = ctx.createGain();
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(frequency, startAt);
+    gain.gain.setValueAtTime(0.0001, startAt);
+    gain.gain.exponentialRampToValueAtTime(gainValue, startAt + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, startAt + duration);
+    oscillator.connect(gain).connect(ctx.destination);
+    oscillator.start(startAt);
+    oscillator.stop(startAt + duration + 0.02);
+}
+
+async function playSuccessSound() {
+    if (!soundEffectsEnabled) return;
+    const ctx = await ensureAudioContext();
+    if (!ctx) return;
+    const startAt = ctx.currentTime + 0.01;
+    pulseTone(ctx, 523.25, startAt, 0.14, 'triangle', 0.04);
+    pulseTone(ctx, 659.25, startAt + 0.11, 0.16, 'triangle', 0.045);
+    pulseTone(ctx, 783.99, startAt + 0.22, 0.2, 'triangle', 0.05);
+}
+
+async function playWrongSound() {
+    if (!soundEffectsEnabled) return;
+    const ctx = await ensureAudioContext();
+    if (!ctx) return;
+    const startAt = ctx.currentTime + 0.01;
+    pulseTone(ctx, 220, startAt, 0.16, 'sawtooth', 0.05);
+    pulseTone(ctx, 164.81, startAt + 0.12, 0.22, 'sawtooth', 0.045);
+}
+
+function stopBackgroundMusic() {
+    if (musicLoopTimer) {
+        clearTimeout(musicLoopTimer);
+        musicLoopTimer = null;
+    }
+}
+
+async function startBackgroundMusic() {
+    stopBackgroundMusic();
+    if (!musicEnabled) return;
+    const ctx = await ensureAudioContext();
+    if (!ctx) return;
+    const pattern = [261.63, 329.63, 392.0, 329.63, 293.66, 349.23, 440.0, 349.23];
+    let noteIndex = 0;
+    const loop = () => {
+        if (!musicEnabled || !audioContext) {
+            stopBackgroundMusic();
+            return;
+        }
+        const now = audioContext.currentTime + 0.02;
+        pulseTone(audioContext, pattern[noteIndex % pattern.length], now, 0.42, 'sine', 0.018);
+        pulseTone(audioContext, pattern[(noteIndex + 2) % pattern.length] / 2, now, 0.5, 'triangle', 0.009);
+        noteIndex++;
+        musicLoopTimer = setTimeout(loop, 520);
+    };
+    loop();
+}
+
+function updateAudioButtons() {
+    const soundBtn = document.getElementById('btn-sound-toggle');
+    const musicBtn = document.getElementById('btn-music-toggle');
+    if (soundBtn) {
+        soundBtn.textContent = `Ήχοι: ${soundEffectsEnabled ? 'On' : 'Off'}`;
+        soundBtn.classList.toggle('active', soundEffectsEnabled);
+    }
+    if (musicBtn) {
+        musicBtn.textContent = `Μουσική: ${musicEnabled ? 'On' : 'Off'}`;
+        musicBtn.classList.toggle('active', musicEnabled);
+    }
+}
+
+window.toggleSoundEffects = async function toggleSoundEffects() {
+    soundEffectsEnabled = !soundEffectsEnabled;
+    localStorage.setItem('quiz12_sound_enabled', String(soundEffectsEnabled));
+    updateAudioButtons();
+    if (soundEffectsEnabled) await playSuccessSound();
+};
+
+window.toggleMusic = async function toggleMusic() {
+    musicEnabled = !musicEnabled;
+    localStorage.setItem('quiz12_music_enabled', String(musicEnabled));
+    updateAudioButtons();
+    if (musicEnabled) {
+        await startBackgroundMusic();
+    } else {
+        stopBackgroundMusic();
+    }
+};
+
 window.toggleMainProfileEditor = function toggleMainProfileEditor(forceState) {
     const editor = document.getElementById('main-profile-editor');
     if (!editor || !currentAuthProfile) return;
@@ -968,12 +1176,31 @@ function updateMainAuthUi() {
     const status = document.getElementById('main-auth-status');
     const logoutBtn = document.getElementById('btn-main-logout');
     const editBtn = document.getElementById('btn-main-edit-profile');
-    if (!manualFields || !profileBanner || !status || !logoutBtn || !editBtn) return;
+    const authForm = document.getElementById('main-auth-form');
+    const authUserCard = document.getElementById('main-auth-user-card');
+    if (!manualFields || !profileBanner || !status || !logoutBtn || !editBtn || !authForm || !authUserCard) return;
 
     if (currentAuthProfile) {
         manualFields.classList.add('hidden');
         profileBanner.classList.remove('hidden');
-        profileBanner.innerHTML = `<strong>Παίζεις ως:</strong> ${currentAuthProfile.nickname} · ${currentAuthProfile.firstName} ${currentAuthProfile.lastName}`;
+        authForm.classList.add('hidden');
+        authUserCard.classList.remove('hidden');
+        authUserCard.innerHTML = `
+            ${currentAuthProfile.photoUrl ? `<img class="player-avatar" src="${currentAuthProfile.photoUrl}" alt="${currentAuthProfile.nickname || currentAuthProfile.firstName}">` : `<span class="player-avatar-fallback">${getInitials(currentAuthProfile.nickname || `${currentAuthProfile.firstName} ${currentAuthProfile.lastName}`)}</span>`}
+            <div class="auth-user-meta">
+                <div class="auth-user-name">${currentAuthProfile.nickname || currentAuthProfile.firstName}</div>
+                <div class="auth-user-sub">Συνδεδεμένο προφίλ</div>
+            </div>
+        `;
+        profileBanner.innerHTML = `
+            <div class="playing-as">
+                ${currentAuthProfile.photoUrl ? `<img class="player-avatar" src="${currentAuthProfile.photoUrl}" alt="${currentAuthProfile.nickname || currentAuthProfile.firstName}">` : `<span class="player-avatar-fallback">${getInitials(currentAuthProfile.nickname || `${currentAuthProfile.firstName} ${currentAuthProfile.lastName}`)}</span>`}
+                <div class="playing-as-meta">
+                    <div class="playing-as-label">Παίζεις ως</div>
+                    <div class="playing-as-name">${currentAuthProfile.nickname || currentAuthProfile.firstName}</div>
+                </div>
+            </div>
+        `;
         status.textContent = 'Το προφίλ σου είναι συνδεδεμένο. Μπορείς να ξεκινήσεις αμέσως παιχνίδι ή μονομαχία.';
         logoutBtn.classList.remove('hidden');
         editBtn.classList.remove('hidden');
@@ -981,6 +1208,9 @@ function updateMainAuthUi() {
         manualFields.classList.remove('hidden');
         profileBanner.classList.add('hidden');
         profileBanner.textContent = '';
+        authForm.classList.remove('hidden');
+        authUserCard.classList.add('hidden');
+        authUserCard.innerHTML = '';
         status.textContent = 'Συνδέσου για να παίξεις με το αποθηκευμένο προφίλ σου χωρίς να ξαναγράψεις στοιχεία.';
         logoutBtn.classList.add('hidden');
         editBtn.classList.add('hidden');
@@ -1005,6 +1235,7 @@ async function handleMainAuthUser(userAccount) {
 }
 
 window.registerMainAccount = async function registerMainAccount() {
+    await ensureAudioContext();
     const email = document.getElementById('main-auth-email').value.trim();
     const password = document.getElementById('main-auth-password').value;
     if (!email || !password) {
@@ -1019,6 +1250,7 @@ window.registerMainAccount = async function registerMainAccount() {
 };
 
 window.loginMainAccount = async function loginMainAccount() {
+    await ensureAudioContext();
     const email = document.getElementById('main-auth-email').value.trim();
     const password = document.getElementById('main-auth-password').value;
     if (!email || !password) {
@@ -1034,6 +1266,7 @@ window.loginMainAccount = async function loginMainAccount() {
 
 window.loginMainWithGoogle = async function loginMainWithGoogle() {
     try {
+        await ensureAudioContext();
         const provider = new authApi.GoogleAuthProvider();
         provider.setCustomParameters({ prompt: 'select_account' });
         await authApi.signInWithPopup(firebaseAuth, provider);
@@ -1388,10 +1621,11 @@ function renderDetailsPanel(entry) {
 
     const answers = Array.isArray(entry.answers) ? entry.answers : [];
     const correctAnswers = answers.filter(answer => answer.isCorrect).length;
+    const entryDisplayName = getPreferredDisplayName(entry);
     detailsContent.className = '';
     detailsContent.innerHTML = `
         <div class="question-review-meta">
-            <strong>${entry.name}</strong><br>
+            <strong>${entryDisplayName}</strong><br>
             Score: ${entry.score} | Accuracy: ${entry.acc} | Correct: ${correctAnswers}/${questions.length}<br>
             Played: ${formatDate(entry.lastPlayed)}
         </div>
@@ -1472,10 +1706,28 @@ function startQuiz() {
     if (f.length < 2 || l.length < 2) { alert('Συμπλήρωσε τα στοιχεία σου.'); return; }
     if (!QUESTION_POOL.length) { alert('Δεν υπάρχουν διαθέσιμες ερωτήσεις για το quiz.'); return; }
     resetQuizState();
-    user = { f, l, id: normalizePlayerId(f, l) };
-    document.getElementById('user-display').textContent = `👤 ${f} ${l}`;
+    const nickname = (currentAuthProfile?.nickname || '').trim();
+    const photoUrl = currentAuthProfile?.photoUrl || '';
+    user = {
+        f,
+        l,
+        id: normalizePlayerId(f, l),
+        nickname,
+        photoUrl,
+        authUid: currentAuthUser?.uid || ''
+    };
+    document.getElementById('user-display').innerHTML = `
+        <div class="playing-as">
+            ${photoUrl ? `<img class="player-avatar" src="${photoUrl}" alt="${nickname || f}">` : `<span class="player-avatar-fallback">${getInitials(nickname || `${f} ${l}`)}</span>`}
+            <div class="playing-as-meta">
+                <div class="playing-as-label">Παίζεις ως</div>
+                <div class="playing-as-name">${nickname || `${f} ${l}`}</div>
+            </div>
+        </div>
+    `;
     document.getElementById('q-total').textContent = questions.length;
     document.getElementById('score-display').textContent = '0';
+    startBackgroundMusic();
     show('scr-quiz');
     loadQuestion();
 }
@@ -1625,10 +1877,12 @@ function checkAnswer(idx) {
         score += getCurrentQuestionPoints();
         correct++;
         launchConfetti();
+        playSuccessSound();
     } else {
         if (idx >= 0) btns[idx].classList.add('wrong');
         btns[q.a].classList.add('correct');
         showSadFace();
+        playWrongSound();
     }
 
     document.getElementById('score-display').textContent = score;
@@ -1755,6 +2009,11 @@ async function endQuiz() {
         lb.push({
             id: attemptId,
             name: `${user.f} ${user.l}`,
+            firstName: user.f,
+            lastName: user.l,
+            nickname: user.nickname || '',
+            photoUrl: user.photoUrl || '',
+            authUid: user.authUid || '',
             score,
             acc,
             accValue: accuracyValue,
@@ -1787,6 +2046,7 @@ async function endQuiz() {
 
 document.title = QUIZ_TITLE;
 document.querySelector('#scr-login h1').textContent = QUIZ_TITLE;
+updateAudioButtons();
 initFirebaseLeaderboard().finally(async () => {
     if (authApi && firebaseAuth) {
         try {

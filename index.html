@@ -196,7 +196,7 @@
         }
         .audio-controls {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 8px;
         }
         .audio-toggle.active {
@@ -735,7 +735,6 @@
             <div class="audio-controls">
                 <button id="btn-sound-toggle" class="secondary audio-toggle" onclick="toggleSoundEffects()">Ήχοι: On</button>
                 <button id="btn-music-toggle" class="secondary audio-toggle" onclick="toggleMusic()">Μουσική: On</button>
-                <button id="btn-music-theme" class="secondary audio-toggle" onclick="cycleMusicTheme()">Θέμα: Κλασικό Ι</button>
             </div>
             <div id="main-profile-editor" class="profile-editor hidden">
                 <input id="main-profile-first" type="text" placeholder="Όνομα">
@@ -926,33 +925,9 @@ let adminUnlocked = sessionStorage.getItem('quiz11_admin_unlocked') === 'true';
 let leaderboardSort = { key: 'score', direction: 'desc' };
 let soundEffectsEnabled = localStorage.getItem('quiz12_sound_enabled') !== 'false';
 let musicEnabled = localStorage.getItem('quiz12_music_enabled') !== 'false';
-let musicThemeIndex = Number(localStorage.getItem('quiz12_music_theme_index') || 0);
 let audioContext = null;
 let audioUnlocked = false;
 let musicLoopTimer = null;
-const MUSIC_THEMES = [
-    {
-        label: 'Κλασικό Ι',
-        bass: [196.0, 146.83, 164.81, 130.81, 196.0, 146.83, 174.61, 130.81],
-        lead: [392.0, 440.0, 493.88, 523.25, 493.88, 440.0, 392.0, 349.23],
-        harmony: [293.66, 329.63, 349.23, 392.0, 349.23, 329.63, 293.66, 261.63],
-        stepMs: 760
-    },
-    {
-        label: 'Κλασικό ΙΙ',
-        bass: [174.61, 130.81, 155.56, 116.54, 174.61, 130.81, 164.81, 123.47],
-        lead: [349.23, 392.0, 440.0, 466.16, 440.0, 392.0, 349.23, 329.63],
-        harmony: [261.63, 293.66, 311.13, 349.23, 311.13, 293.66, 261.63, 246.94],
-        stepMs: 720
-    },
-    {
-        label: 'Κλασικό ΙΙΙ',
-        bass: [164.81, 123.47, 130.81, 98.0, 164.81, 123.47, 146.83, 110.0],
-        lead: [329.63, 392.0, 415.3, 493.88, 440.0, 415.3, 392.0, 329.63],
-        harmony: [246.94, 261.63, 293.66, 329.63, 293.66, 261.63, 246.94, 220.0],
-        stepMs: 800
-    }
-];
 
 function normalizePlayerId(firstName, lastName) {
     return `${firstName.trim().toLowerCase()}::${lastName.trim().toLowerCase()}`;
@@ -1160,28 +1135,14 @@ function pulseTone(ctx, frequency, startAt, duration, type = 'sine', gainValue =
     oscillator.stop(startAt + duration + 0.02);
 }
 
-function sweepTone(ctx, startFrequency, endFrequency, startAt, duration, type = 'sine', gainValue = 0.05) {
-    const oscillator = ctx.createOscillator();
-    const gain = ctx.createGain();
-    oscillator.type = type;
-    oscillator.frequency.setValueAtTime(startFrequency, startAt);
-    oscillator.frequency.exponentialRampToValueAtTime(Math.max(1, endFrequency), startAt + duration);
-    gain.gain.setValueAtTime(0.0001, startAt);
-    gain.gain.exponentialRampToValueAtTime(gainValue, startAt + 0.015);
-    gain.gain.exponentialRampToValueAtTime(0.0001, startAt + duration);
-    oscillator.connect(gain).connect(ctx.destination);
-    oscillator.start(startAt);
-    oscillator.stop(startAt + duration + 0.02);
-}
-
 async function playSuccessSound() {
     if (!soundEffectsEnabled) return;
     const ctx = await ensureAudioContext();
     if (!ctx) return;
     const startAt = ctx.currentTime + 0.01;
-    sweepTone(ctx, 880, 1320, startAt, 0.08, 'triangle', 0.04);
-    sweepTone(ctx, 1320, 1980, startAt + 0.06, 0.1, 'triangle', 0.05);
-    pulseTone(ctx, 2637.02, startAt + 0.12, 0.08, 'sine', 0.025);
+    pulseTone(ctx, 523.25, startAt, 0.14, 'triangle', 0.04);
+    pulseTone(ctx, 659.25, startAt + 0.11, 0.16, 'triangle', 0.045);
+    pulseTone(ctx, 783.99, startAt + 0.22, 0.2, 'triangle', 0.05);
 }
 
 async function playWrongSound() {
@@ -1215,10 +1176,9 @@ async function startBackgroundMusic() {
     if (!musicEnabled) return;
     const ctx = await ensureAudioContext();
     if (!ctx) return;
-    const theme = MUSIC_THEMES[((musicThemeIndex % MUSIC_THEMES.length) + MUSIC_THEMES.length) % MUSIC_THEMES.length];
-    const bassPattern = theme.bass;
-    const leadPattern = theme.lead;
-    const harmonyPattern = theme.harmony;
+    const bassPattern = [196.0, 146.83, 164.81, 130.81, 196.0, 146.83, 174.61, 130.81];
+    const leadPattern = [392.0, 440.0, 493.88, 523.25, 493.88, 440.0, 392.0, 349.23];
+    const harmonyPattern = [293.66, 329.63, 349.23, 392.0, 349.23, 329.63, 293.66, 261.63];
     let noteIndex = 0;
     const loop = () => {
         if (!musicEnabled || !audioContext) {
@@ -1230,7 +1190,7 @@ async function startBackgroundMusic() {
         pulseTone(audioContext, leadPattern[noteIndex % leadPattern.length], now + 0.08, 0.42, 'sine', 0.013);
         pulseTone(audioContext, harmonyPattern[noteIndex % harmonyPattern.length], now + 0.16, 0.36, 'sine', 0.008);
         noteIndex++;
-        musicLoopTimer = setTimeout(loop, theme.stepMs);
+        musicLoopTimer = setTimeout(loop, 760);
     };
     loop();
 }
@@ -1238,7 +1198,6 @@ async function startBackgroundMusic() {
 function updateAudioButtons() {
     const soundBtn = document.getElementById('btn-sound-toggle');
     const musicBtn = document.getElementById('btn-music-toggle');
-    const themeBtn = document.getElementById('btn-music-theme');
     if (soundBtn) {
         soundBtn.textContent = `${soundEffectsEnabled ? '🔊' : '🔇'} Ήχοι ${soundEffectsEnabled ? 'On' : 'Off'}`;
         soundBtn.classList.toggle('active', soundEffectsEnabled);
@@ -1246,11 +1205,6 @@ function updateAudioButtons() {
     if (musicBtn) {
         musicBtn.textContent = `${musicEnabled ? '🎵' : '🎼'} Μουσική ${musicEnabled ? 'On' : 'Off'}`;
         musicBtn.classList.toggle('active', musicEnabled);
-    }
-    if (themeBtn) {
-        const theme = MUSIC_THEMES[((musicThemeIndex % MUSIC_THEMES.length) + MUSIC_THEMES.length) % MUSIC_THEMES.length];
-        themeBtn.textContent = `🎻 ${theme.label}`;
-        themeBtn.classList.toggle('active', musicEnabled);
     }
 }
 
@@ -1269,15 +1223,6 @@ window.toggleMusic = async function toggleMusic() {
         await startBackgroundMusic();
     } else {
         stopBackgroundMusic();
-    }
-};
-
-window.cycleMusicTheme = async function cycleMusicTheme() {
-    musicThemeIndex = (musicThemeIndex + 1) % MUSIC_THEMES.length;
-    localStorage.setItem('quiz12_music_theme_index', String(musicThemeIndex));
-    updateAudioButtons();
-    if (musicEnabled) {
-        await startBackgroundMusic();
     }
 };
 

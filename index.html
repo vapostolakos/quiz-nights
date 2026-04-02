@@ -1352,6 +1352,19 @@ function shuffleArray(items) {
     return copy;
 }
 
+function shuffleQuestionOptions(question) {
+    if (!question || !Array.isArray(question.o) || question.o.length < 2) {
+        return question;
+    }
+    const optionEntries = question.o.map((option, index) => ({ option, originalIndex: index }));
+    const shuffledEntries = shuffleArray(optionEntries);
+    return {
+        ...question,
+        o: shuffledEntries.map(entry => entry.option),
+        a: shuffledEntries.findIndex(entry => entry.originalIndex === question.a)
+    };
+}
+
 function getQuestionId(question) {
     return question?.id || question?.q || JSON.stringify(question);
 }
@@ -1379,8 +1392,8 @@ function initializeQuestionSet() {
     const shuffled = shuffleArray(basePool);
     const totalQuestions = Math.min(QUESTIONS_PER_GAME, shuffled.length);
 
-    questions = shuffled.slice(0, totalQuestions);
-    reserveQuestions = shuffled.slice(totalQuestions);
+    questions = shuffled.slice(0, totalQuestions).map(shuffleQuestionOptions);
+    reserveQuestions = shuffled.slice(totalQuestions).map(shuffleQuestionOptions);
 
     const selectedIds = questions.map(getQuestionId);
     const nextHistory = [...history.filter(id => !selectedIds.includes(id)), ...selectedIds];

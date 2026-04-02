@@ -1,157 +1,87 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="el">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz 12 - General</title>
+    <title>Lobby Μονομαχίας</title>
     <style>
         :root {
             --bg: #0f172a;
             --card: #1e293b;
+            --panel: #0b1220;
             --primary: #0ea5e9;
             --accent: #f59e0b;
-            --danger: #ef4444;
             --success: #10b981;
-            --nav: #475569;
-            --text: #f8fafc;
+            --danger: #ef4444;
             --muted: #94a3b8;
             --border: #334155;
+            --text: #f8fafc;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: "Segoe UI", system-ui, sans-serif;
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             background:
-                radial-gradient(circle at top, rgba(14,165,233,0.18), transparent 30%),
+                radial-gradient(circle at top, rgba(14, 165, 233, 0.18), transparent 30%),
                 linear-gradient(180deg, #020617 0%, #0f172a 60%, #111827 100%);
             color: var(--text);
             padding: 1rem;
-            position: relative;
-            overflow-x: hidden;
-        }
-        body::before {
-            content: "?\00a0?\00a0?\00a0?\00a0?\A?\00a0?\00a0QUIZ\00a0?\00a0?\A?\00a0?\00a0?\00a0?\00a0?\A?\00a0CARD\00a0?\00a0?\00a0?\A?\00a0?\00a0?\00a0?\00a0?\A?\00a0?\00a0SCORE\00a0?\00a0?";
-            position: fixed;
-            inset: 0;
-            font-size: clamp(4.4rem, 9.6vw, 7.8rem);
-            line-height: 1.02;
-            letter-spacing: 1.3rem;
-            white-space: pre-wrap;
-            word-break: break-word;
-            font-weight: 900;
-            background:
-                radial-gradient(circle at 10% 18%, rgba(255,255,255,0.18) 0 10%, transparent 11%),
-                radial-gradient(circle at 30% 76%, rgba(245,158,11,0.18) 0 10%, transparent 11%),
-                radial-gradient(circle at 68% 24%, rgba(34,197,94,0.18) 0 10%, transparent 11%),
-                radial-gradient(circle at 88% 70%, rgba(14,165,233,0.18) 0 10%, transparent 11%),
-                radial-gradient(circle at 52% 52%, rgba(255,255,255,0.15) 0 8%, transparent 9%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-shadow:
-                0 0 10px rgba(255, 255, 255, 0.05),
-                0 0 24px rgba(255, 255, 255, 0.02);
-            z-index: 0;
-            pointer-events: none;
-            transform: rotate(-11deg) scale(1.12) translate(-1%, -3%);
-            opacity: 1;
         }
         body::after {
-            content: "Quiz K-nights";
+            content: "Quiz K-nights Duel";
             position: fixed;
-            top: 3.5vh;
+            top: 2vh;
             left: 0;
             right: 0;
-            display: flex;
-            justify-content: center;
-            font-size: clamp(2.8rem, 6.4vw, 5.4rem);
+            text-align: center;
+            font-size: clamp(2rem, 5vw, 4.2rem);
             font-weight: 900;
             letter-spacing: 0.18em;
             text-transform: uppercase;
-            color: rgba(245, 158, 11, 0.26);
-            text-shadow:
-                0 0 10px rgba(245, 158, 11, 0.16),
-                0 10px 30px rgba(0, 0, 0, 0.28);
-            z-index: 0;
+            color: rgba(245, 158, 11, 0.16);
             pointer-events: none;
-            transform: none;
+            z-index: 0;
         }
-        .container {
-            width: min(100%, 720px);
-            background: rgba(30, 41, 59, 0.96);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 1.5rem;
-            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.45);
+        .app {
+            width: min(1180px, 100%);
+            margin: 0 auto;
             position: relative;
             z-index: 1;
         }
-        #scr-login {
-            position: relative;
-            padding-top: 0;
+        .card {
+            background: rgba(30, 41, 59, 0.96);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 1.35rem;
+            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.38);
         }
         .hidden { display: none !important; }
-        h1 {
-            text-align: center;
-            color: var(--accent);
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            margin-bottom: 0.5rem;
-            font-size: 1.5rem;
+        h1, h2, h3 { color: var(--accent); margin-bottom: 0.75rem; }
+        p { color: #cbd5e1; line-height: 1.6; }
+        .lead { color: var(--muted); margin-bottom: 1rem; }
+        input, button {
+            width: 100%;
+            border-radius: 12px;
+            font: inherit;
         }
-        p.sub {
-            text-align: center;
-            color: var(--muted);
-            margin-bottom: 1.25rem;
-        }
-        .intro-guide {
-            background: rgba(15, 23, 42, 0.88);
+        input {
+            background: #0b1220;
+            color: var(--text);
             border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 14px 16px;
-            margin: 0 0 1rem;
-            color: #cbd5e1;
-            line-height: 1.65;
-            font-size: 0.95rem;
+            padding: 12px 14px;
         }
-        .intro-guide strong {
-            color: var(--accent);
+        button {
+            border: none;
+            background: var(--primary);
+            color: white;
+            padding: 12px 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.15s ease, opacity 0.15s ease;
         }
-        .login-auth-panel {
-            position: fixed;
-            top: 2.8vh;
-            right: 1.6rem;
-            width: min(330px, calc(100vw - 2rem));
-            background: rgba(15, 23, 42, 0.92);
-            border: 1px solid var(--border);
-            border-radius: 18px;
-            padding: 12px;
-            display: grid;
-            gap: 10px;
-            z-index: 3;
-            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
-        }
-        .login-auth-panel h3 {
-            color: var(--accent);
-            font-size: 0.95rem;
-            margin: 0;
-        }
-        .auth-form.hidden {
-            display: none !important;
-        }
-        .auth-mini-actions {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 8px;
-        }
-        .auth-mini-actions button {
-            margin: 0;
-            padding: 10px 8px;
-            font-size: 0.92rem;
-        }
+        button:hover:not(:disabled) { transform: translateY(-1px); }
+        button:disabled { opacity: 0.45; cursor: not-allowed; }
+        .secondary { background: #475569; }
         .salmon-btn {
             background: #f59e8b;
             color: #3f1d16;
@@ -160,109 +90,58 @@
             background: #dcfce7;
             color: #14532d;
         }
-        .auth-status-mini {
-            color: var(--muted);
-            font-size: 0.88rem;
-            line-height: 1.45;
-        }
-        .auth-user-card {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            background: rgba(30, 41, 59, 0.78);
-        }
-        .auth-user-card.hidden {
-            display: none !important;
-        }
-        .auth-user-meta {
-            min-width: 0;
-        }
-        .auth-user-name {
-            font-weight: 800;
-            color: var(--accent);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .auth-user-sub {
-            color: var(--muted);
-            font-size: 0.8rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .audio-controls {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 8px;
-        }
-        .audio-toggle.active {
-            background: #0f766e;
-            box-shadow: 0 0 14px rgba(16, 185, 129, 0.18);
-        }
-        .player-profile-banner {
-            margin: 0 0 1rem;
+        .tip-box, .status-box, .winner-box {
             background: rgba(15, 23, 42, 0.88);
             border: 1px solid var(--border);
             border-radius: 16px;
-            padding: 12px 14px;
-            color: #cbd5e1;
+            padding: 14px 16px;
+            line-height: 1.6;
         }
-        .player-profile-banner strong {
-            color: var(--accent);
+        .tip-box strong { color: var(--accent); }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
         }
-        .playing-as {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .stack { display: grid; gap: 12px; }
+        .auth-box {
+            margin: 1rem 0;
+            display: grid;
+            gap: 12px;
         }
-        .playing-as-meta {
-            min-width: 0;
+        .auth-actions {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
         }
-        .playing-as-label {
+        .lobby-actions, .duel-top, .chat-form {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+        .auth-note {
             color: var(--muted);
-            font-size: 0.78rem;
-            font-weight: 600;
-            letter-spacing: 0.03em;
-            text-transform: uppercase;
+            font-size: 0.92rem;
         }
-        .playing-as-name {
-            color: var(--accent);
-            font-weight: 800;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .profile-editor {
-            margin-top: 0.35rem;
-            padding-top: 0.35rem;
-            border-top: 1px solid rgba(148, 163, 184, 0.18);
+        .profile-password-box {
             display: grid;
             gap: 8px;
-        }
-        .profile-editor.hidden {
-            display: none !important;
-        }
-        .profile-editor input {
-            margin-bottom: 0;
             padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: rgba(15, 23, 42, 0.82);
         }
-        .profile-editor-actions {
-            display: flex;
-            gap: 8px;
-        }
-        .profile-editor-status {
-            color: var(--muted);
-            font-size: 0.82rem;
-            line-height: 1.4;
+        .profile-box {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 16px;
+            align-items: start;
+            margin-top: 1rem;
         }
         .avatar-choice-label {
             color: var(--muted);
-            font-size: 0.82rem;
-            line-height: 1.35;
+            font-size: 0.88rem;
+            margin-top: -2px;
         }
         .avatar-picker {
             display: grid;
@@ -272,13 +151,13 @@
         .avatar-choice {
             width: 100%;
             aspect-ratio: 1;
-            border-radius: 12px;
+            border-radius: 14px;
             border: 1px solid var(--border);
             background: #172234;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
+            font-size: 1.45rem;
             cursor: pointer;
             transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
         }
@@ -287,574 +166,556 @@
             border-color: rgba(14, 165, 233, 0.45);
         }
         .avatar-choice.active {
-            border-color: rgba(14, 165, 233, 0.72);
+            border-color: rgba(14, 165, 233, 0.7);
             box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2) inset;
         }
-        .player-cell {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .player-avatar {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
+        .avatar-preview, .avatar-fallback, .chat-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: #0b1220;
             object-fit: cover;
-            border: 1px solid rgba(148, 163, 184, 0.35);
-            background: rgba(15, 23, 42, 0.9);
-            flex: 0 0 auto;
         }
-        .player-avatar-fallback {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            display: inline-flex;
+        .avatar-fallback {
+            display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(14, 165, 233, 0.16);
-            color: #e2e8f0;
-            font-size: 0.78rem;
-            font-weight: 800;
-            border: 1px solid rgba(148, 163, 184, 0.28);
-            flex: 0 0 auto;
+            font-size: 2.6rem;
         }
-        .player-meta {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            min-width: 0;
+        .join-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            align-items: center;
+            margin-top: 12px;
         }
-        .player-name {
-            font-weight: 700;
-            color: var(--text);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+        .room-limit-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 140px;
+            gap: 10px;
+            align-items: center;
+            margin-top: 12px;
         }
-        .player-nickname {
-            color: var(--muted);
-            font-size: 0.78rem;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .player-nickname.primary {
-            color: var(--text);
-            font-size: 0.92rem;
-            font-weight: 800;
-        }
-        .player-name.secondary {
-            color: var(--muted);
-            font-size: 0.76rem;
-            font-weight: 600;
-        }
-        input, button {
+        .room-limit-row select {
             width: 100%;
             border-radius: 12px;
+            border: 1px solid var(--border);
+            background: #0b1220;
+            color: var(--text);
+            padding: 12px 14px;
             font: inherit;
         }
-        input {
-            padding: 12px 14px;
-            border: 1px solid var(--border);
-            background: #0f172a;
-            color: var(--text);
-            margin-bottom: 0.75rem;
-        }
-        button {
-            border: none;
-            padding: 12px 14px;
-            background: var(--primary);
-            color: white;
-            font-weight: 700;
-            cursor: pointer;
-            transition: transform 0.15s ease, opacity 0.15s ease;
-        }
-        button:hover:not(:disabled) { transform: translateY(-1px); }
-        button:disabled { opacity: 0.45; cursor: not-allowed; }
-        .secondary { background: var(--nav); }
-        .duel-btn {
-            background: #86efac;
-            color: #14532d;
-            box-shadow: 0 0 14px rgba(134, 239, 172, 0.22);
-        }
-        .duel-btn:hover {
-            background: #bbf7d0;
-        }
-        .lifeline-container .secondary:not(:disabled) {
-            background: #c026d3;
-            box-shadow: 0 0 14px rgba(192, 38, 211, 0.18);
-        }
-        .next-active,
-        .prev-active {
-            background: var(--primary) !important;
-            box-shadow: 0 0 18px rgba(14, 165, 233, 0.35);
-        }
-        .top-actions, .leaderboard-actions, .nav-controls, .lifeline-container {
-            display: flex;
-            gap: 10px;
-        }
-        .lifeline-container {
-            margin-top: 14px;
+        .duel-layout {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.85fr);
+            gap: 16px;
         }
-        .quiz-header {
+        .player-card, .question-card, .chat-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 14px;
+        }
+        .player-card.you {
+            border-color: rgba(14, 165, 233, 0.55);
+            box-shadow: 0 0 0 1px rgba(14, 165, 233, 0.22) inset;
+        }
+        .player-head {
+            display: grid;
+            grid-template-columns: 54px 1fr;
+            gap: 12px;
+            align-items: center;
+        }
+        .player-head img, .chat-avatar {
+            width: 54px;
+            height: 54px;
+            border-radius: 14px;
+            object-fit: cover;
+            background: #0b1220;
+            border: 1px solid var(--border);
+        }
+        .player-name { font-weight: 800; color: var(--text); }
+        .player-sub, .small { color: var(--muted); font-size: 0.9rem; }
+        .scoreline {
+            margin-top: 10px;
             display: flex;
             justify-content: space-between;
-            gap: 12px;
-            color: var(--accent);
-            font-weight: 700;
-            margin-bottom: 12px;
+            color: #cbd5e1;
         }
-        .timer-info {
+        .room-meta {
             display: flex;
-            justify-content: flex-end;
-            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 12px;
+            color: var(--muted);
         }
-        .timer-count {
-            color: var(--accent);
-            font-size: 1rem;
-            font-weight: 700;
+        .room-roster {
+            margin-bottom: 12px;
+            display: grid;
+            gap: 8px;
         }
-        .timer-count.urgent { color: #f87171; }
-        #timer-wrap {
-            width: 100%;
-            height: 8px;
-            background: var(--border);
-            border-radius: 999px;
-            overflow: hidden;
-            margin-bottom: 14px;
+        .roster-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
         }
-        #timer-bar {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, var(--danger), var(--accent), var(--success));
-        }
-        #q-image-container { text-align: center; margin-bottom: 14px; }
-        .q-img-display {
-            max-width: 100%;
-            max-height: 220px;
-            object-fit: cover;
-            border-radius: 14px;
+        .roster-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #172234;
             border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 10px 12px;
         }
-        #q-hint {
-            text-align: center;
+        .roster-item img,
+        .roster-item .avatar-fallback {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            flex: 0 0 auto;
+        }
+        .roster-meta {
+            min-width: 0;
+        }
+        .roster-name {
+            font-weight: 700;
+            color: var(--text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .roster-score {
+            color: var(--muted);
+            font-size: 0.84rem;
+        }
+        .code-pill {
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+            color: #fde68a;
+            border-radius: 999px;
+            padding: 7px 12px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+        }
+        .hint {
+            margin-bottom: 10px;
             color: var(--muted);
             font-style: italic;
             font-weight: 600;
-            margin-bottom: 8px;
         }
-        #q-text {
-            text-align: center;
-            line-height: 1.5;
+        .question-text {
+            font-size: clamp(1.15rem, 2.4vw, 1.8rem);
+            line-height: 1.45;
             margin-bottom: 14px;
-            min-height: 56px;
+            text-align: center;
         }
-        #options-box { display: grid; gap: 10px; }
-        .option-btn {
+        .options { display: grid; gap: 10px; }
+        .option {
             background: #334155;
-            color: var(--text);
             text-align: left;
+            border: 1px solid transparent;
+            transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+        }
+        .option:hover:not(:disabled) {
+            transform: translateY(-1px);
+            border-color: rgba(255,255,255,0.14);
+        }
+        .option.correct-choice,
+        .option.reveal-correct {
+            background: linear-gradient(180deg, rgba(25, 135, 114, 0.98) 0%, rgba(27, 119, 103, 0.98) 100%) !important;
+            border-color: rgba(52, 211, 153, 0.9) !important;
+            color: #eafff7 !important;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+        .option.wrong-choice {
+            background: linear-gradient(180deg, rgba(132, 56, 68, 0.98) 0%, rgba(124, 54, 66, 0.98) 100%) !important;
+            border-color: rgba(248, 113, 113, 0.9) !important;
+            color: #ffe8e8 !important;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+        }
+        .answer-status {
+            margin-top: 12px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .answer-status.success-result { color: #10b981; }
+        .answer-status.error-result { color: #ff5a5f; }
+        .duel-timer-track {
+            margin: 8px 0 14px;
+            width: 100%;
+            height: 8px;
+            background: #334155;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .duel-timer-fill {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #ef4444 0%, #f59e0b 35%, #10b981 100%);
+            transform-origin: left center;
+            transition: width 0.2s linear;
+        }
+        .chat-card {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            min-height: 580px;
+        }
+        .chat-list {
+            margin-top: 10px;
+            display: grid;
+            gap: 10px;
+            overflow-y: auto;
+            max-height: 470px;
+            padding-right: 4px;
+        }
+        .chat-item {
+            display: grid;
+            grid-template-columns: 44px 1fr;
+            gap: 10px;
+            align-items: start;
+        }
+        .chat-bubble {
+            background: #172234;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 10px 12px;
+        }
+        .reaction-picker,
+        .reaction-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .reaction-btn,
+        .reaction-chip {
+            width: auto;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            line-height: 1;
+        }
+        .reaction-btn {
+            background: #253247;
+            color: #f8fafc;
+        }
+        .reaction-chip {
+            background: rgba(14, 165, 233, 0.14);
+            border: 1px solid rgba(14, 165, 233, 0.26);
+            color: #e0f2fe;
+        }
+        .chat-name { color: var(--accent); font-weight: 700; margin-bottom: 4px; }
+        .chat-time { color: var(--muted); font-size: 0.78rem; margin-top: 6px; }
+        .chat-item {
+            touch-action: pan-y;
+            transition: transform 0.14s ease;
+        }
+        .chat-item.mine .chat-bubble {
+            border-color: rgba(14, 165, 233, 0.25);
+        }
+        .chat-reply-preview {
+            padding: 8px 10px;
+            border-left: 3px solid var(--accent);
+            background: rgba(245, 158, 11, 0.08);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            color: #e2e8f0;
+            font-size: 0.85rem;
+        }
+        .chat-message-text.deleted {
+            color: var(--muted);
+            font-style: italic;
+        }
+        .chat-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .chat-action-btn {
+            width: auto;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #1e293b;
+            color: #cbd5e1;
+            font-size: 0.78rem;
+            line-height: 1;
+        }
+        .chat-action-btn.danger {
+            background: rgba(185, 28, 28, 0.9);
+            color: #fff;
+        }
+        .chat-reply-composer {
+            margin-bottom: 8px;
+            padding: 8px 10px;
+            border-radius: 12px;
+            background: rgba(14, 165, 233, 0.1);
+            border: 1px solid rgba(14, 165, 233, 0.18);
+            color: #e2e8f0;
+        }
+        .chat-reply-composer.hidden {
+            display: none !important;
+        }
+        .reply-head {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 8px;
-        }
-        .option-btn.correct { background: var(--success); }
-        .option-btn.wrong { background: var(--danger); }
-        .option-btn.hidden-by-5050 { visibility: hidden; }
-        .audience-pct {
-            color: #fde68a;
-            font-size: 0.8rem;
-            min-width: 36px;
-            text-align: right;
-            display: none;
-        }
-        #rationale-box {
-            background: #0f172a;
-            border-left: 4px solid var(--accent);
-            border-radius: 12px;
-            padding: 12px;
-            margin-top: 14px;
-            color: #cbd5e1;
-            line-height: 1.6;
-        }
-        .nav-controls { margin-top: 16px; }
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
             gap: 10px;
-            margin: 16px 0;
-        }
-        .summary-card {
-            background: #0f172a;
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 14px;
-            text-align: center;
-        }
-        .summary-card strong {
-            display: block;
-            color: var(--accent);
-            font-size: 1.3rem;
             margin-bottom: 4px;
-        }
-        .summary-card span {
-            color: var(--muted);
-            font-size: 0.78rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        .table-wrap {
-            margin-top: 14px;
-            max-height: 340px;
-            overflow-y: auto;
-            border: 1px solid var(--border);
-            border-radius: 14px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.88rem;
-        }
-        th, td {
-            padding: 10px;
-            border-bottom: 1px solid var(--border);
-            text-align: left;
-        }
-        th {
-            color: var(--muted);
-            background: var(--card);
-            position: sticky;
-            top: 0;
-        }
-        th.sortable {
-            cursor: pointer;
-            user-select: none;
-        }
-        th.sortable:hover {
-            color: var(--text);
-        }
-        .highlight td { color: var(--accent); font-weight: 700; }
-        .highlight .player-name,
-        .highlight .player-nickname,
-        .highlight .player-meta {
             color: var(--accent);
-        }
-        .rank-badge { display: inline-flex; min-width: 28px; justify-content: center; }
-        .leaderboard-note {
-            margin-top: 10px;
-            color: var(--muted);
-            text-align: center;
-            line-height: 1.5;
-        }
-        .entry-row { cursor: pointer; }
-        .entry-row:hover td { background: rgba(14, 165, 233, 0.08); }
-        .delete-cell {
-            width: 74px;
-            text-align: right;
-        }
-        .delete-entry-btn {
-            display: none;
-            width: auto;
-            padding: 8px 10px;
-            border-radius: 10px;
-            background: #b91c1c;
             font-size: 0.8rem;
-            line-height: 1;
+            font-weight: 700;
         }
-        .delete-entry-btn.visible {
+        .reply-close-btn {
+            width: auto;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: #334155;
+            font-size: 0.72rem;
+        }
+        .reply-snippet {
+            color: #cbd5e1;
+            font-size: 0.84rem;
+            line-height: 1.4;
+        }
+        .chat-tools {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .mention-btn {
+            width: auto;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: #1d4ed8;
+        }
+        .mention-menu {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .mention-menu.hidden {
+            display: none !important;
+        }
+        .mention-chip {
+            width: auto;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #1e293b;
+            color: #e2e8f0;
+            font-size: 0.8rem;
+        }
+        .reaction-palette {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .reaction-palette.hidden {
+            display: none !important;
+        }
+        .chat-item.swiping {
+            transition: none;
+        }
+        .chat-item.reply-ready .chat-bubble {
+            border-color: rgba(245, 158, 11, 0.55);
+            box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.18) inset;
+        }
+        .chat-message-text {
+            color: #f8fafc;
+            line-height: 1.55;
+            word-break: break-word;
+        }
+        .mention-token {
+            color: #7dd3fc;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .edited-mark {
+            color: var(--muted);
+            font-size: 0.76rem;
+            margin-left: 6px;
+        }
+        .chat-meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 6px;
+        }
+        .chat-gesture-hint {
+            color: var(--muted);
+            font-size: 0.76rem;
+            margin-top: 4px;
+        }
+        .reaction-icon {
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            min-width: 1em;
+            line-height: 1;
+            font-weight: 800;
         }
-        .details-panel {
-            margin-top: 16px;
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            background: #0f172a;
-            padding: 14px;
-        }
-        .details-panel h3 {
-            color: var(--accent);
-            margin-bottom: 10px;
-            font-size: 1rem;
-        }
-        .details-empty {
-            color: var(--muted);
-            text-align: center;
-            line-height: 1.5;
-        }
-        .question-review {
-            display: grid;
-            gap: 10px;
-            margin-top: 12px;
-        }
-        .question-review-item {
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 12px;
-            background: rgba(30, 41, 59, 0.75);
-        }
-        .question-review-item.correct-review { border-color: rgba(16, 185, 129, 0.45); }
-        .question-review-item.wrong-review { border-color: rgba(239, 68, 68, 0.45); }
-        .question-review-status {
-            display: inline-block;
-            margin-bottom: 8px;
-            font-size: 0.78rem;
-            font-weight: 700;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-        }
-        .correct-review .question-review-status { color: var(--success); }
-        .wrong-review .question-review-status { color: var(--danger); }
-        .question-review-text {
-            font-weight: 700;
-            line-height: 1.45;
-            margin-bottom: 8px;
-        }
-        .question-review-meta {
-            color: #cbd5e1;
-            line-height: 1.5;
-            font-size: 0.92rem;
-        }
-        .admin-btn { display: none; }
-        .admin-btn.visible { display: inline-block; }
-        #effect-layer {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            overflow: hidden;
-            z-index: 3;
-        }
-        .confetti-piece {
-            position: fixed;
-            top: -20px;
-            width: 12px;
-            height: 20px;
-            border-radius: 3px;
-            opacity: 0.95;
-            animation: confetti-fall 1.8s ease-out forwards;
-        }
-        .sad-badge {
-            position: fixed;
-            left: 50%;
-            top: 24%;
-            transform: translateX(-50%) scale(0.7);
-            font-size: clamp(3.5rem, 8vw, 5rem);
-            filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.35));
-            animation: sad-pop 1.2s ease-out forwards;
-        }
-        .help-badge {
-            position: fixed;
-            left: 50%;
-            top: 24%;
-            transform: translateX(-50%) scale(0.7);
-            font-size: clamp(3.5rem, 8vw, 5rem);
-            filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.35));
-            animation: sad-pop 1.2s ease-out forwards;
-        }
-        @keyframes confetti-fall {
-            0% {
-                transform: translateY(0) rotate(0deg);
-                opacity: 0.95;
-            }
-            100% {
-                transform: translateY(110vh) rotate(540deg);
-                opacity: 0;
-            }
-        }
-        @keyframes sad-pop {
-            0% {
-                opacity: 0;
-                transform: translateX(-50%) scale(0.4);
-            }
-            20% {
-                opacity: 1;
-                transform: translateX(-50%) scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: translateX(-50%) translateY(24px) scale(0.92);
-            }
+        @media (max-width: 920px) {
+            .duel-layout { grid-template-columns: 1fr; }
+            .chat-card { min-height: auto; }
         }
         @media (max-width: 640px) {
-            .container { padding: 1rem; }
-            .login-auth-panel {
-                position: static;
-                width: 100%;
-                margin-bottom: 1rem;
-                box-shadow: none;
-            }
-            .auth-mini-actions {
+            .grid-2, .auth-actions, .lobby-actions, .duel-top, .join-row, .profile-box, .chat-form, .room-limit-row {
                 grid-template-columns: 1fr;
             }
-            .quiz-header, .top-actions, .leaderboard-actions, .nav-controls, .lifeline-container {
-                flex-direction: column;
+            .avatar-picker {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
             }
-            .lifeline-container {
-                grid-template-columns: 1fr;
-            }
-            .summary-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-<div class="container">
-
-    <div id="scr-login">
-        <div class="login-auth-panel">
-            <h3>Login / Δημιουργία Λογαριασμού</h3>
-            <div id="main-auth-form" class="auth-form">
-                <input id="main-auth-email" type="email" placeholder="Email">
-                <input id="main-auth-password" type="password" placeholder="Password">
-                <div class="auth-mini-actions">
-                    <button onclick="registerMainAccount()">Register</button>
-                    <button class="salmon-btn" onclick="loginMainAccount()">Login</button>
-                    <button class="google-btn" onclick="loginMainWithGoogle()">Google</button>
+<div class="app">
+    <div id="scr-auth" class="card">
+        <h1>Quiz Rooms</h1>
+        <p class="lead">Κάνε register ή login και κράτα μόνιμα το profile σου με nickname, avatar και live rooms.</p>
+        <div class="tip-box">
+            <strong>Πώς παίζεται:</strong> Κάθε room δίνει 10 τυχαίες ερωτήσεις από το κοινό pool. Όλοι οι παίκτες βλέπουν το ίδιο set, απαντούν με τον δικό τους ρυθμό και παρακολουθούν live score και chat.
+        </div>
+        <div class="auth-box status-box">
+            <h2>Λογαριασμός Παίκτη</h2>
+            <div class="grid-2">
+                <input id="auth-email" type="email" placeholder="Email">
+                <input id="auth-password" type="password" placeholder="Password">
+            </div>
+            <div class="auth-actions">
+                <button onclick="registerAccount()">Δημιουργία Λογαριασμού</button>
+                <button class="salmon-btn" onclick="loginAccount()">Login</button>
+                <button class="google-btn" onclick="loginWithGoogle()">Google Login</button>
+            </div>
+            <div id="auth-status" class="auth-note">Σύνδεσε πρώτα λογαριασμό και μετά αποθήκευσε το profile σου.</div>
+        </div>
+        <div id="profile-setup" class="profile-box hidden">
+            <div>
+                <img id="profile-avatar-preview" class="avatar-preview hidden" alt="">
+                <div id="profile-avatar-fallback" class="avatar-fallback">👤</div>
+            </div>
+            <div class="stack">
+                <div class="grid-2">
+                    <input id="profile-first-name" type="text" placeholder="Όνομα">
+                    <input id="profile-last-name" type="text" placeholder="Επώνυμο">
                 </div>
-            </div>
-            <div id="main-auth-user-card" class="auth-user-card hidden"></div>
-            <button class="secondary hidden" id="btn-main-edit-profile" onclick="toggleMainProfileEditor()">Επεξεργασία Προφίλ</button>
-            <button class="secondary hidden" id="btn-main-logout" onclick="logoutMainAccount()">Logout</button>
-            <div id="main-auth-status" class="auth-status-mini">Συνδέσου για να παίξεις με το αποθηκευμένο προφίλ σου χωρίς να ξαναγράψεις στοιχεία.</div>
-            <div class="audio-controls">
-                <button id="btn-sound-toggle" class="secondary audio-toggle" onclick="toggleSoundEffects()">Ήχοι: On</button>
-                <button id="btn-music-toggle" class="secondary audio-toggle" onclick="toggleMusic()">Μουσική: On</button>
-            </div>
-            <div id="main-profile-editor" class="profile-editor hidden">
-                <input id="main-profile-first" type="text" placeholder="Όνομα">
-                <input id="main-profile-last" type="text" placeholder="Επώνυμο">
-                <input id="main-profile-nickname" type="text" placeholder="Nickname">
+                <input id="profile-nickname" type="text" placeholder="Nickname για μονομαχίες">
                 <div class="avatar-choice-label">Διάλεξε ένα από τα default avatars ή ανέβασε δική σου φωτογραφία.</div>
-                <div id="main-default-avatar-picker" class="avatar-picker"></div>
-                <input id="main-profile-photo" type="file" accept="image/*">
-                <div class="profile-editor-actions">
-                    <button onclick="saveMainProfile()">Αποθήκευση</button>
-                    <button class="secondary" onclick="toggleMainProfileEditor(false)">Κλείσιμο</button>
+                <div id="default-avatar-picker" class="avatar-picker"></div>
+                <input id="profile-avatar-file" type="file" accept="image/*">
+                <div class="profile-password-box">
+                    <div class="small">Αλλαγή κωδικού</div>
+                    <input id="profile-new-password" type="password" placeholder="Νέος κωδικός">
+                    <button class="secondary" onclick="changeAccountPassword()">Αλλαγή Κωδικού</button>
                 </div>
-                <div id="main-profile-editor-status" class="profile-editor-status">Μπορείς να αλλάξεις όνομα, nickname και φωτογραφία προφίλ.</div>
+                <button onclick="saveProfile()">Αποθήκευση Προφίλ</button>
+                <button class="secondary" id="btn-back-lobby" onclick="backToLobby()">Back to Lobby</button>
             </div>
         </div>
-        <h1>Quiz 12 - General</h1>
-        <p class="sub">Quiz Γενικών Γνώσεων Υψηλού Επιπέδου</p>
-        <div class="intro-guide">
-            <strong>Οδηγίες:</strong> Σε κάθε ερώτηση υπάρχει υπόδειξη και διαθέσιμες βοήθειες.
-            Το <strong>50:50</strong> κοστίζει το 50% της αξίας της ερώτησης, το <strong>Κοινό</strong> κοστίζει 75%
-            και η <strong>Αλλαγή Ερώτησης</strong> κοστίζει 25%. Οι ποινές αφαιρούνται αμέσως από το σκορ σου, οπότε
-            μπορεί να πέσεις και σε αρνητικό σκορ αν χρησιμοποιήσεις βοήθεια πολύ νωρίς.
-        </div>
-        <div id="main-profile-banner" class="player-profile-banner hidden"></div>
-        <div id="manual-player-fields">
-            <input type="text" id="fname" placeholder="Όνομα">
-            <input type="text" id="lname" placeholder="Επώνυμο">
-        </div>
-        <button onclick="startQuiz()">Έναρξη Παιχνιδιού</button>
-        <div class="top-actions" style="margin-top:10px;">
-            <button class="secondary duel-btn" onclick="openDuelMode()">Μονομαχία / Room</button>
-            <button class="secondary" onclick="openLeaderboard()">Leaderboard</button>
-        </div>
-        <p class="leaderboard-note">Παίξε solo ή μπες σε room για online μονομαχία.</p>
     </div>
 
-    <div id="scr-quiz" class="hidden">
-        <div class="quiz-header">
-            <span id="user-display"></span>
-            <span>Ερώτηση <span id="q-num">1</span>/<span id="q-total"></span> · <span id="score-display">0</span> πόντοι</span>
+        <div id="scr-lobby" class="card hidden">
+            <h1>Lobby Μονομαχίας</h1>
+            <p class="lead">Φτιάξε νέο room ή μπες σε room φίλου σου με τον κωδικό.</p>
+            <div id="lobby-profile-card" class="player-card"></div>
+            <div class="lobby-actions" style="margin-top:1rem;">
+                <button onclick="createRoom()">Δημιουργία Room</button>
+                <button class="secondary" onclick="goToProfile()">Επεξεργασία Προφίλ</button>
+                <button class="secondary" onclick="logoutAccount()">Logout</button>
+                <button class="secondary" onclick="goToMainPage()">Back to Main Page</button>
+            </div>
+            <div class="room-limit-row">
+                <div class="small">Μέγιστος αριθμός παικτών για νέο room</div>
+                <select id="room-player-limit"></select>
+            </div>
+            <div class="room-limit-row">
+                <div class="small">Πλήθος ερωτήσεων για νέο room</div>
+                <select id="room-question-count"></select>
+            </div>
+            <div class="join-row">
+                <input id="join-room-code" type="text" placeholder="Κωδικός room" maxlength="6">
+                <button style="width:auto; padding:12px 18px;" onclick="joinRoom()">Join</button>
+            </div>
+        <p class="small" style="margin-top:12px;">Τα rooms υποστηρίζουν από 1 έως 20 παίκτες. Το ίδιο σετ ερωτήσεων μοιράζεται σε όλους και το σκορ ενημερώνεται live.</p>
         </div>
 
-        <div class="timer-info">
-            <span id="timer-count" class="timer-count">45s</span>
-        </div>
-        <div id="timer-wrap"><div id="timer-bar"></div></div>
-
-        <div id="q-image-container" class="hidden">
-            <img id="q-image" class="q-img-display" src="" alt="">
-        </div>
-
-        <div id="q-hint"></div>
-        <h2 id="q-text"></h2>
-        <div id="options-box"></div>
-        <div class="lifeline-container">
-            <button id="btn-5050" class="secondary" onclick="use5050()">50:50 (-50%)</button>
-            <button id="btn-audience" class="secondary" onclick="useAudience()">Κοινό (-75%)</button>
-            <button id="btn-swap" class="secondary" onclick="useSwapQuestion()">Αλλαγή (-25%)</button>
-        </div>
-        <div id="rationale-box" class="hidden"></div>
-
-        <div class="nav-controls">
-            <button id="btn-prev" class="secondary" onclick="goBack()" disabled>Πίσω</button>
-            <button id="btn-next" class="secondary" onclick="goNext()" disabled>Επόμενο</button>
+    <div id="scr-room" class="hidden">
+        <div class="duel-layout">
+            <div class="card">
+                <div class="room-meta">
+                    <span class="code-pill" id="room-code-pill">ROOM</span>
+                    <span id="room-status-text">Αναμονή για αντίπαλο...</span>
+                    <button class="secondary" style="width:auto; padding:8px 12px;" onclick="leaveRoom()">Έξοδος</button>
+                </div>
+                <div class="room-roster">
+                    <div class="small">Παίκτες room</div>
+                    <div id="room-roster" class="roster-grid"></div>
+                </div>
+                <div class="duel-top" style="margin-bottom:12px;">
+                    <div id="you-card" class="player-card you"></div>
+                    <div id="opponent-card" class="player-card"></div>
+                </div>
+                <div class="question-card">
+                    <div id="question-area-wait" class="status-box">
+                        Μόλις μπει και ο δεύτερος παίκτης, η μονομαχία θα ξεκινήσει αυτόματα.
+                    </div>
+                    <div id="question-area-game" class="hidden">
+                        <div class="room-meta" style="margin-bottom:10px;">
+                            <span id="duel-progress-text">Ερώτηση 1/10</span>
+                            <span id="duel-timer-text">30s</span>
+                        </div>
+                        <div class="duel-timer-track">
+                            <div id="duel-timer-fill" class="duel-timer-fill"></div>
+                        </div>
+                        <div id="duel-hint" class="hint"></div>
+                        <div id="duel-question-text" class="question-text"></div>
+                        <div id="duel-options" class="options"></div>
+                        <div id="duel-answer-status" class="answer-status hidden"></div>
+                        <div id="duel-final-box" class="winner-box hidden" style="margin-top:14px;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-card">
+                <div>
+                    <h2>Live Chat</h2>
+                    <p class="small">Μπορείτε να μιλάτε μεταξύ σας όσο παίζετε.</p>
+                </div>
+                <div id="chat-list" class="chat-list"></div>
+                <div id="chat-reply-box" class="chat-reply-composer hidden">
+                    <div class="reply-head">
+                        <span id="chat-reply-title">Απάντηση</span>
+                        <button class="reply-close-btn" onclick="clearReplyTarget()">Κλείσιμο</button>
+                    </div>
+                    <div id="chat-reply-snippet" class="reply-snippet"></div>
+                </div>
+                <div id="mention-menu" class="mention-menu hidden"></div>
+                <div class="chat-form">
+                    <div class="chat-tools">
+                        <button class="mention-btn" style="width:auto;" onclick="toggleMentionMenu()">@</button>
+                        <input id="chat-input" type="text" placeholder="Γράψε μήνυμα...">
+                    </div>
+                    <button onclick="sendChatMessage()">Αποστολή</button>
+                </div>
+            </div>
         </div>
     </div>
-
-    <div id="scr-end" class="hidden">
-        <h1>Αποτελέσματα</h1>
-        <h2 id="final-msg" style="text-align:center; margin:1rem 0;"></h2>
-        <div class="summary-grid">
-            <div class="summary-card"><strong id="summary-score">0</strong><span>Score</span></div>
-            <div class="summary-card"><strong id="summary-correct">0</strong><span>Correct</span></div>
-            <div class="summary-card"><strong id="summary-rank">-</strong><span>Rank</span></div>
-        </div>
-        <div class="table-wrap">
-            <table>
-                <thead><tr><th>#</th><th>Παίκτης</th><th>Score</th><th>Accuracy</th><th>Date</th></tr></thead>
-                <tbody id="lb-body"></tbody>
-            </table>
-        </div>
-        <div class="leaderboard-actions" style="margin-top:14px;">
-            <button class="secondary" onclick="openLeaderboard()">Full Leaderboard</button>
-            <button onclick="restartQuiz()">Νέο Παιχνίδι</button>
-        </div>
-    </div>
-
-    <div id="scr-leaderboard" class="hidden">
-        <h1>Leaderboard</h1>
-        <p class="leaderboard-note">Top Players</p>
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th class="sortable" onclick="changeSort('name')">Player</th>
-                        <th class="sortable" onclick="changeSort('score')">Score</th>
-                        <th class="sortable" onclick="changeSort('accValue')">Accuracy</th>
-                        <th class="sortable" onclick="changeSort('lastPlayedTs')">Last Played</th>
-                        <th class="delete-cell">Admin</th>
-                    </tr>
-                </thead>
-                <tbody id="leaderboard-full-body"></tbody>
-            </table>
-        </div>
-        <div id="details-panel" class="details-panel">
-            <h3>Ανάλυση Συμμετοχής</h3>
-            <div id="details-content" class="details-empty">Πάτησε μια συμμετοχή από τον πίνακα για να δεις ποιες ερωτήσεις απαντήθηκαν σωστά και ποιες λάθος.</div>
-        </div>
-        <div class="leaderboard-actions" style="margin-top:14px;">
-            <button class="secondary" onclick="show('scr-login')">Back</button>
-            <button class="secondary" onclick="unlockAdmin()" id="btn-admin-unlock">Admin Unlock</button>
-            <button class="secondary admin-btn" onclick="clearLeaderboard()" id="btn-admin-reset">Καθαρισμός Leaderboard</button>
-            <button onclick="restartQuiz()">New Game</button>
-        </div>
-    </div>
-
 </div>
-
-<div id="effect-layer"></div>
 
 <script src="./firebase-config.js"></script>
 <script src="./Quiz12-questions.js"></script>
-<script>
-const QUIZ_TITLE = 'ultimate quiz';
-const FIREBASE_SDK_VERSION = '12.7.0';
-const FIREBASE_COLLECTION = 'quiz12_leaderboard';
-const PROFILE_COLLECTION = 'quiz12_duel_profiles';
-const QUESTION_TIME = 45;
-const DUEL_MODE_URL = 'https://vapostolakos.github.io/quiz12-duel/';
-const ADMIN_CONFIG = window.QUIZ_ADMIN || { username: '', password: '' };
-const QUESTION_POOL = Array.isArray(window.QUIZ12_QUESTIONS) ? window.QUIZ12_QUESTIONS : [];
-const QUESTIONS_PER_GAME = 10;
+<script type="module">
+  const FIREBASE_SDK_VERSION = '12.7.0';
+  const PROFILE_COLLECTION = 'quiz12_duel_profiles';
+  const ROOM_COLLECTION = 'quiz12_duel_rooms';
+  const MAX_ROOM_PLAYERS = 20;
+  const QUESTIONS_PER_DUEL = 10;
 const DEFAULT_AVATAR_OPTIONS = [
     { key: 'man-1', emoji: '👨', bg: '#1d4ed8' },
     { key: 'man-2', emoji: '🧔', bg: '#0f766e' },
@@ -877,40 +738,97 @@ const DEFAULT_AVATAR_OPTIONS = [
     { key: 'girl-4', emoji: '🧑‍🎨', bg: '#0f766e' },
     { key: 'girl-5', emoji: '🧑‍🎓', bg: '#334155' }
 ];
-const FIFTY_FIFTY_PENALTY = 0.5;
-const AUDIENCE_PENALTY = 0.75;
-const SWAP_PENALTY = 0.25;
-const AUDIENCE_PATTERN_KEY = 'quiz12_audience_pattern_count';
-const QUESTION_HISTORY_KEY = 'quiz12_recent_question_history';
+const REACTION_OPTIONS = [
+    { key: 'heart', emoji: '❤️' },
+    { key: 'laugh', emoji: '😂' },
+    { key: 'wow', emoji: '😮' },
+    { key: 'fire', emoji: '🔥' },
+    { key: 'clap', emoji: '👏' },
+    { key: 'thumbs', emoji: '👍' }
+];
 
-const LEADERBOARD_KEY = FIREBASE_COLLECTION;
-let questions = [];
-let reserveQuestions = [];
-let user = { f: "", l: "", id: "" };
-let cur = 0, score = 0, correct = 0;
-let timeLeft = QUESTION_TIME, timer = null;
-let answersStatus = [];
-let lifeline5050Used = false, lifelineAudienceUsed = false;
-let lifelineSwapUsed = false;
-let firebaseReady = false;
+const QUESTION_POOL = Array.isArray(window.QUIZ12_QUESTIONS) ? window.QUIZ12_QUESTIONS : [];
 let firebaseDb = null;
-let firebaseApi = null;
 let firebaseAuth = null;
+let firebaseApp = null;
+let firestoreApi = null;
 let authApi = null;
-let currentAuthUser = null;
-let currentAuthProfile = null;
-let mainProfileEditorOpen = false;
-let selectedEntryId = null;
-let adminUnlocked = sessionStorage.getItem('quiz11_admin_unlocked') === 'true';
-let leaderboardSort = { key: 'score', direction: 'desc' };
-let soundEffectsEnabled = localStorage.getItem('quiz12_sound_enabled') !== 'false';
-let musicEnabled = localStorage.getItem('quiz12_music_enabled') !== 'false';
-let audioContext = null;
-let audioUnlocked = false;
-let musicLoopTimer = null;
+let firebaseReady = false;
+let authUser = null;
+let currentProfile = null;
+let currentRoomCode = null;
+let currentRoomData = null;
+let roomUnsub = null;
+let chatUnsub = null;
+let avatarDataUrl = '';
+let replyTarget = null;
+let editingMessageId = null;
+let seenMessageIds = new Set();
+let chatAudioContext = null;
+let lastChatCount = 0;
+let swipeState = { activeId: null, startX: 0, currentX: 0 };
+let openReactionPaletteFor = null;
+let duelTimerInterval = null;
+let duelTimerDeadline = 0;
+let duelRenderedQuestionKey = '';
+let duelAnswerLocked = false;
+let duelAdvanceTimeout = null;
+const HEART_REACTION_OPTIONS = [
+    { key: 'heart-red', emoji: '❤️' },
+    { key: 'heart-pink', emoji: '🩷' },
+    { key: 'heart-orange', emoji: '🧡' },
+    { key: 'heart-yellow', emoji: '💛' },
+    { key: 'heart-green', emoji: '💚' },
+    { key: 'heart-blue', emoji: '🩵' },
+    { key: 'heart-purple', emoji: '💜' }
+];
+const CHAT_REACTION_OPTIONS = [
+    ...HEART_REACTION_OPTIONS,
+    { key: 'laugh', emoji: '😂' },
+    { key: 'wow', emoji: '😮' },
+    { key: 'fire', emoji: '🔥' },
+    { key: 'clap', emoji: '👏' },
+    { key: 'thumbs', emoji: '👍' }
+];
+const EXTRA_REACTION_OPTIONS = [
+    { key: 'grin', emoji: '😁' },
+    { key: 'cry', emoji: '😭' },
+    { key: 'angry', emoji: '😡' },
+    { key: 'party', emoji: '🥳' },
+    { key: 'mindblown', emoji: '🤯' },
+    { key: 'star', emoji: '🌟' },
+    { key: 'rocket', emoji: '🚀' },
+    { key: 'trophy', emoji: '🏆' },
+    { key: 'eyes', emoji: '👀' },
+    { key: 'ok-hand', emoji: '👌' },
+    { key: 'muscle', emoji: '💪' },
+    { key: 'check', emoji: '✅' },
+    { key: 'cross', emoji: '❌' },
+    { key: 'brain', emoji: '🧠' },
+    { key: 'wave', emoji: '👋' },
+    { key: 'crown', emoji: '👑' },
+    { key: 'lightning', emoji: '⚡' },
+    { key: 'skull', emoji: '💀' },
+    { key: '100', emoji: '💯' },
+    { key: 'star-eyes', emoji: '🤩' }
+];
+const ALL_REACTION_OPTIONS = [...CHAT_REACTION_OPTIONS, ...EXTRA_REACTION_OPTIONS];
+HEART_REACTION_OPTIONS.splice(0, HEART_REACTION_OPTIONS.length,
+    { key: 'heart-red', emoji: '♥', color: '#ef4444' },
+    { key: 'heart-pink', emoji: '♥', color: '#ec4899' },
+    { key: 'heart-orange', emoji: '♥', color: '#f97316' },
+    { key: 'heart-yellow', emoji: '♥', color: '#facc15' },
+    { key: 'heart-green', emoji: '♥', color: '#22c55e' },
+    { key: 'heart-blue', emoji: '♥', color: '#38bdf8' },
+    { key: 'heart-purple', emoji: '♥', color: '#a855f7' }
+);
 
-function normalizePlayerId(firstName, lastName) {
-    return `${firstName.trim().toLowerCase()}::${lastName.trim().toLowerCase()}`;
+function $(id) { return document.getElementById(id); }
+
+function show(screenId) {
+    ['scr-auth', 'scr-lobby', 'scr-room'].forEach(id => {
+        $(id).classList.toggle('hidden', id !== screenId);
+    });
 }
 
 function hasFirebaseConfig() {
@@ -918,460 +836,19 @@ function hasFirebaseConfig() {
     return !!(cfg && cfg.apiKey && cfg.projectId && !String(cfg.apiKey).includes('YOUR_'));
 }
 
-async function initFirebaseLeaderboard() {
+async function initFirebase() {
     if (!hasFirebaseConfig()) return false;
-    try {
-        const appMod = await import(`https://www.gstatic.com/firebasejs/${FIREBASE_SDK_VERSION}/firebase-app.js`);
-        const dbMod = await import(`https://www.gstatic.com/firebasejs/${FIREBASE_SDK_VERSION}/firebase-firestore.js`);
-        const authMod = await import(`https://www.gstatic.com/firebasejs/${FIREBASE_SDK_VERSION}/firebase-auth.js`);
-        const app = appMod.initializeApp(window.FIREBASE_CONFIG);
-        firebaseDb = dbMod.getFirestore(app);
-        firebaseAuth = authMod.getAuth(app);
-        firebaseApi = dbMod;
-        authApi = authMod;
-        await authMod.setPersistence(firebaseAuth, authMod.browserLocalPersistence);
-        authMod.onAuthStateChanged(firebaseAuth, handleMainAuthUser);
-        firebaseReady = true;
-        return true;
-    } catch (e) {
-        console.error('Firebase init failed', e);
-        return false;
-    }
-}
-
-function updateAdminUi() {
-    const resetBtn = document.getElementById('btn-admin-reset');
-    const unlockBtn = document.getElementById('btn-admin-unlock');
-    if (!resetBtn || !unlockBtn) return;
-    resetBtn.classList.toggle('visible', adminUnlocked);
-    unlockBtn.textContent = adminUnlocked ? 'Admin Active' : 'Admin Unlock';
-}
-
-async function fetchMainProfile(uid) {
-    if (!firebaseReady || !uid) return null;
-    const snap = await firebaseApi.getDoc(firebaseApi.doc(firebaseDb, PROFILE_COLLECTION, uid));
-    return snap.exists() ? snap.data() : null;
-}
-
-function deriveProfileFromAuth(userAccount) {
-    const display = (userAccount?.displayName || '').trim();
-    const emailName = (userAccount?.email || 'player').split('@')[0];
-    const parts = display ? display.split(/\s+/) : [emailName];
-    const firstName = parts[0] || 'Player';
-    const lastName = parts.slice(1).join(' ') || 'Quiz';
-    return {
-        id: userAccount.uid,
-        firstName,
-        lastName,
-        nickname: display || emailName,
-        photoUrl: userAccount?.photoURL || ''
-    };
-}
-
-function getPreferredDisplayName(entry = {}) {
-    const nickname = String(entry.nickname || '').trim();
-    if (nickname) return nickname;
-    const fullName = String(entry.name || `${entry.firstName || ''} ${entry.lastName || ''}`).trim();
-    return fullName || 'Παίκτης';
-}
-
-function getSecondaryDisplayName(entry = {}) {
-    const nickname = String(entry.nickname || '').trim();
-    if (nickname) return '';
-    return '';
-}
-
-function getInitials(name) {
-    return (name || 'P')
-        .split(/\s+/)
-        .filter(Boolean)
-        .slice(0, 2)
-        .map(part => part[0]?.toUpperCase() || '')
-        .join('') || 'P';
-}
-
-function renderPlayerCell(entry) {
-    const fullName = entry.name || `${entry.firstName || ''} ${entry.lastName || ''}`.trim() || 'Παίκτης';
-    const preferredName = getPreferredDisplayName(entry);
-    const secondaryName = getSecondaryDisplayName(entry);
-    const avatar = entry.photoUrl
-        ? `<img class="player-avatar" src="${entry.photoUrl}" alt="${fullName}">`
-        : `<span class="player-avatar-fallback">${getInitials(fullName)}</span>`;
-    return `
-        <div class="player-cell">
-            ${avatar}
-            <div class="player-meta">
-                <span class="${entry.nickname ? 'player-nickname primary' : 'player-name'}">${preferredName}</span>
-                ${secondaryName ? `<span class="player-name secondary">${secondaryName}</span>` : ''}
-            </div>
-        </div>
-    `;
-}
-
-function makeDefaultAvatarUrl(option) {
-    const svg = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
-            <rect width="160" height="160" rx="36" fill="${option.bg}"/>
-            <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="76">${option.emoji}</text>
-        </svg>
-    `.trim();
-    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
-}
-
-function renderMainDefaultAvatarPicker() {
-    const mount = document.getElementById('main-default-avatar-picker');
-    if (!mount) return;
-    mount.innerHTML = DEFAULT_AVATAR_OPTIONS.map(option => {
-        const active = (currentAuthProfile?.photoUrl || '') === makeDefaultAvatarUrl(option) ? 'active' : '';
-        return `<button type="button" class="avatar-choice ${active}" onclick="selectMainDefaultAvatar('${option.key}')">${option.emoji}</button>`;
-    }).join('');
-}
-
-window.selectMainDefaultAvatar = function selectMainDefaultAvatar(key) {
-    const option = DEFAULT_AVATAR_OPTIONS.find(item => item.key === key);
-    if (!option) return;
-    currentAuthProfile = { ...(currentAuthProfile || {}), photoUrl: makeDefaultAvatarUrl(option) };
-    document.getElementById('main-profile-photo').value = '';
-    renderMainDefaultAvatarPicker();
-};
-
-function populateMainProfileEditor() {
-    if (!currentAuthProfile) return;
-    document.getElementById('main-profile-first').value = currentAuthProfile.firstName || '';
-    document.getElementById('main-profile-last').value = currentAuthProfile.lastName || '';
-    document.getElementById('main-profile-nickname').value = currentAuthProfile.nickname || '';
-    document.getElementById('main-profile-photo').value = '';
-    renderMainDefaultAvatarPicker();
-}
-
-const AVATAR_MAX_SIZE = 512;
-const AVATAR_OUTPUT_QUALITY = 0.82;
-
-function readFileAsDataUrl(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : '');
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-    });
-}
-
-function loadImageFromDataUrl(dataUrl) {
-    return new Promise((resolve, reject) => {
-        const image = new Image();
-        image.onload = () => resolve(image);
-        image.onerror = reject;
-        image.src = dataUrl;
-    });
-}
-
-async function fileToDataUrl(file) {
-    const originalDataUrl = await readFileAsDataUrl(file);
-    const image = await loadImageFromDataUrl(originalDataUrl);
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return originalDataUrl;
-
-    const maxSide = Math.max(image.width, image.height) || 1;
-    const scale = Math.min(1, AVATAR_MAX_SIZE / maxSide);
-    const targetWidth = Math.max(1, Math.round(image.width * scale));
-    const targetHeight = Math.max(1, Math.round(image.height * scale));
-
-    canvas.width = targetWidth;
-    canvas.height = targetHeight;
-    ctx.drawImage(image, 0, 0, targetWidth, targetHeight);
-
-    return canvas.toDataURL('image/jpeg', AVATAR_OUTPUT_QUALITY);
-}
-
-async function ensureAudioContext() {
-    if (audioContext) {
-        if (audioContext.state === 'suspended') {
-            await audioContext.resume();
-        }
-        audioUnlocked = true;
-        return audioContext;
-    }
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    if (!AudioCtx) return null;
-    audioContext = new AudioCtx();
-    if (audioContext.state === 'suspended') {
-        await audioContext.resume();
-    }
-    audioUnlocked = true;
-    return audioContext;
-}
-
-function pulseTone(ctx, frequency, startAt, duration, type = 'sine', gainValue = 0.05) {
-    const oscillator = ctx.createOscillator();
-    const gain = ctx.createGain();
-    oscillator.type = type;
-    oscillator.frequency.setValueAtTime(frequency, startAt);
-    gain.gain.setValueAtTime(0.0001, startAt);
-    gain.gain.exponentialRampToValueAtTime(gainValue, startAt + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.0001, startAt + duration);
-    oscillator.connect(gain).connect(ctx.destination);
-    oscillator.start(startAt);
-    oscillator.stop(startAt + duration + 0.02);
-}
-
-async function playSuccessSound() {
-    if (!soundEffectsEnabled) return;
-    const ctx = await ensureAudioContext();
-    if (!ctx) return;
-    const startAt = ctx.currentTime + 0.01;
-    pulseTone(ctx, 523.25, startAt, 0.14, 'triangle', 0.04);
-    pulseTone(ctx, 659.25, startAt + 0.11, 0.16, 'triangle', 0.045);
-    pulseTone(ctx, 783.99, startAt + 0.22, 0.2, 'triangle', 0.05);
-}
-
-async function playWrongSound() {
-    if (!soundEffectsEnabled) return;
-    const ctx = await ensureAudioContext();
-    if (!ctx) return;
-    const startAt = ctx.currentTime + 0.01;
-    pulseTone(ctx, 220, startAt, 0.16, 'sawtooth', 0.05);
-    pulseTone(ctx, 164.81, startAt + 0.12, 0.22, 'sawtooth', 0.045);
-}
-
-async function playHelpSound() {
-    if (!soundEffectsEnabled) return;
-    const ctx = await ensureAudioContext();
-    if (!ctx) return;
-    const startAt = ctx.currentTime + 0.01;
-    pulseTone(ctx, 880, startAt, 0.08, 'square', 0.03);
-    pulseTone(ctx, 698.46, startAt + 0.1, 0.08, 'square', 0.026);
-    pulseTone(ctx, 880, startAt + 0.2, 0.09, 'square', 0.028);
-}
-
-function stopBackgroundMusic() {
-    if (musicLoopTimer) {
-        clearTimeout(musicLoopTimer);
-        musicLoopTimer = null;
-    }
-}
-
-async function startBackgroundMusic() {
-    stopBackgroundMusic();
-    if (!musicEnabled) return;
-    const ctx = await ensureAudioContext();
-    if (!ctx) return;
-    const bassPattern = [130.81, 146.83, 155.56, 174.61, 130.81, 146.83, 155.56, 196.0];
-    const leadPattern = [261.63, 293.66, 311.13, 349.23, 329.63, 311.13, 293.66, 261.63];
-    let noteIndex = 0;
-    const loop = () => {
-        if (!musicEnabled || !audioContext) {
-            stopBackgroundMusic();
-            return;
-        }
-        const now = audioContext.currentTime + 0.02;
-        pulseTone(audioContext, bassPattern[noteIndex % bassPattern.length], now, 0.58, 'triangle', 0.012);
-        pulseTone(audioContext, leadPattern[noteIndex % leadPattern.length], now + 0.08, 0.34, 'sine', 0.014);
-        pulseTone(audioContext, leadPattern[(noteIndex + 3) % leadPattern.length] / 2, now, 0.5, 'sine', 0.006);
-        noteIndex++;
-        musicLoopTimer = setTimeout(loop, 620);
-    };
-    loop();
-}
-
-function updateAudioButtons() {
-    const soundBtn = document.getElementById('btn-sound-toggle');
-    const musicBtn = document.getElementById('btn-music-toggle');
-    if (soundBtn) {
-        soundBtn.textContent = `${soundEffectsEnabled ? '🔊' : '🔇'} Ήχοι ${soundEffectsEnabled ? 'On' : 'Off'}`;
-        soundBtn.classList.toggle('active', soundEffectsEnabled);
-    }
-    if (musicBtn) {
-        musicBtn.textContent = `${musicEnabled ? '🎵' : '🎼'} Μουσική ${musicEnabled ? 'On' : 'Off'}`;
-        musicBtn.classList.toggle('active', musicEnabled);
-    }
-}
-
-window.toggleSoundEffects = async function toggleSoundEffects() {
-    soundEffectsEnabled = !soundEffectsEnabled;
-    localStorage.setItem('quiz12_sound_enabled', String(soundEffectsEnabled));
-    updateAudioButtons();
-    if (soundEffectsEnabled) await playSuccessSound();
-};
-
-window.toggleMusic = async function toggleMusic() {
-    musicEnabled = !musicEnabled;
-    localStorage.setItem('quiz12_music_enabled', String(musicEnabled));
-    updateAudioButtons();
-    if (musicEnabled) {
-        await startBackgroundMusic();
-    } else {
-        stopBackgroundMusic();
-    }
-};
-
-window.toggleMainProfileEditor = function toggleMainProfileEditor(forceState) {
-    const editor = document.getElementById('main-profile-editor');
-    if (!editor || !currentAuthProfile) return;
-    mainProfileEditorOpen = typeof forceState === 'boolean' ? forceState : !mainProfileEditorOpen;
-    editor.classList.toggle('hidden', !mainProfileEditorOpen);
-    if (mainProfileEditorOpen) populateMainProfileEditor();
-};
-
-function updateMainAuthUi() {
-    const manualFields = document.getElementById('manual-player-fields');
-    const profileBanner = document.getElementById('main-profile-banner');
-    const status = document.getElementById('main-auth-status');
-    const logoutBtn = document.getElementById('btn-main-logout');
-    const editBtn = document.getElementById('btn-main-edit-profile');
-    const authForm = document.getElementById('main-auth-form');
-    const authUserCard = document.getElementById('main-auth-user-card');
-    if (!manualFields || !profileBanner || !status || !logoutBtn || !editBtn || !authForm || !authUserCard) return;
-
-    if (currentAuthProfile) {
-        manualFields.classList.add('hidden');
-        profileBanner.classList.remove('hidden');
-        authForm.classList.add('hidden');
-        authUserCard.classList.remove('hidden');
-        authUserCard.innerHTML = `
-            ${currentAuthProfile.photoUrl ? `<img class="player-avatar" src="${currentAuthProfile.photoUrl}" alt="${currentAuthProfile.nickname || currentAuthProfile.firstName}">` : `<span class="player-avatar-fallback">${getInitials(currentAuthProfile.nickname || `${currentAuthProfile.firstName} ${currentAuthProfile.lastName}`)}</span>`}
-            <div class="auth-user-meta">
-                <div class="auth-user-name">${currentAuthProfile.nickname || currentAuthProfile.firstName}</div>
-                <div class="auth-user-sub">Συνδεδεμένο προφίλ</div>
-            </div>
-        `;
-        profileBanner.innerHTML = `
-            <div class="playing-as">
-                ${currentAuthProfile.photoUrl ? `<img class="player-avatar" src="${currentAuthProfile.photoUrl}" alt="${currentAuthProfile.nickname || currentAuthProfile.firstName}">` : `<span class="player-avatar-fallback">${getInitials(currentAuthProfile.nickname || `${currentAuthProfile.firstName} ${currentAuthProfile.lastName}`)}</span>`}
-                <div class="playing-as-meta">
-                    <div class="playing-as-label">Παίζεις ως</div>
-                    <div class="playing-as-name">${currentAuthProfile.nickname || currentAuthProfile.firstName}</div>
-                </div>
-            </div>
-        `;
-        status.textContent = 'Το προφίλ σου είναι συνδεδεμένο. Μπορείς να ξεκινήσεις αμέσως παιχνίδι ή μονομαχία.';
-        logoutBtn.classList.remove('hidden');
-        editBtn.classList.remove('hidden');
-    } else {
-        manualFields.classList.remove('hidden');
-        profileBanner.classList.add('hidden');
-        profileBanner.textContent = '';
-        authForm.classList.remove('hidden');
-        authUserCard.classList.add('hidden');
-        authUserCard.innerHTML = '';
-        status.textContent = 'Συνδέσου για να παίξεις με το αποθηκευμένο προφίλ σου χωρίς να ξαναγράψεις στοιχεία.';
-        logoutBtn.classList.add('hidden');
-        editBtn.classList.add('hidden');
-        mainProfileEditorOpen = false;
-        document.getElementById('main-profile-editor')?.classList.add('hidden');
-    }
-}
-
-async function handleMainAuthUser(userAccount) {
-    currentAuthUser = userAccount;
-    if (!userAccount) {
-        currentAuthProfile = null;
-        updateMainAuthUi();
-        return;
-    }
-
-    const storedProfile = await fetchMainProfile(userAccount.uid);
-    currentAuthProfile = storedProfile || deriveProfileFromAuth(userAccount);
-    document.getElementById('fname').value = currentAuthProfile.firstName || '';
-    document.getElementById('lname').value = currentAuthProfile.lastName || '';
-    updateMainAuthUi();
-}
-
-window.registerMainAccount = async function registerMainAccount() {
-    await ensureAudioContext();
-    const email = document.getElementById('main-auth-email').value.trim();
-    const password = document.getElementById('main-auth-password').value;
-    if (!email || !password) {
-        document.getElementById('main-auth-status').textContent = 'Συμπλήρωσε email και password για register.';
-        return;
-    }
-    try {
-        await authApi.createUserWithEmailAndPassword(firebaseAuth, email, password);
-    } catch (error) {
-        document.getElementById('main-auth-status').textContent = `Register error: ${error.message}`;
-    }
-};
-
-window.loginMainAccount = async function loginMainAccount() {
-    await ensureAudioContext();
-    const email = document.getElementById('main-auth-email').value.trim();
-    const password = document.getElementById('main-auth-password').value;
-    if (!email || !password) {
-        document.getElementById('main-auth-status').textContent = 'Συμπλήρωσε email και password για login.';
-        return;
-    }
-    try {
-        await authApi.signInWithEmailAndPassword(firebaseAuth, email, password);
-    } catch (error) {
-        document.getElementById('main-auth-status').textContent = `Login error: ${error.message}`;
-    }
-};
-
-window.loginMainWithGoogle = async function loginMainWithGoogle() {
-    try {
-        await ensureAudioContext();
-        const provider = new authApi.GoogleAuthProvider();
-        provider.setCustomParameters({ prompt: 'select_account' });
-        await authApi.signInWithPopup(firebaseAuth, provider);
-    } catch (error) {
-        const code = error?.code || '';
-        if (code === 'auth/popup-blocked' || code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
-            const provider = new authApi.GoogleAuthProvider();
-            provider.setCustomParameters({ prompt: 'select_account' });
-            await authApi.signInWithRedirect(firebaseAuth, provider);
-            return;
-        }
-        document.getElementById('main-auth-status').textContent = `Google login error: ${error.message}`;
-    }
-};
-
-window.logoutMainAccount = async function logoutMainAccount() {
-    await authApi.signOut(firebaseAuth);
-};
-
-window.saveMainProfile = async function saveMainProfile() {
-    if (!firebaseReady || !currentAuthUser) return;
-    const status = document.getElementById('main-profile-editor-status');
-    const firstName = document.getElementById('main-profile-first').value.trim();
-    const lastName = document.getElementById('main-profile-last').value.trim();
-    const nickname = document.getElementById('main-profile-nickname').value.trim();
-    const photoFile = document.getElementById('main-profile-photo').files?.[0];
-
-    if (firstName.length < 2 || lastName.length < 2 || nickname.length < 2) {
-        status.textContent = 'Συμπλήρωσε σωστά όνομα, επώνυμο και nickname.';
-        return;
-    }
-
-    try {
-        let photoUrl = currentAuthProfile?.photoUrl || '';
-        if (photoFile) {
-            photoUrl = await fileToDataUrl(photoFile);
-        }
-
-        const nextProfile = {
-            id: currentAuthUser.uid,
-            firstName,
-            lastName,
-            nickname,
-            photoUrl,
-            updatedAt: new Date().toISOString()
-        };
-
-        await firebaseApi.setDoc(firebaseApi.doc(firebaseDb, PROFILE_COLLECTION, currentAuthUser.uid), nextProfile, { merge: true });
-        currentAuthProfile = { ...currentAuthProfile, ...nextProfile };
-        document.getElementById('fname').value = firstName;
-        document.getElementById('lname').value = lastName;
-        updateMainAuthUi();
-        renderMainDefaultAvatarPicker();
-        status.textContent = 'Το προφίλ σου αποθηκεύτηκε.';
-        await renderLeaderboard(selectedEntryId || user.id);
-    } catch (error) {
-        status.textContent = `Σφάλμα αποθήκευσης: ${error.message}`;
-    }
-};
-
-function createAttemptId() {
-    return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    const appMod = await import(`https://www.gstatic.com/firebasejs/${FIREBASE_SDK_VERSION}/firebase-app.js`);
+    const dbMod = await import(`https://www.gstatic.com/firebasejs/${FIREBASE_SDK_VERSION}/firebase-firestore.js`);
+    const authMod = await import(`https://www.gstatic.com/firebasejs/${FIREBASE_SDK_VERSION}/firebase-auth.js`);
+    firebaseApp = appMod.initializeApp(window.FIREBASE_CONFIG);
+    firebaseDb = dbMod.getFirestore(firebaseApp);
+    firebaseAuth = authMod.getAuth(firebaseApp);
+    firestoreApi = dbMod;
+    authApi = authMod;
+    await authMod.setPersistence(firebaseAuth, authMod.browserLocalPersistence);
+    firebaseReady = true;
+    return true;
 }
 
 function shuffleArray(items) {
@@ -1396,728 +873,1245 @@ function shuffleQuestionOptions(question) {
     };
 }
 
-function getQuestionId(question) {
-    return question?.id || question?.q || JSON.stringify(question);
+function pickDuelQuestions(count = QUESTIONS_PER_DUEL) {
+    return shuffleArray(QUESTION_POOL)
+        .slice(0, Math.max(1, Math.min(QUESTION_POOL.length, count)))
+        .map(shuffleQuestionOptions);
 }
 
-function getQuestionHistory() {
-    try {
-        const raw = JSON.parse(localStorage.getItem(QUESTION_HISTORY_KEY) || '[]');
-        return Array.isArray(raw) ? raw : [];
-    } catch {
-        return [];
-    }
-}
-
-function saveQuestionHistory(history) {
-    try {
-        localStorage.setItem(QUESTION_HISTORY_KEY, JSON.stringify(history));
-    } catch {}
-}
-
-function initializeQuestionSet() {
-    const history = getQuestionHistory();
-    const historySet = new Set(history);
-    const freshPool = QUESTION_POOL.filter(question => !historySet.has(getQuestionId(question)));
-    const basePool = freshPool.length >= QUESTIONS_PER_GAME ? freshPool : QUESTION_POOL;
-    const shuffled = shuffleArray(basePool);
-    const totalQuestions = Math.min(QUESTIONS_PER_GAME, shuffled.length);
-
-    questions = shuffled.slice(0, totalQuestions).map(shuffleQuestionOptions);
-    reserveQuestions = shuffled.slice(totalQuestions).map(shuffleQuestionOptions);
-
-    const selectedIds = questions.map(getQuestionId);
-    const nextHistory = [...history.filter(id => !selectedIds.includes(id)), ...selectedIds];
-    const maxHistory = Math.max(QUESTIONS_PER_GAME, QUESTION_POOL.length - QUESTIONS_PER_GAME);
-    saveQuestionHistory(nextHistory.slice(-maxHistory));
-}
-
-function getCurrentQuestionPoints() {
-    return 100 + Math.round(timeLeft * 10);
-}
-
-function applyLifelinePenalty(rate) {
-    const penalty = Math.round(getCurrentQuestionPoints() * rate);
-    score -= penalty;
-    document.getElementById('score-display').textContent = score;
-    return penalty;
-}
-
-function getAudiencePatternCount() {
-    const raw = Number(localStorage.getItem(AUDIENCE_PATTERN_KEY) || 0);
-    return Number.isFinite(raw) ? raw : 0;
-}
-
-function bumpAudiencePatternCount() {
-    const next = getAudiencePatternCount() + 1;
-    localStorage.setItem(AUDIENCE_PATTERN_KEY, String(next));
-    return next;
-}
-
-function buildAnswerReview() {
-    return questions.map((question, index) => {
-        const answer = answersStatus[index];
-        const selectedIndex = answer ? answer.selectedIndex : -1;
-        return {
-            questionIndex: index,
-            questionText: question.q,
-            selectedIndex,
-            selectedText: selectedIndex >= 0 ? question.o[selectedIndex] : 'Καμία απάντηση',
-            correctIndex: question.a,
-            correctText: question.o[question.a],
-            isCorrect: !!answer?.isCorrect,
-            rationale: question.r
-        };
-    });
-}
-
-function getLeaderboard() {
-    try {
-        const raw = JSON.parse(localStorage.getItem(LEADERBOARD_KEY) || '[]');
-        return Array.isArray(raw) ? raw : [];
-    } catch {
-        return [];
-    }
-}
-
-function saveLeaderboard(entries) {
-    try { localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(entries)); } catch {}
-}
-
-function sortLeaderboard(entries) {
-    const direction = leaderboardSort.direction === 'asc' ? 1 : -1;
-    const key = leaderboardSort.key;
-
-    return [...entries].sort((a, b) => {
-        let primary = 0;
-
-        if (key === 'name') {
-            primary = (a.name || '').localeCompare(b.name || '', 'el');
-        } else if (key === 'score') {
-            primary = (a.score || 0) - (b.score || 0);
-        } else if (key === 'accValue') {
-            primary = (a.accValue || 0) - (b.accValue || 0);
-        } else if (key === 'lastPlayedTs') {
-            primary = (a.lastPlayedTs || 0) - (b.lastPlayedTs || 0);
-        }
-
-        if (primary !== 0) return primary * direction;
-
-        if ((b.score || 0) !== (a.score || 0)) return (b.score || 0) - (a.score || 0);
-        if ((b.accValue || 0) !== (a.accValue || 0)) return (b.accValue || 0) - (a.accValue || 0);
-        if ((b.lastPlayedTs || 0) !== (a.lastPlayedTs || 0)) return (b.lastPlayedTs || 0) - (a.lastPlayedTs || 0);
-        return (a.name || '').localeCompare(b.name || '', 'el');
-    });
-}
-
-function changeSort(key) {
-    if (leaderboardSort.key === key) {
-        leaderboardSort.direction = leaderboardSort.direction === 'asc' ? 'desc' : 'asc';
+function renderAvatar(imgEl, fallbackEl, photoUrl) {
+    if (photoUrl) {
+        imgEl.src = photoUrl;
+        imgEl.classList.remove('hidden');
+        fallbackEl.classList.add('hidden');
     } else {
-        leaderboardSort.key = key;
-        leaderboardSort.direction = key === 'name' ? 'asc' : 'desc';
-    }
-    renderLeaderboard(selectedEntryId || user.id);
-}
-
-function launchConfetti() {
-    const layer = document.getElementById('effect-layer');
-    if (!layer) return;
-    const colors = ['#f59e0b', '#ef4444', '#10b981', '#0ea5e9'];
-
-    for (let i = 0; i < 28; i++) {
-        const piece = document.createElement('span');
-        piece.className = 'confetti-piece';
-        piece.style.left = `${Math.random() * 100}vw`;
-        piece.style.background = colors[i % colors.length];
-        piece.style.animationDelay = `${Math.random() * 0.25}s`;
-        piece.style.animationDuration = `${1.4 + Math.random() * 0.8}s`;
-        piece.style.transform = `translateY(0) rotate(${Math.random() * 240}deg)`;
-        layer.appendChild(piece);
-        setTimeout(() => piece.remove(), 2300);
+        imgEl.removeAttribute('src');
+        imgEl.classList.add('hidden');
+        fallbackEl.classList.remove('hidden');
     }
 }
 
-function showSadFace() {
-    const layer = document.getElementById('effect-layer');
-    if (!layer) return;
-    const badge = document.createElement('div');
-    badge.className = 'sad-badge';
-    badge.textContent = '😢';
-    layer.appendChild(badge);
-    setTimeout(() => badge.remove(), 1300);
+function profileLabel(profile) {
+    return profile.nickname || `${profile.firstName} ${profile.lastName}`.trim();
 }
 
-function showHelpBadge() {
-    const layer = document.getElementById('effect-layer');
-    if (!layer) return;
-    const badge = document.createElement('div');
-    badge.className = 'help-badge';
-    badge.textContent = '🩹';
-    layer.appendChild(badge);
-    setTimeout(() => badge.remove(), 1300);
+function escapeHtml(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
 }
 
-function formatDate(ts) {
-    if (!ts) return '-';
-    return new Date(ts).toLocaleString('el-GR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+function getKnownMentionTokens() {
+    const nicknames = currentRoomData?.players
+        ? Object.values(currentRoomData.players)
+            .map(player => player?.nickname)
+            .filter(Boolean)
+            .sort((a, b) => b.length - a.length)
+        : [];
+    return ['@all', ...nicknames.map(nickname => `@${nickname}`)];
 }
 
-function normalizeRemoteEntries(entries) {
-    return entries.map(entry => {
-        const totalCorrect = Number(entry.total_correct || 0);
-        const totalWrong = Number(entry.total_wrong || 0);
-        const totalAnswers = totalCorrect + totalWrong;
-        const accValue = totalAnswers > 0 ? Math.round((totalCorrect / totalAnswers) * 100) : 0;
-        const lastPlayed = entry.last_played || null;
-        return {
-            id: entry.id || createAttemptId(),
-            name: `${entry.first_name || ''} ${entry.last_name || ''}`.trim(),
-            firstName: entry.first_name || '',
-            lastName: entry.last_name || '',
-            nickname: entry.nickname || '',
-            photoUrl: entry.photo_url || '',
-            authUid: entry.auth_uid || '',
-            score: Number(entry.score || entry.high_score || 0),
-            acc: `${accValue}%`,
-            accValue,
-            games: Number(entry.games || 1),
-            lastPlayed,
-            lastPlayedTs: lastPlayed ? Date.parse(lastPlayed) : 0,
-            answers: Array.isArray(entry.answers) ? entry.answers : []
-        };
-    });
-}
+function highlightMentions(text) {
+    const source = String(text ?? '');
+    const tokens = getKnownMentionTokens();
+    if (!tokens.length) return escapeHtml(source);
 
-async function fetchRemoteLeaderboard() {
-    const snapshot = await firebaseApi.getDocs(firebaseApi.collection(firebaseDb, FIREBASE_COLLECTION));
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-}
-
-async function submitRemoteScore(payload) {
-    const docId = createAttemptId();
-    await firebaseApi.setDoc(firebaseApi.doc(firebaseDb, FIREBASE_COLLECTION, docId), {
-        id: docId,
-        player_id: normalizePlayerId(payload.first_name, payload.last_name),
-        first_name: payload.first_name,
-        last_name: payload.last_name,
-        nickname: payload.nickname || '',
-        photo_url: payload.photo_url || '',
-        auth_uid: payload.auth_uid || '',
-        score: Number(payload.score || 0),
-        total_correct: Number(payload.correct || 0),
-        total_wrong: Number(payload.wrong || 0),
-        games: 1,
-        answers: Array.isArray(payload.answers) ? payload.answers : [],
-        last_played: new Date().toISOString()
-    });
-}
-
-async function resetRemoteLeaderboard() {
-    const snapshot = await firebaseApi.getDocs(firebaseApi.collection(firebaseDb, FIREBASE_COLLECTION));
-    await Promise.all(snapshot.docs.map(item => firebaseApi.deleteDoc(firebaseApi.doc(firebaseDb, FIREBASE_COLLECTION, item.id))));
-}
-
-async function deleteRemoteEntry(entryId) {
-    await firebaseApi.deleteDoc(firebaseApi.doc(firebaseDb, FIREBASE_COLLECTION, entryId));
-}
-
-function renderLeaderboardEntries(entries, targetId = user.id) {
-    const medals = ['🥇', '🥈', '🥉'];
-    const previewRows = entries.slice(0, Math.min(entries.length, 10));
-
-    document.getElementById('lb-body').innerHTML = previewRows.length ? previewRows.map((p, i) => `
-        <tr class="${p.id === targetId ? 'highlight' : ''}">
-            <td><span class="rank-badge">${medals[i] || (i + 1)}</span></td>
-            <td>${renderPlayerCell(p)}</td>
-            <td>${p.score}</td>
-            <td>${p.acc}</td>
-            <td>${formatDate(p.lastPlayed)}</td>
-        </tr>`).join('') : '<tr><td colspan="5">Δεν υπάρχουν παίκτες ακόμα.</td></tr>';
-
-    document.getElementById('leaderboard-full-body').innerHTML = entries.length ? entries.map((p, i) => `
-        <tr class="entry-row ${p.id === targetId ? 'highlight' : ''}" onclick="showEntryDetails('${p.id}')">
-            <td><span class="rank-badge">${medals[i] || (i + 1)}</span></td>
-            <td>${renderPlayerCell(p)}</td>
-            <td>${p.score}</td>
-            <td>${p.acc}</td>
-            <td>${formatDate(p.lastPlayed)}</td>
-            <td class="delete-cell">
-                <button class="delete-entry-btn ${adminUnlocked ? 'visible' : ''}" onclick="event.stopPropagation(); deleteLeaderboardEntry('${p.id}')">🗑</button>
-            </td>
-        </tr>`).join('') : '<tr><td colspan="5">Δεν υπάρχουν παίκτες ακόμα.</td></tr>';
-
-    if (!selectedEntryId && entries.length) {
-        selectedEntryId = targetId && entries.some(entry => entry.id === targetId) ? targetId : entries[0].id;
-    } else if (selectedEntryId && !entries.some(entry => entry.id === selectedEntryId)) {
-        selectedEntryId = entries.length ? entries[0].id : null;
+    let result = '';
+    let cursor = 0;
+    while (cursor < source.length) {
+        let matchedToken = '';
+        for (const token of tokens) {
+            if (source.slice(cursor, cursor + token.length) === token) {
+                const prevChar = cursor === 0 ? '' : source[cursor - 1];
+                const nextChar = source[cursor + token.length] || '';
+                const prevOk = cursor === 0 || /\s|[([{"'“]/.test(prevChar);
+                const nextOk = !nextChar || /\s|[)\]}",.!?:;'"”]/.test(nextChar);
+                if (prevOk && nextOk) {
+                    matchedToken = token;
+                    break;
+                }
+            }
+        }
+        if (matchedToken) {
+            result += `<span class="mention-token">${escapeHtml(matchedToken)}</span>`;
+            cursor += matchedToken.length;
+        } else {
+            result += escapeHtml(source[cursor]);
+            cursor += 1;
+        }
     }
-
-    renderDetailsPanel(entries.find(entry => entry.id === selectedEntryId) || null);
-    updateAdminUi();
-
-    return entries;
+    return result;
 }
 
-function renderDetailsPanel(entry) {
-    const detailsContent = document.getElementById('details-content');
-    if (!detailsContent) return;
+function formatReplySnippet(text) {
+    const clean = String(text || '').trim();
+    if (!clean) return 'Χωρίς κείμενο';
+    return clean.length > 90 ? `${clean.slice(0, 87)}...` : clean;
+}
 
-    if (!entry) {
-        detailsContent.className = 'details-empty';
-        detailsContent.innerHTML = 'Πάτησε μια συμμετοχή από τον πίνακα για να δεις ποιες ερωτήσεις απαντήθηκαν σωστά και ποιες λάθος.';
+function clearDuelAdvanceTimeout() {
+    if (duelAdvanceTimeout) {
+        clearTimeout(duelAdvanceTimeout);
+        duelAdvanceTimeout = null;
+    }
+}
+
+function stopDuelTimer() {
+    if (duelTimerInterval) {
+        clearInterval(duelTimerInterval);
+        duelTimerInterval = null;
+    }
+    duelTimerDeadline = 0;
+    updateDuelTimerLabel();
+}
+
+function updateDuelTimerLabel() {
+    const mount = $('duel-timer-text');
+    const fill = $('duel-timer-fill');
+    if (!mount) return;
+    if (!duelTimerDeadline) {
+        mount.textContent = '30s';
+        mount.style.color = '#f59e0b';
+        if (fill) fill.style.width = '100%';
         return;
     }
+    const remainingMs = Math.max(0, duelTimerDeadline - Date.now());
+    const remainingSec = Math.ceil(remainingMs / 1000);
+    const ratio = Math.max(0, Math.min(1, remainingMs / 30000));
+    mount.textContent = `${remainingSec}s`;
+    mount.style.color = remainingSec <= 5 ? '#ef4444' : '#f59e0b';
+    if (fill) fill.style.width = `${ratio * 100}%`;
+}
 
-    const answers = Array.isArray(entry.answers) ? entry.answers : [];
-    const correctAnswers = answers.filter(answer => answer.isCorrect).length;
-    const entryDisplayName = getPreferredDisplayName(entry);
-    detailsContent.className = '';
-    detailsContent.innerHTML = `
-        <div class="question-review-meta">
-            <strong>${entryDisplayName}</strong><br>
-            Score: ${entry.score} | Accuracy: ${entry.acc} | Correct: ${correctAnswers}/${questions.length}<br>
-            Played: ${formatDate(entry.lastPlayed)}
-        </div>
-        <div class="question-review">
-            ${answers.length ? answers.map((answer, index) => `
-                <div class="question-review-item ${answer.isCorrect ? 'correct-review' : 'wrong-review'}">
-                    <div class="question-review-status">${answer.isCorrect ? 'Σωστό' : 'Λάθος'}</div>
-                    <div class="question-review-text">${index + 1}. ${answer.questionText}</div>
-                    <div class="question-review-meta">
-                        Δική του απάντηση: ${answer.selectedText}<br>
-                        Σωστή απάντηση: ${answer.correctText}
-                    </div>
-                </div>
-            `).join('') : '<div class="details-empty">Δεν υπάρχουν διαθέσιμες λεπτομέρειες για αυτή τη συμμετοχή.</div>'}
-        </div>
+function lockDuelOptions() {
+    Array.from(document.querySelectorAll('#duel-options .option')).forEach(button => {
+        button.disabled = true;
+    });
+}
+
+function markDuelOptionResults(question, selectedIndex = null, timedOut = false) {
+    const optionButtons = Array.from(document.querySelectorAll('#duel-options .option'));
+    optionButtons.forEach((button, index) => {
+        button.classList.remove('correct-choice', 'wrong-choice', 'reveal-correct');
+        if (index === question.a) {
+            button.classList.add(selectedIndex === question.a && !timedOut ? 'correct-choice' : 'reveal-correct');
+        }
+        if (!timedOut && selectedIndex !== null && index === selectedIndex && selectedIndex !== question.a) {
+            button.classList.add('wrong-choice');
+        }
+    });
+}
+
+function scheduleDuelAdvance(callback, delay = 2600) {
+    clearDuelAdvanceTimeout();
+    duelAdvanceTimeout = setTimeout(async () => {
+        duelAdvanceTimeout = null;
+        await callback();
+    }, delay);
+}
+
+function formatDuelResult(question, isCorrect, selectedIndex = null, timedOut = false) {
+    const correctAnswer = question.o?.[question.a] || '';
+    const explanation = question.r ? `<div style="margin-top:8px; color:#cbd5e1; line-height:1.55;">${escapeHtml(question.r)}</div>` : '';
+    const yourAnswer = selectedIndex === null || timedOut
+        ? '<div style="margin-top:8px;">Η απάντησή σου: Δεν απάντησες εγκαίρως.</div>'
+        : `<div style="margin-top:8px;">Η απάντησή σου: ${escapeHtml(question.o?.[selectedIndex] || '')}</div>`;
+    if (isCorrect) {
+        return `
+            <div style="color:#10b981;">Σωστό! Κέρδισες 100 πόντους.</div>
+            <div style="margin-top:8px; color:#10b981;">Σωστή απάντηση: ${escapeHtml(correctAnswer)}</div>
+            ${question.r ? `<div style="margin-top:8px; color:#cbd5e1; line-height:1.55;">${escapeHtml(question.r)}</div>` : ''}
+        `;
+    }
+    return `
+        <div style="color:#ff2c2c;">${timedOut ? 'Ο χρόνος τελείωσε.' : 'Λάθος απάντηση.'}</div>
+        ${yourAnswer}
+        <div style="margin-top:8px; color:#ff5a5f;">Σωστή απάντηση: ${escapeHtml(correctAnswer)}</div>
+		${explanation}
     `;
 }
 
-function showEntryDetails(entryId) {
-    selectedEntryId = entryId;
-    renderLeaderboard();
-}
+async function commitDuelAnswer(selectedIndex = null, timedOut = false) {
+    if (!currentRoomData || !currentProfile) return;
+    const me = currentRoomData.players?.[currentProfile.id];
+    if (!me || me.finished || duelAnswerLocked) return;
+    const question = currentRoomData.questions[me.currentIndex];
+    if (!question) return;
 
-function unlockAdmin() {
-    const username = prompt('Admin username:');
-    if (username === null) return;
-    const password = prompt('Admin password:');
-    if (password === null) return;
+    duelAnswerLocked = true;
+    stopDuelTimer();
+    lockDuelOptions();
+    markDuelOptionResults(question, selectedIndex, timedOut);
 
-    if (username === ADMIN_CONFIG.username && password === ADMIN_CONFIG.password) {
-        adminUnlocked = true;
-        sessionStorage.setItem('quiz11_admin_unlocked', 'true');
-        updateAdminUi();
-        alert('Admin ενεργοποιήθηκε.');
-        return;
-    }
+    const isCorrect = !timedOut && selectedIndex === question.a;
+    const nextIndex = me.currentIndex + 1;
+    $('duel-answer-status').innerHTML = formatDuelResult(question, isCorrect, selectedIndex, timedOut);
+    $('duel-answer-status').classList.remove('hidden', 'success-result', 'error-result');
+    $('duel-answer-status').classList.add(isCorrect ? 'success-result' : 'error-result');
 
-    alert('Λάθος στοιχεία admin.');
-}
+    const updates = {
+        [`players.${currentProfile.id}.score`]: (me.score || 0) + (isCorrect ? 100 : 0),
+        [`players.${currentProfile.id}.correct`]: (me.correct || 0) + (isCorrect ? 1 : 0),
+        [`players.${currentProfile.id}.currentIndex`]: nextIndex,
+        [`players.${currentProfile.id}.finished`]: nextIndex >= currentRoomData.questions.length
+    };
 
-async function renderLeaderboard(targetId = user.id) {
-    if (firebaseReady) {
-        const remoteEntries = normalizeRemoteEntries(await fetchRemoteLeaderboard());
-        return renderLeaderboardEntries(sortLeaderboard(remoteEntries), targetId);
-    }
-    return renderLeaderboardEntries(sortLeaderboard(getLeaderboard()), targetId);
-}
+    const latestPlayers = {
+        ...currentRoomData.players,
+        [currentProfile.id]: {
+            ...me,
+            score: (me.score || 0) + (isCorrect ? 100 : 0),
+            correct: (me.correct || 0) + (isCorrect ? 1 : 0),
+            currentIndex: nextIndex,
+            finished: nextIndex >= currentRoomData.questions.length
+        }
+    };
 
-function resetQuizState() {
-    clearInterval(timer);
-    cur = 0;
-    score = 0;
-    correct = 0;
-    timeLeft = QUESTION_TIME;
-    answersStatus = [];
-    lifeline5050Used = false;
-    lifelineAudienceUsed = false;
-    lifelineSwapUsed = false;
-    initializeQuestionSet();
-}
-
-function show(id) {
-    ['scr-login', 'scr-quiz', 'scr-end', 'scr-leaderboard'].forEach(s => {
-        document.getElementById(s).classList.toggle('hidden', s !== id);
+    scheduleDuelAdvance(async () => {
+        await firestoreApi.updateDoc(firestoreApi.doc(firebaseDb, ROOM_COLLECTION, currentRoomCode), updates);
+        await maybeFinishRoom(latestPlayers);
     });
 }
 
-function updateTimerDisplay() {
-    const t = Math.ceil(timeLeft);
-    document.getElementById('timer-bar').style.width = (timeLeft / QUESTION_TIME * 100) + '%';
-    document.getElementById('timer-count').textContent = `${t}s`;
-    document.getElementById('timer-count').classList.toggle('urgent', timeLeft <= 5);
+function startDuelTimer(questionKey) {
+    stopDuelTimer();
+    duelTimerDeadline = Date.now() + 30000;
+    updateDuelTimerLabel();
+    duelTimerInterval = setInterval(() => {
+        updateDuelTimerLabel();
+        if (Date.now() >= duelTimerDeadline) {
+            stopDuelTimer();
+            commitDuelAnswer(null, true);
+        }
+    }, 250);
+    duelRenderedQuestionKey = questionKey;
 }
 
-function startQuiz() {
-    const f = (currentAuthProfile?.firstName || document.getElementById('fname').value).trim();
-    const l = (currentAuthProfile?.lastName || document.getElementById('lname').value).trim();
-    if (f.length < 2 || l.length < 2) { alert('Συμπλήρωσε τα στοιχεία σου.'); return; }
-    if (!QUESTION_POOL.length) { alert('Δεν υπάρχουν διαθέσιμες ερωτήσεις για το quiz.'); return; }
-    resetQuizState();
-    const nickname = (currentAuthProfile?.nickname || '').trim();
-    const photoUrl = currentAuthProfile?.photoUrl || '';
-    user = {
-        f,
-        l,
-        id: normalizePlayerId(f, l),
-        nickname,
-        photoUrl,
-        authUid: currentAuthUser?.uid || ''
+function renderReactionGlyph(option) {
+    const style = option?.color ? ` style="color:${option.color}"` : '';
+    return `<span class="reaction-icon"${style}>${option?.emoji || ''}</span>`;
+}
+
+async function ensureChatAudio() {
+    if (chatAudioContext) {
+        if (chatAudioContext.state === 'suspended') await chatAudioContext.resume();
+        return chatAudioContext;
+    }
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return null;
+    chatAudioContext = new AudioCtx();
+    if (chatAudioContext.state === 'suspended') await chatAudioContext.resume();
+    return chatAudioContext;
+}
+
+function playChatTone(ctx, frequency, startAt, duration, type = 'triangle', gainValue = 0.03) {
+    const oscillator = ctx.createOscillator();
+    const gain = ctx.createGain();
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(frequency, startAt);
+    gain.gain.setValueAtTime(0.0001, startAt);
+    gain.gain.exponentialRampToValueAtTime(gainValue, startAt + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, startAt + duration);
+    oscillator.connect(gain).connect(ctx.destination);
+    oscillator.start(startAt);
+    oscillator.stop(startAt + duration + 0.03);
+}
+
+async function playIncomingMessageSound() {
+    const ctx = await ensureChatAudio();
+    if (!ctx) return;
+    const now = ctx.currentTime + 0.01;
+    playChatTone(ctx, 659.25, now, 0.12, 'triangle', 0.03);
+    playChatTone(ctx, 880, now + 0.1, 0.16, 'triangle', 0.028);
+}
+
+function maybeNotifyNewMessage(item) {
+    if (!item || !currentProfile || item.senderId === currentProfile.id) return;
+    playIncomingMessageSound();
+    if ('Notification' in window) {
+        if (Notification.permission === 'granted') {
+            new Notification(`Νέο μήνυμα από ${item.nickname || 'Παίκτη'}`, {
+                body: item.text || 'Σου έστειλε μήνυμα στο room',
+                icon: item.photoUrl || undefined
+            });
+        } else if (Notification.permission === 'default') {
+            Notification.requestPermission().catch(() => {});
+        }
+    }
+}
+
+function buildMentionMenu() {
+    const mount = $('mention-menu');
+    if (!mount || !currentRoomData?.players) return;
+    const players = getSortedPlayers(currentRoomData.players);
+    const options = [
+        { label: '@all', value: '@all ' },
+        ...players.map(player => ({ label: `@${player.nickname}`, value: `@${player.nickname} ` }))
+    ];
+    mount.innerHTML = options.map(option => `
+        <button class="mention-chip" onclick="insertMention('${option.value.replace(/'/g, "\\'")}')">${option.label}</button>
+    `).join('');
+}
+
+window.toggleMentionMenu = function toggleMentionMenu() {
+    const menu = $('mention-menu');
+    if (!menu) return;
+    buildMentionMenu();
+    menu.classList.toggle('hidden');
+};
+
+window.insertMention = function insertMention(token) {
+    const input = $('chat-input');
+    if (!input) return;
+    input.value = `${input.value}${input.value && !input.value.endsWith(' ') ? ' ' : ''}${token}`;
+    input.focus();
+    $('mention-menu').classList.add('hidden');
+};
+
+window.toggleReactionPalette = function toggleReactionPalette(messageId) {
+    openReactionPaletteFor = openReactionPaletteFor === messageId ? null : messageId;
+    const palettes = Array.from(document.querySelectorAll('.reaction-palette[data-message-id]'));
+    palettes.forEach(node => {
+        node.classList.toggle('hidden', node.dataset.messageId !== openReactionPaletteFor);
+    });
+};
+
+function renderReplyComposer() {
+    const box = $('chat-reply-box');
+    if (!box) return;
+    if (!replyTarget) {
+        box.classList.add('hidden');
+        $('chat-reply-title').textContent = 'Απάντηση';
+        $('chat-reply-snippet').textContent = '';
+        return;
+    }
+    box.classList.remove('hidden');
+    $('chat-reply-title').textContent = editingMessageId ? 'Επεξεργασία μηνύματος' : `Απάντηση σε ${replyTarget.nickname}`;
+    $('chat-reply-snippet').textContent = replyTarget.text || 'Χωρίς κείμενο';
+}
+
+window.clearReplyTarget = function clearReplyTarget() {
+    replyTarget = null;
+    editingMessageId = null;
+    $('chat-input').value = '';
+    renderReplyComposer();
+};
+
+window.beginReplyToMessage = function beginReplyToMessage(messageId) {
+    const item = document.querySelector(`.chat-item[data-message-id="${messageId}"]`);
+    if (!item) return;
+    replyTarget = {
+        id: messageId,
+        nickname: item.dataset.nickname || 'Παίκτης',
+        text: item.dataset.text || ''
     };
-    document.getElementById('user-display').innerHTML = `
-        <div class="playing-as">
-            ${photoUrl ? `<img class="player-avatar" src="${photoUrl}" alt="${nickname || f}">` : `<span class="player-avatar-fallback">${getInitials(nickname || `${f} ${l}`)}</span>`}
-            <div class="playing-as-meta">
-                <div class="playing-as-label">Παίζεις ως</div>
-                <div class="playing-as-name">${nickname || `${f} ${l}`}</div>
+    editingMessageId = null;
+    renderReplyComposer();
+    $('chat-input').focus();
+};
+
+window.beginEditMessage = async function beginEditMessage(messageId) {
+    if (!currentRoomCode || !currentProfile) return;
+    const messageRef = firestoreApi.doc(firebaseDb, ROOM_COLLECTION, currentRoomCode, 'messages', messageId);
+    const messageSnap = await firestoreApi.getDoc(messageRef);
+    if (!messageSnap.exists()) return;
+    const data = messageSnap.data();
+    if (data.senderId !== currentProfile.id || data.deletedAt) return;
+    editingMessageId = messageId;
+    replyTarget = {
+        id: messageId,
+        nickname: data.nickname || currentProfile.nickname,
+        text: data.text || ''
+    };
+    $('chat-input').value = data.text || '';
+    renderReplyComposer();
+    $('chat-input').focus();
+};
+
+window.deleteMessage = async function deleteMessage(messageId) {
+    if (!currentRoomCode || !currentProfile) return;
+    const messageRef = firestoreApi.doc(firebaseDb, ROOM_COLLECTION, currentRoomCode, 'messages', messageId);
+    const messageSnap = await firestoreApi.getDoc(messageRef);
+    if (!messageSnap.exists()) return;
+    const data = messageSnap.data();
+    if (data.senderId !== currentProfile.id) return;
+    await firestoreApi.updateDoc(messageRef, {
+        text: '',
+        mentions: [],
+        replyTo: firestoreApi.deleteField(),
+        deletedAt: firestoreApi.serverTimestamp(),
+        editedAt: firestoreApi.serverTimestamp()
+    });
+    if (editingMessageId === messageId) {
+        window.clearReplyTarget();
+    }
+};
+
+function formatTime(timestamp) {
+    if (!timestamp) return 'τώρα';
+    const date = timestamp?.toDate ? timestamp.toDate() : new Date(timestamp);
+    return Number.isNaN(date.getTime()) ? 'τώρα' : date.toLocaleTimeString('el-GR', { hour: '2-digit', minute: '2-digit' });
+}
+
+async function fileToAvatarDataUrl(file) {
+    const originalDataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+    const image = await new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = originalDataUrl;
+    });
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return originalDataUrl;
+
+    const maxSide = Math.max(image.width, image.height) || 1;
+    const scale = Math.min(1, 512 / maxSide);
+    const targetWidth = Math.max(1, Math.round(image.width * scale));
+    const targetHeight = Math.max(1, Math.round(image.height * scale));
+
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+    ctx.drawImage(image, 0, 0, targetWidth, targetHeight);
+
+    return canvas.toDataURL('image/jpeg', 0.82);
+}
+
+function makeDefaultAvatarUrl(option) {
+    const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+            <rect width="160" height="160" rx="36" fill="${option.bg}"/>
+            <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="76">${option.emoji}</text>
+        </svg>
+    `.trim();
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
+function renderDefaultAvatarPicker() {
+    const mount = $('default-avatar-picker');
+    if (!mount) return;
+    mount.innerHTML = DEFAULT_AVATAR_OPTIONS.map(option => {
+        const active = avatarDataUrl === makeDefaultAvatarUrl(option) ? 'active' : '';
+        return `<button type="button" class="avatar-choice ${active}" onclick="selectDefaultAvatar('${option.key}')">${option.emoji}</button>`;
+    }).join('');
+}
+
+window.selectDefaultAvatar = function selectDefaultAvatar(key) {
+    const option = DEFAULT_AVATAR_OPTIONS.find(item => item.key === key);
+    if (!option) return;
+    avatarDataUrl = makeDefaultAvatarUrl(option);
+    $('profile-avatar-file').value = '';
+    renderAvatar($('profile-avatar-preview'), $('profile-avatar-fallback'), avatarDataUrl);
+    renderDefaultAvatarPicker();
+};
+
+async function fetchProfile(uid) {
+    const snap = await firestoreApi.getDoc(firestoreApi.doc(firebaseDb, PROFILE_COLLECTION, uid));
+    return snap.exists() ? snap.data() : null;
+}
+
+function fillProfileForm(profile) {
+    $('profile-first-name').value = profile?.firstName || '';
+    $('profile-last-name').value = profile?.lastName || '';
+    $('profile-nickname').value = profile?.nickname || '';
+    avatarDataUrl = profile?.photoUrl || '';
+    renderAvatar($('profile-avatar-preview'), $('profile-avatar-fallback'), avatarDataUrl);
+    renderDefaultAvatarPicker();
+}
+
+function renderAuthState(message = '') {
+    $('auth-status').textContent = message || (
+        authUser
+            ? 'Ο λογαριασμός σου είναι συνδεδεμένος.'
+            : 'Σύνδεσε πρώτα λογαριασμό και μετά αποθήκευσε το duel profile σου.'
+    );
+    $('profile-setup').classList.toggle('hidden', !authUser);
+    $('btn-back-lobby').classList.toggle('hidden', !currentProfile);
+}
+
+function renderLobbyProfile() {
+    if (!currentProfile || !authUser) return;
+    $('lobby-profile-card').innerHTML = `
+        <div class="player-head">
+            ${currentProfile.photoUrl ? `<img src="${currentProfile.photoUrl}" alt="">` : `<div class="avatar-fallback" style="width:54px;height:54px;border-radius:14px;font-size:1.5rem;">👤</div>`}
+            <div>
+                <div class="player-name">${profileLabel(currentProfile)}</div>
+                <div class="player-sub">Παίζεις ως</div>
             </div>
         </div>
     `;
-    document.getElementById('q-total').textContent = questions.length;
-    document.getElementById('score-display').textContent = '0';
-    startBackgroundMusic();
-    show('scr-quiz');
-    loadQuestion();
 }
 
-function openLeaderboard() {
-    renderLeaderboard();
-    show('scr-leaderboard');
+window.goToMainPage = function goToMainPage() {
+    window.location.href = 'https://vapostolakos.github.io/quiz12-general/';
+};
+
+function stopSubscriptions() {
+    if (roomUnsub) roomUnsub();
+    if (chatUnsub) chatUnsub();
+    roomUnsub = null;
+    chatUnsub = null;
 }
 
-function openDuelMode() {
-    window.location.href = DUEL_MODE_URL;
-}
+async function handleAuthUser(user) {
+    authUser = user;
+    stopSubscriptions();
+    currentRoomCode = null;
+    currentRoomData = null;
 
-function restartQuiz() {
-    resetQuizState();
-    document.getElementById('fname').value = currentAuthProfile?.firstName || '';
-    document.getElementById('lname').value = currentAuthProfile?.lastName || '';
-    document.getElementById('score-display').textContent = '0';
-    document.getElementById('timer-count').textContent = `${QUESTION_TIME}s`;
-    document.getElementById('timer-count').classList.remove('urgent');
-    show('scr-login');
-}
-
-async function clearLeaderboard() {
-    if (!adminUnlocked) {
-        alert('Μόνο ο διαχειριστής μπορεί να κάνει εκκαθάριση leaderboard.');
-        return;
-    }
-    if (!confirm('Θέλεις σίγουρα εκκαθάριση leaderboard;')) return;
-    if (firebaseReady) {
-        await resetRemoteLeaderboard();
-        selectedEntryId = null;
-        await renderLeaderboard();
-        alert('Το online leaderboard καθαρίστηκε.');
-        return;
-    }
-    localStorage.removeItem(LEADERBOARD_KEY);
-    selectedEntryId = null;
-    renderLeaderboardEntries([], user.id);
-}
-
-async function deleteLeaderboardEntry(entryId) {
-    if (!adminUnlocked) {
-        alert('Μόνο ο διαχειριστής μπορεί να διαγράψει εγγραφές.');
-        return;
-    }
-    if (!confirm('Θέλεις να διαγραφεί αυτή η συμμετοχή;')) return;
-
-    if (firebaseReady) {
-        await deleteRemoteEntry(entryId);
-        if (selectedEntryId === entryId) selectedEntryId = null;
-        await renderLeaderboard();
+    if (!authUser) {
+        currentProfile = null;
+        fillProfileForm(null);
+        renderAuthState();
+        show('scr-auth');
         return;
     }
 
-    const filtered = getLeaderboard().filter(entry => entry.id !== entryId);
-    saveLeaderboard(filtered);
-    if (selectedEntryId === entryId) selectedEntryId = null;
-    renderLeaderboardEntries(sortLeaderboard(filtered), user.id);
-}
+    currentProfile = await fetchProfile(authUser.uid);
+    fillProfileForm(currentProfile);
+    renderAuthState('Ο λογαριασμός σου είναι συνδεδεμένος.');
 
-function loadQuestion() {
-    clearInterval(timer);
-    const q = questions[cur];
-    const isAnswered = answersStatus[cur] !== undefined;
-    const answeredState = answersStatus[cur];
-
-    document.getElementById('q-num').textContent = cur + 1;
-    document.getElementById('q-text').textContent = q.q;
-    document.getElementById('q-hint').textContent = q.h ? `💡 Υπόδειξη: ${q.h}` : '';
-
-    const imgCont = document.getElementById('q-image-container');
-    const imgEl = document.getElementById('q-image');
-    if (q.img) {
-        imgEl.src = q.img;
-        imgCont.classList.remove('hidden');
+    if (currentProfile) {
+        renderLobbyProfile();
+        show('scr-lobby');
     } else {
-        imgCont.classList.add('hidden');
+        show('scr-auth');
+    }
+}
+
+window.registerAccount = async function registerAccount() {
+    const email = $('auth-email').value.trim();
+    const password = $('auth-password').value;
+    if (!email || !password) {
+        renderAuthState('Συμπλήρωσε email και password για register.');
+        return;
+    }
+    try {
+        await authApi.createUserWithEmailAndPassword(firebaseAuth, email, password);
+        renderAuthState('Ο λογαριασμός δημιουργήθηκε. Συνέχισε με το duel profile σου.');
+    } catch (error) {
+        renderAuthState(`Register error: ${error.message}`);
+    }
+};
+
+window.loginAccount = async function loginAccount() {
+    const email = $('auth-email').value.trim();
+    const password = $('auth-password').value;
+    if (!email || !password) {
+        renderAuthState('Συμπλήρωσε email και password για login.');
+        return;
+    }
+    try {
+        await authApi.signInWithEmailAndPassword(firebaseAuth, email, password);
+    } catch (error) {
+        renderAuthState(`Login error: ${error.message}`);
+    }
+};
+
+window.loginWithGoogle = async function loginWithGoogle() {
+    try {
+        const provider = new authApi.GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
+        await authApi.signInWithPopup(firebaseAuth, provider);
+    } catch (error) {
+        const code = error?.code || '';
+        if (code === 'auth/popup-blocked' || code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
+            const provider = new authApi.GoogleAuthProvider();
+            provider.setCustomParameters({ prompt: 'select_account' });
+            await authApi.signInWithRedirect(firebaseAuth, provider);
+            return;
+        }
+        renderAuthState(`Google login error: ${error.message}`);
+    }
+};
+
+window.logoutAccount = async function logoutAccount() {
+    stopSubscriptions();
+    await authApi.signOut(firebaseAuth);
+};
+
+window.saveProfile = async function saveProfile() {
+    if (!firebaseReady || !authUser) {
+        renderAuthState('Πρέπει πρώτα να κάνεις login.');
+        return;
     }
 
-    const btnPrev = document.getElementById('btn-prev');
-    btnPrev.disabled = cur === 0;
-    btnPrev.classList.toggle('prev-active', cur > 0);
-    const btnNext = document.getElementById('btn-next');
-    btnNext.disabled = true;
-    btnNext.classList.remove('next-active');
-    document.getElementById('btn-5050').disabled = lifeline5050Used || isAnswered;
-    document.getElementById('btn-audience').disabled = lifelineAudienceUsed || isAnswered;
-    document.getElementById('btn-swap').disabled = lifelineSwapUsed || isAnswered || reserveQuestions.length === 0;
-    document.getElementById('rationale-box').classList.add('hidden');
+    const firstName = $('profile-first-name').value.trim();
+    const lastName = $('profile-last-name').value.trim();
+    const nickname = $('profile-nickname').value.trim();
+    const file = $('profile-avatar-file').files[0];
 
-    const box = document.getElementById('options-box');
-    box.innerHTML = '';
-    q.o.forEach((opt, i) => {
-        const btn = document.createElement('button');
-        btn.className = 'option-btn';
-        btn.dataset.idx = i;
+    if (!firstName || !lastName || !nickname) {
+        renderAuthState('Συμπλήρωσε όνομα, επώνυμο και nickname.');
+        return;
+    }
 
-        const label = document.createElement('span');
-        label.textContent = opt;
-        const pct = document.createElement('span');
-        pct.className = 'audience-pct';
+    if (file) {
+        avatarDataUrl = await fileToAvatarDataUrl(file);
+        renderAvatar($('profile-avatar-preview'), $('profile-avatar-fallback'), avatarDataUrl);
+        renderDefaultAvatarPicker();
+    }
 
-        btn.appendChild(label);
-        btn.appendChild(pct);
+    const profile = {
+        id: authUser.uid,
+        email: authUser.email,
+        firstName,
+        lastName,
+        nickname,
+        photoUrl: avatarDataUrl || '',
+        updatedAt: new Date().toISOString()
+    };
 
-        if (isAnswered) {
-            btn.disabled = true;
-            if (i === q.a) btn.classList.add('correct');
-            else if (i === answeredState?.selectedIndex && !answeredState?.isCorrect) btn.classList.add('wrong');
+    await firestoreApi.setDoc(firestoreApi.doc(firebaseDb, PROFILE_COLLECTION, authUser.uid), profile, { merge: true });
+    currentProfile = profile;
+    renderLobbyProfile();
+    show('scr-lobby');
+};
+
+window.changeAccountPassword = async function changeAccountPassword() {
+    if (!authUser || !authApi) {
+        renderAuthState('Πρέπει πρώτα να κάνεις login.');
+        return;
+    }
+    const newPassword = $('profile-new-password').value.trim();
+    if (newPassword.length < 6) {
+        renderAuthState('Ο νέος κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες.');
+        return;
+    }
+    try {
+        await authApi.updatePassword(authUser, newPassword);
+        $('profile-new-password').value = '';
+        renderAuthState('Ο κωδικός άλλαξε επιτυχώς.');
+    } catch (error) {
+        if (error?.code === 'auth/requires-recent-login') {
+            renderAuthState('Για αλλαγή κωδικού χρειάζεται να κάνεις ξανά login.');
+            return;
+        }
+        renderAuthState(`Password error: ${error.message}`);
+    }
+};
+
+window.goToProfile = function goToProfile() {
+    fillProfileForm(currentProfile);
+    renderAuthState('Ο λογαριασμός σου είναι συνδεδεμένος.');
+    show('scr-auth');
+};
+
+window.backToLobby = function backToLobby() {
+    if (!currentProfile) return;
+    renderLobbyProfile();
+    show('scr-lobby');
+};
+
+async function ensureRoomCodeFree() {
+    for (let i = 0; i < 10; i++) {
+        const code = Math.random().toString(36).slice(2, 8).toUpperCase();
+        const snap = await firestoreApi.getDoc(firestoreApi.doc(firebaseDb, ROOM_COLLECTION, code));
+        if (!snap.exists()) return code;
+    }
+    throw new Error('Δεν βρέθηκε διαθέσιμο room code.');
+}
+
+function playerStateFromProfile(profile) {
+    return {
+        id: profile.id,
+        nickname: profile.nickname,
+        fullName: `${profile.firstName} ${profile.lastName}`.trim(),
+        photoUrl: profile.photoUrl || '',
+        score: 0,
+        correct: 0,
+        currentIndex: 0,
+        finished: false
+    };
+}
+
+function getRoomCapacity(roomData) {
+    const raw = Number(roomData?.maxPlayers || MAX_ROOM_PLAYERS);
+    return Math.max(1, Math.min(MAX_ROOM_PLAYERS, raw || MAX_ROOM_PLAYERS));
+}
+
+function getRequiredPlayersToStart(roomData) {
+    return Math.min(2, getRoomCapacity(roomData));
+}
+
+function getSortedPlayers(players = {}) {
+    return Object.values(players).sort((a, b) => {
+        if ((b.score || 0) !== (a.score || 0)) return (b.score || 0) - (a.score || 0);
+        if ((b.correct || 0) !== (a.correct || 0)) return (b.correct || 0) - (a.correct || 0);
+        return (a.nickname || '').localeCompare(b.nickname || '');
+    });
+}
+
+function populateRoomPlayerLimitOptions() {
+    const select = $('room-player-limit');
+    if (!select) return;
+    select.innerHTML = Array.from({ length: MAX_ROOM_PLAYERS }, (_, index) => {
+        const value = index + 1;
+        return `<option value="${value}" ${value === 10 ? 'selected' : ''}>${value}</option>`;
+    }).join('');
+}
+
+function populateRoomQuestionCountOptions() {
+    const select = $('room-question-count');
+    if (!select) return;
+    const maxQuestions = Math.max(10, Math.min(QUESTION_POOL.length || QUESTIONS_PER_DUEL, 50));
+    select.innerHTML = Array.from({ length: maxQuestions }, (_, index) => {
+        const value = index + 1;
+        const selected = value === QUESTIONS_PER_DUEL ? 'selected' : '';
+        return `<option value="${value}" ${selected}>${value}</option>`;
+    }).join('');
+}
+
+window.createRoom = async function createRoom() {
+    if (!currentProfile) {
+        alert('Φτιάξε πρώτα προφίλ.');
+        return;
+    }
+
+    const maxPlayers = Math.max(1, Math.min(MAX_ROOM_PLAYERS, Number($('room-player-limit')?.value || 10)));
+    const questionCount = Math.max(1, Math.min(QUESTION_POOL.length || QUESTIONS_PER_DUEL, Number($('room-question-count')?.value || QUESTIONS_PER_DUEL)));
+    const code = await ensureRoomCodeFree();
+    const questions = pickDuelQuestions(questionCount);
+    await firestoreApi.setDoc(firestoreApi.doc(firebaseDb, ROOM_COLLECTION, code), {
+        code,
+        createdBy: currentProfile.id,
+        maxPlayers,
+        questionCount,
+        status: maxPlayers === 1 ? 'active' : 'waiting',
+        questions,
+        players: {
+            [currentProfile.id]: playerStateFromProfile(currentProfile)
+        },
+        createdAt: firestoreApi.serverTimestamp(),
+        startedAt: maxPlayers === 1 ? firestoreApi.serverTimestamp() : null
+    });
+    await openRoom(code);
+};
+
+window.joinRoom = async function joinRoom() {
+    if (!currentProfile) {
+        alert('Φτιάξε πρώτα προφίλ.');
+        return;
+    }
+
+    const code = $('join-room-code').value.trim().toUpperCase();
+    if (code.length < 4) {
+        alert('Βάλε έγκυρο κωδικό room.');
+        return;
+    }
+
+    const roomRef = firestoreApi.doc(firebaseDb, ROOM_COLLECTION, code);
+    const roomSnap = await firestoreApi.getDoc(roomRef);
+    if (!roomSnap.exists()) {
+        alert('Το room δεν βρέθηκε.');
+        return;
+    }
+
+    const roomData = roomSnap.data();
+    const players = roomData.players || {};
+    const ids = Object.keys(players);
+    const roomCapacity = getRoomCapacity(roomData);
+
+    if (!players[currentProfile.id] && ids.length >= roomCapacity) {
+        alert('Το room είναι ήδη γεμάτο.');
+        return;
+    }
+
+    const updates = {
+        [`players.${currentProfile.id}`]: players[currentProfile.id] || playerStateFromProfile(currentProfile)
+    };
+    if (Object.keys({ ...players, [currentProfile.id]: true }).length >= getRequiredPlayersToStart(roomData)) {
+        updates.status = 'active';
+        if (!roomData.startedAt) updates.startedAt = firestoreApi.serverTimestamp();
+    }
+
+    await firestoreApi.updateDoc(roomRef, updates);
+    await openRoom(code);
+};
+
+async function openRoom(code) {
+    currentRoomCode = code;
+    $('room-code-pill').textContent = code;
+    show('scr-room');
+    subscribeRoom(code);
+    subscribeMessages(code);
+}
+
+window.leaveRoom = function leaveRoom() {
+    stopSubscriptions();
+    stopDuelTimer();
+    clearDuelAdvanceTimeout();
+    duelRenderedQuestionKey = '';
+    duelAnswerLocked = false;
+    currentRoomCode = null;
+    currentRoomData = null;
+    seenMessageIds = new Set();
+    openReactionPaletteFor = null;
+    window.clearReplyTarget();
+    $('chat-list').innerHTML = '';
+    show('scr-lobby');
+};
+
+function renderPlayerCard(targetId, mountId, fallbackText) {
+    const player = currentRoomData?.players?.[targetId];
+    if (!player) {
+        $(mountId).innerHTML = `
+            <div class="player-head">
+                <div class="avatar-fallback" style="width:54px;height:54px;border-radius:14px;font-size:1.5rem;">👤</div>
+                <div>
+                    <div class="player-name">${fallbackText}</div>
+                    <div class="player-sub">Δεν έχει μπει ακόμα</div>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    $(mountId).innerHTML = `
+        <div class="player-head">
+            ${player.photoUrl ? `<img src="${player.photoUrl}" alt="">` : `<div class="avatar-fallback" style="width:54px;height:54px;border-radius:14px;font-size:1.5rem;">👤</div>`}
+            <div>
+                <div class="player-name">${player.nickname}</div>
+                <div class="player-sub">Παίκτης room</div>
+            </div>
+        </div>
+        <div class="scoreline"><span>Σκορ</span><strong>${player.score}</strong></div>
+        <div class="scoreline"><span>Σωστές</span><strong>${player.correct}</strong></div>
+        <div class="scoreline"><span>Πρόοδος</span><strong>${Math.min((player.currentIndex || 0), currentRoomData.questions.length)}/${currentRoomData.questions.length}</strong></div>
+    `;
+}
+
+function getOpponentId() {
+    if (!currentRoomData?.players || !currentProfile) return null;
+    const rankedOpponents = getSortedPlayers(currentRoomData.players).filter(player => player.id !== currentProfile.id);
+    return rankedOpponents[0]?.id || null;
+}
+
+function renderFinalBox() {
+    const players = currentRoomData.players || {};
+    const me = players[currentProfile.id];
+    const ranking = getSortedPlayers(players);
+    const winner = ranking[0];
+    const requiredPlayers = getRequiredPlayersToStart(currentRoomData || {});
+    if (!me) return;
+
+    const everyoneFinished = Object.values(players).length >= requiredPlayers && Object.values(players).every(player => player.finished);
+    let message = 'Περιμένεις να ολοκληρώσουν και οι υπόλοιποι παίκτες.';
+    if (everyoneFinished && winner) {
+        const leaders = ranking.filter(player => (player.score || 0) === (winner.score || 0));
+        if (leaders.length > 1 && leaders.some(player => player.id === currentProfile.id)) message = 'Ισοπαλία στην κορυφή!';
+        else if (winner.id === currentProfile.id) message = 'Κέρδισες το room!';
+        else message = `Νικητής room: ${winner.nickname || winner.fullName}`;
+    }
+
+    $('duel-final-box').innerHTML = `
+        <strong>${message}</strong><br>
+        Δικό σου σκορ: ${me.score} | Σωστές: ${me.correct}/${currentRoomData.questions.length}
+    `;
+    $('duel-final-box').classList.remove('hidden');
+}
+
+function renderRoomRoster() {
+    if (!currentRoomData?.players) return;
+    const players = getSortedPlayers(currentRoomData.players);
+    $('room-roster').innerHTML = players.map((player, index) => `
+        <div class="roster-item">
+            ${player.photoUrl ? `<img src="${player.photoUrl}" alt="">` : `<div class="avatar-fallback" style="font-size:1.05rem;">👤</div>`}
+            <div class="roster-meta">
+                <div class="roster-name">${index + 1}. ${player.nickname || player.fullName}</div>
+                <div class="roster-score">Score: ${player.score || 0} · Correct: ${player.correct || 0}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function reactionCount(reactions, key) {
+    return Array.isArray(reactions?.[key]) ? reactions[key].length : 0;
+}
+
+function renderReactionSummary(item) {
+    const chips = ALL_REACTION_OPTIONS
+        .map(option => {
+            const count = reactionCount(item.reactions, option.key);
+            return count ? `<span class="reaction-chip">${renderReactionGlyph(option)} ${count}</span>` : '';
+        })
+        .filter(Boolean)
+        .join('');
+    return chips ? `<div class="reaction-summary">${chips}</div>` : '';
+}
+
+function renderReactionPicker(itemId) {
+    return `
+        <div class="reaction-picker">
+            <button class="reaction-btn" onclick="toggleReactionPalette('${itemId}')">❤️</button>
+            <button class="reaction-btn" onclick="toggleReaction('${itemId}', 'laugh')">😂</button>
+            <button class="reaction-btn" onclick="toggleReaction('${itemId}', 'wow')">😮</button>
+            <button class="reaction-btn" onclick="toggleReaction('${itemId}', 'fire')">🔥</button>
+            <button class="reaction-btn" onclick="toggleReaction('${itemId}', 'clap')">👏</button>
+            <button class="reaction-btn" onclick="toggleReaction('${itemId}', 'thumbs')">👍</button>
+        </div>
+        <div class="reaction-palette ${openReactionPaletteFor === itemId ? '' : 'hidden'}" data-message-id="${itemId}">
+            ${HEART_REACTION_OPTIONS.map(option => `
+                <button class="reaction-btn" onclick="toggleReaction('${itemId}', '${option.key}')">${option.emoji}</button>
+            `).join('')}
+        </div>
+    `;
+}
+
+function renderEnhancedReactionPicker(itemId) {
+    return `
+        <div class="reaction-picker">
+            <button class="reaction-btn" onclick="toggleReactionPalette('${itemId}')">❤️</button>
+            <button class="reaction-btn" onclick="toggleReaction('${itemId}', 'laugh')">😂</button>
+            <button class="reaction-btn" onclick="toggleReaction('${itemId}', 'wow')">😮</button>
+            <button class="reaction-btn" onclick="toggleReaction('${itemId}', 'fire')">🔥</button>
+            <button class="reaction-btn" onclick="toggleReaction('${itemId}', 'clap')">👏</button>
+            <button class="reaction-btn" onclick="toggleReaction('${itemId}', 'thumbs')">👍</button>
+            <button class="reaction-btn" onclick="toggleReactionPalette('${itemId}-plus')">+</button>
+        </div>
+        <div class="reaction-palette ${openReactionPaletteFor === itemId ? '' : 'hidden'}" data-message-id="${itemId}">
+            ${HEART_REACTION_OPTIONS.map(option => `
+                <button class="reaction-btn" onclick="toggleReaction('${itemId}', '${option.key}')">${option.emoji}</button>
+            `).join('')}
+        </div>
+        <div class="reaction-palette ${openReactionPaletteFor === `${itemId}-plus` ? '' : 'hidden'}" data-message-id="${itemId}-plus">
+            ${EXTRA_REACTION_OPTIONS.map(option => `
+                <button class="reaction-btn" onclick="toggleReaction('${itemId}', '${option.key}')">${option.emoji}</button>
+            `).join('')}
+        </div>
+    `;
+}
+
+function renderRoom() {
+    if (!currentRoomData || !currentProfile) return;
+    const status = currentRoomData.status || 'waiting';
+    const players = currentRoomData.players || {};
+    const opponentId = getOpponentId();
+    const playerCount = Object.keys(players).length;
+    const roomCapacity = getRoomCapacity(currentRoomData);
+
+    const totalQuestions = currentRoomData.questionCount || currentRoomData.questions?.length || QUESTIONS_PER_DUEL;
+    $('room-status-text').textContent =
+        status === 'waiting' ? `Αναμονή για παίκτες... (${playerCount}/${roomCapacity}) · ${totalQuestions} ερωτήσεις` :
+        status === 'active' ? `Το room είναι ενεργό · ${playerCount}/${roomCapacity} παίκτες · ${totalQuestions} ερωτήσεις` :
+        `Η μονομαχία ολοκληρώθηκε · ${totalQuestions} ερωτήσεις`;
+
+    renderRoomRoster();
+    renderPlayerCard(currentProfile.id, 'you-card', 'Εσύ');
+    renderPlayerCard(opponentId, 'opponent-card', playerCount > 2 ? 'Πρωτοπόρος room' : 'Αντίπαλος');
+
+    if (status === 'waiting') {
+        stopDuelTimer();
+        clearDuelAdvanceTimeout();
+        duelRenderedQuestionKey = '';
+        duelAnswerLocked = false;
+        $('question-area-wait').classList.remove('hidden');
+        $('question-area-game').classList.add('hidden');
+        return;
+    }
+
+    $('question-area-wait').classList.add('hidden');
+    $('question-area-game').classList.remove('hidden');
+
+    const me = players[currentProfile.id];
+    const total = currentRoomData.questions.length;
+    $('duel-progress-text').textContent = `Ερώτηση ${Math.min((me?.currentIndex || 0) + 1, total)}/${total}`;
+
+    if (!me || me.finished || me.currentIndex >= total) {
+        stopDuelTimer();
+        clearDuelAdvanceTimeout();
+        duelRenderedQuestionKey = '';
+        duelAnswerLocked = false;
+        $('duel-hint').textContent = '';
+        $('duel-question-text').textContent = 'Ολοκλήρωσες τις ερωτήσεις σου.';
+        $('duel-options').innerHTML = '';
+        $('duel-answer-status').classList.add('hidden');
+        renderFinalBox();
+        return;
+    }
+
+    const question = currentRoomData.questions[me.currentIndex];
+    const questionKey = `${currentProfile.id}:${me.currentIndex}`;
+    $('duel-hint').textContent = question.h ? `💡 Υπόδειξη: ${question.h}` : '';
+    $('duel-question-text').textContent = question.q;
+    $('duel-answer-status').classList.add('hidden');
+    $('duel-answer-status').classList.remove('success-result', 'error-result');
+    $('duel-final-box').classList.add('hidden');
+    $('duel-options').innerHTML = question.o.map((option, index) => `
+        <button class="option" onclick="answerDuelQuestion(${index})">${option}</button>
+    `).join('');
+    if (duelRenderedQuestionKey !== questionKey) {
+        duelAnswerLocked = false;
+        clearDuelAdvanceTimeout();
+        startDuelTimer(questionKey);
+    } else if (duelTimerDeadline) {
+        updateDuelTimerLabel();
+    }
+}
+
+async function maybeFinishRoom(updatedPlayers) {
+    const minPlayersNeeded = getRequiredPlayersToStart(currentRoomData || {});
+    const everyoneFinished = Object.values(updatedPlayers).length >= minPlayersNeeded && Object.values(updatedPlayers).every(player => player.finished);
+    if (!everyoneFinished) return;
+    await firestoreApi.updateDoc(firestoreApi.doc(firebaseDb, ROOM_COLLECTION, currentRoomCode), {
+        status: 'finished',
+        finishedAt: firestoreApi.serverTimestamp()
+    });
+}
+
+window.answerDuelQuestion = async function answerDuelQuestion(index) {
+    await commitDuelAnswer(index, false);
+};
+
+function subscribeRoom(code) {
+    if (roomUnsub) roomUnsub();
+    roomUnsub = firestoreApi.onSnapshot(firestoreApi.doc(firebaseDb, ROOM_COLLECTION, code), snap => {
+        if (!snap.exists()) {
+            alert('Το room διαγράφηκε.');
+            leaveRoom();
+            return;
+        }
+        currentRoomData = snap.data();
+        renderRoom();
+    });
+}
+
+function renderMessages(items) {
+    const chatList = $('chat-list');
+    chatList.innerHTML = items.length ? items.map(item => {
+        const isMine = item.senderId === currentProfile?.id;
+        const isDeleted = !!item.deletedAt;
+        const textHtml = isDeleted
+            ? '<div class="chat-message-text deleted">Το μήνυμα διαγράφηκε.</div>'
+            : `<div class="chat-message-text">${highlightMentions(item.text || '')}</div>`;
+        const replyPreview = item.replyTo ? `
+            <div class="chat-reply-preview">
+                <strong>${escapeHtml(item.replyTo.nickname || 'Παίκτης')}</strong><br>
+                ${escapeHtml(formatReplySnippet(item.replyTo.text))}
+            </div>
+        ` : '';
+        return `
+            <div class="chat-item ${isMine ? 'mine' : ''}" data-message-id="${item.id}" data-sender-id="${escapeHtml(item.senderId || '')}" data-nickname="${escapeHtml(item.nickname || 'Παίκτης')}" data-text="${escapeHtml(item.text || '')}">
+                ${item.photoUrl ? `<img class="chat-avatar" src="${item.photoUrl}" alt="">` : `<div class="avatar-fallback chat-avatar" style="font-size:1.3rem;">👤</div>`}
+                <div class="chat-bubble">
+                    ${replyPreview}
+                    <div class="chat-name">${escapeHtml(item.nickname || 'Παίκτης')}</div>
+                    ${textHtml}
+                    <div class="chat-meta-row">
+                        <div class="chat-time">
+                            ${formatTime(item.createdAt)}
+                            ${item.editedAt ? '<span class="edited-mark">(edited)</span>' : ''}
+                        </div>
+                        <div class="chat-gesture-hint">${isMine ? 'Σύρε δεξιά προς αριστερά για reply' : 'Σύρε αριστερά προς δεξιά για reply'}</div>
+                    </div>
+                    ${renderReactionSummary(item)}
+                    ${renderEmojiReactionPicker(item.id)}
+                    <div class="chat-actions">
+                        <button class="chat-action-btn" onclick="beginReplyToMessage('${item.id}')">Απάντηση</button>
+                        ${isMine && !isDeleted ? `<button class="chat-action-btn" onclick="beginEditMessage('${item.id}')">Επεξεργασία</button>` : ''}
+                        ${isMine && !isDeleted ? `<button class="chat-action-btn danger" onclick="deleteMessage('${item.id}')">Διαγραφή</button>` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('') : '<div class="small">Δεν υπάρχουν μηνύματα ακόμα.</div>';
+    attachSwipeReplyHandlers();
+    chatList.scrollTop = chatList.scrollHeight;
+}
+
+function subscribeMessages(code) {
+    if (chatUnsub) chatUnsub();
+    seenMessageIds = new Set();
+    openReactionPaletteFor = null;
+    window.clearReplyTarget();
+    const messagesQuery = firestoreApi.query(
+        firestoreApi.collection(firebaseDb, ROOM_COLLECTION, code, 'messages'),
+        firestoreApi.orderBy('createdAt', 'asc')
+    );
+    chatUnsub = firestoreApi.onSnapshot(messagesQuery, snap => {
+        const items = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        if (seenMessageIds.size === 0) {
+            seenMessageIds = new Set(items.map(item => item.id));
         } else {
-            btn.onclick = () => checkAnswer(i);
+            const newcomers = items.filter(item => !seenMessageIds.has(item.id));
+            newcomers.forEach(maybeNotifyNewMessage);
+            seenMessageIds = new Set(items.map(item => item.id));
         }
-        box.appendChild(btn);
+        lastChatCount = items.length;
+        renderMessages(items);
     });
+}
 
-    if (isAnswered) {
-        timeLeft = 0;
-        updateTimerDisplay();
-        showRationale(q.r);
-        btnNext.disabled = false;
-        btnNext.classList.add('next-active');
+window.toggleReaction = async function toggleReaction(messageId, reactionKey) {
+    if (!currentRoomCode || !currentProfile) return;
+    const messageRef = firestoreApi.doc(firebaseDb, ROOM_COLLECTION, currentRoomCode, 'messages', messageId);
+    const messageSnap = await firestoreApi.getDoc(messageRef);
+    if (!messageSnap.exists()) return;
+
+    const data = messageSnap.data();
+    const currentUsers = Array.isArray(data?.reactions?.[reactionKey]) ? data.reactions[reactionKey] : [];
+    const hasReacted = currentUsers.includes(currentProfile.id);
+
+    await firestoreApi.updateDoc(messageRef, {
+        [`reactions.${reactionKey}`]: hasReacted
+            ? firestoreApi.arrayRemove(currentProfile.id)
+            : firestoreApi.arrayUnion(currentProfile.id)
+    });
+};
+
+window.sendChatMessage = async function sendChatMessage() {
+    if (!currentRoomCode || !currentProfile) return;
+    await ensureChatAudio();
+    const text = $('chat-input').value.trim();
+    if (!text) return;
+
+    const mentions = Array.from(new Set(getKnownMentionTokens().filter(token => text.includes(token))));
+
+    if (editingMessageId) {
+        const messageRef = firestoreApi.doc(firebaseDb, ROOM_COLLECTION, currentRoomCode, 'messages', editingMessageId);
+        await firestoreApi.updateDoc(messageRef, {
+            text,
+            mentions,
+            editedAt: firestoreApi.serverTimestamp()
+        });
     } else {
-        timeLeft = QUESTION_TIME;
-        updateTimerDisplay();
-        timer = setInterval(() => {
-            timeLeft = Math.max(0, timeLeft - 0.1);
-            updateTimerDisplay();
-            if (timeLeft <= 0) {
-                clearInterval(timer);
-                checkAnswer(-1);
+        await firestoreApi.addDoc(firestoreApi.collection(firebaseDb, ROOM_COLLECTION, currentRoomCode, 'messages'), {
+            senderId: currentProfile.id,
+            nickname: currentProfile.nickname,
+            fullName: `${currentProfile.firstName} ${currentProfile.lastName}`.trim(),
+            photoUrl: currentProfile.photoUrl || '',
+            text,
+            mentions,
+            replyTo: replyTarget && !editingMessageId ? {
+                id: replyTarget.id,
+                nickname: replyTarget.nickname,
+                text: replyTarget.text
+            } : null,
+            reactions: {},
+            createdAt: firestoreApi.serverTimestamp()
+        });
+    }
+
+    window.clearReplyTarget();
+};
+
+function attachSwipeReplyHandlers() {
+    const items = Array.from(document.querySelectorAll('.chat-item[data-message-id]'));
+    items.forEach(item => {
+        if (item.dataset.swipeBound === 'true') return;
+        item.dataset.swipeBound = 'true';
+        item.addEventListener('pointerdown', event => {
+            swipeState.activeId = item.dataset.messageId;
+            swipeState.startX = event.clientX;
+            swipeState.currentX = event.clientX;
+            item.classList.add('swiping');
+        });
+        item.addEventListener('pointermove', event => {
+            if (swipeState.activeId !== item.dataset.messageId) return;
+            swipeState.currentX = event.clientX;
+            const delta = Math.max(-120, Math.min(120, event.clientX - swipeState.startX));
+            item.style.transform = `translateX(${delta}px)`;
+            const mine = item.dataset.senderId === currentProfile?.id;
+            const ready = (!mine && delta > 70) || (mine && delta < -70);
+            item.classList.toggle('reply-ready', ready);
+        });
+        const finishSwipe = () => {
+            if (swipeState.activeId !== item.dataset.messageId) return;
+            const delta = swipeState.currentX - swipeState.startX;
+            const mine = item.dataset.senderId === currentProfile?.id;
+            const shouldReply = (!mine && delta > 70) || (mine && delta < -70);
+            item.style.transform = '';
+            item.classList.remove('swiping', 'reply-ready');
+            swipeState = { activeId: null, startX: 0, currentX: 0 };
+            if (shouldReply) {
+                window.beginReplyToMessage(item.dataset.messageId);
             }
-        }, 100);
-    }
-}
-
-function checkAnswer(idx) {
-    clearInterval(timer);
-    const q = questions[cur];
-    const isCorrect = idx === q.a;
-    answersStatus[cur] = { selectedIndex: idx, isCorrect };
-    const btns = document.querySelectorAll('.option-btn');
-    btns.forEach(btn => { btn.disabled = true; btn.onclick = null; });
-
-    if (isCorrect) {
-        btns[idx].classList.add('correct');
-        score += getCurrentQuestionPoints();
-        correct++;
-        launchConfetti();
-        playSuccessSound();
-    } else {
-        if (idx >= 0) btns[idx].classList.add('wrong');
-        btns[q.a].classList.add('correct');
-        showSadFace();
-        playWrongSound();
-    }
-
-    document.getElementById('score-display').textContent = score;
-    showRationale(q.r);
-    document.getElementById('btn-next').disabled = false;
-    document.getElementById('btn-next').classList.add('next-active');
-}
-
-function showRationale(text) {
-    const box = document.getElementById('rationale-box');
-    box.textContent = text;
-    box.classList.remove('hidden');
-}
-
-function use5050() {
-    if (lifeline5050Used || answersStatus[cur] !== undefined) return;
-    lifeline5050Used = true;
-    applyLifelinePenalty(FIFTY_FIFTY_PENALTY);
-    showHelpBadge();
-    playHelpSound();
-    document.getElementById('btn-5050').disabled = true;
-    const q = questions[cur];
-    const btns = [...document.querySelectorAll('.option-btn')];
-    const wrongIdxs = btns.map((_, i) => i).filter(i => i !== q.a).sort(() => Math.random() - 0.5);
-    wrongIdxs.slice(0, q.o.length - 2).forEach(i => {
-        btns[i].classList.add('hidden-by-5050');
-        btns[i].disabled = true;
+        };
+        item.addEventListener('pointerup', finishSwipe);
+        item.addEventListener('pointercancel', finishSwipe);
+        item.addEventListener('pointerleave', finishSwipe);
     });
 }
 
-function useAudience() {
-    if (lifelineAudienceUsed || answersStatus[cur] !== undefined) return;
-    lifelineAudienceUsed = true;
-    applyLifelinePenalty(AUDIENCE_PENALTY);
-    showHelpBadge();
-    playHelpSound();
-    document.getElementById('btn-audience').disabled = true;
-    const q = questions[cur];
-    const btns = [...document.querySelectorAll('.option-btn')];
-    const visible = btns.map((btn, i) => ({ btn, i })).filter(x => !x.btn.classList.contains('hidden-by-5050'));
-    const rivals = visible.filter(x => x.i !== q.a);
-    const rivalLeader = rivals[Math.floor(Math.random() * rivals.length)];
-    const audienceCount = bumpAudiencePatternCount();
-    const shouldMislead = audienceCount % 3 === 0;
-    let leaderPct = Math.floor(Math.random() * 3) + 35;
-    let runnerUpPct = leaderPct - (Math.floor(Math.random() * 2) + 1);
-    if (runnerUpPct < 32) runnerUpPct = 32;
-
-    let correctPct = shouldMislead ? runnerUpPct : leaderPct;
-    let rivalPct = shouldMislead ? leaderPct : runnerUpPct;
-
-    let leftover = 100 - correctPct - rivalPct;
-    const remainingRivals = rivals.filter(x => x.i !== rivalLeader.i);
-
-    remainingRivals.forEach(({ btn }, index) => {
-        const p = index === remainingRivals.length - 1
-            ? leftover
-            : Math.max(0, Math.min(Math.floor(Math.random() * Math.max(1, leftover - 4)), leftover));
-        leftover -= p;
-        const pct = btn.querySelector('.audience-pct');
-        pct.textContent = `${p}%`;
-        pct.style.display = 'inline';
-    });
-
-    const rivalPctEl = rivalLeader.btn.querySelector('.audience-pct');
-    rivalPctEl.textContent = `${rivalPct}%`;
-    rivalPctEl.style.display = 'inline';
-
-    const correctBtn = btns[q.a].querySelector('.audience-pct');
-    correctBtn.textContent = `${correctPct}%`;
-    correctBtn.style.display = 'inline';
+function renderEmojiReactionPicker(itemId) {
+    const heartButton = renderReactionGlyph({ emoji: '♥', color: '#ef4444' });
+    const laughButton = renderReactionGlyph({ emoji: '😂' });
+    const wowButton = renderReactionGlyph({ emoji: '😮' });
+    const fireButton = renderReactionGlyph({ emoji: '🔥' });
+    const clapButton = renderReactionGlyph({ emoji: '👏' });
+    const thumbsButton = renderReactionGlyph({ emoji: '👍' });
+    return `
+        <div class="reaction-picker">
+            <button class="reaction-btn" onclick="toggleReactionPalette('${itemId}')">${heartButton}</button>
+            <button class="reaction-btn" onclick="toggleReaction('${itemId}', 'laugh')">${laughButton}</button>
+            <button class="reaction-btn" onclick="toggleReaction('${itemId}', 'wow')">${wowButton}</button>
+            <button class="reaction-btn" onclick="toggleReaction('${itemId}', 'fire')">${fireButton}</button>
+            <button class="reaction-btn" onclick="toggleReaction('${itemId}', 'clap')">${clapButton}</button>
+            <button class="reaction-btn" onclick="toggleReaction('${itemId}', 'thumbs')">${thumbsButton}</button>
+            <button class="reaction-btn" onclick="toggleReactionPalette('${itemId}-plus')">+</button>
+        </div>
+        <div class="reaction-palette ${openReactionPaletteFor === itemId ? '' : 'hidden'}" data-message-id="${itemId}">
+            ${HEART_REACTION_OPTIONS.map(option => `
+                <button class="reaction-btn" onclick="toggleReaction('${itemId}', '${option.key}')">${renderReactionGlyph(option)}</button>
+            `).join('')}
+        </div>
+        <div class="reaction-palette ${openReactionPaletteFor === `${itemId}-plus` ? '' : 'hidden'}" data-message-id="${itemId}-plus">
+            ${EXTRA_REACTION_OPTIONS.map(option => `
+                <button class="reaction-btn" onclick="toggleReaction('${itemId}', '${option.key}')">${renderReactionGlyph(option)}</button>
+            `).join('')}
+        </div>
+    `;
 }
 
-function useSwapQuestion() {
-    if (lifelineSwapUsed || answersStatus[cur] !== undefined || !reserveQuestions.length) return;
-    lifelineSwapUsed = true;
-    applyLifelinePenalty(SWAP_PENALTY);
-    showHelpBadge();
-    playHelpSound();
-    const nextQuestion = reserveQuestions.shift();
-    if (!nextQuestion) return;
-
-    questions[cur] = nextQuestion;
-    document.getElementById('btn-swap').disabled = true;
-    loadQuestion();
-}
-
-function goNext() {
-    cur++;
-    if (cur >= questions.length) endQuiz();
-    else loadQuestion();
-}
-
-function goBack() {
-    if (cur > 0) {
-        cur--;
-        loadQuestion();
-    }
-}
-
-async function endQuiz() {
-    clearInterval(timer);
-    show('scr-end');
-    document.getElementById('final-msg').textContent = `Τέλος! Σκορ: ${score} πόντοι`;
-    const accuracyValue = Math.round((correct / questions.length) * 100);
-    const acc = `${accuracyValue}%`;
-    const answers = buildAnswerReview();
-    const attemptId = createAttemptId();
-    const lastPlayed = Date.now();
-    let sorted = [];
-
-    if (firebaseReady) {
-        await submitRemoteScore({
-            first_name: user.f,
-            last_name: user.l,
-            nickname: currentAuthProfile?.nickname || '',
-            photo_url: currentAuthProfile?.photoUrl || '',
-            auth_uid: currentAuthUser?.uid || '',
-            score,
-            correct,
-            wrong: questions.length - correct,
-            answers
-        });
-        sorted = await renderLeaderboard();
-    } else {
-        const lb = getLeaderboard();
-        lb.push({
-            id: attemptId,
-            name: `${user.f} ${user.l}`,
-            firstName: user.f,
-            lastName: user.l,
-            nickname: user.nickname || '',
-            photoUrl: user.photoUrl || '',
-            authUid: user.authUid || '',
-            score,
-            acc,
-            accValue: accuracyValue,
-            games: 1,
-            lastPlayed,
-            lastPlayedTs: lastPlayed,
-            answers
-        });
-
-        sorted = sortLeaderboard(lb);
-        saveLeaderboard(sorted);
-        selectedEntryId = attemptId;
-        renderLeaderboardEntries(sorted, attemptId);
+async function start() {
+    if (!hasFirebaseConfig()) {
+        alert('Λείπει το Firebase config.');
+        return;
     }
 
-    if (firebaseReady) {
-        const matchedEntry = sorted.find(item =>
-            item.name === `${user.f} ${user.l}` &&
-            item.score === score &&
-            item.lastPlayedTs && Math.abs(item.lastPlayedTs - lastPlayed) < 10000
-        );
-        selectedEntryId = matchedEntry ? matchedEntry.id : (sorted[0]?.id || null);
+    await initFirebase();
+    try {
+        await authApi.getRedirectResult(firebaseAuth);
+    } catch (error) {
+        renderAuthState(`Google redirect error: ${error.message}`);
     }
-
-    const rank = sorted.findIndex(item => item.id === selectedEntryId) + 1;
-    document.getElementById('summary-score').textContent = score;
-    document.getElementById('summary-correct').textContent = `${correct}/${questions.length}`;
-    document.getElementById('summary-rank').textContent = rank ? `#${rank}` : '-';
-}
-
-document.title = QUIZ_TITLE;
-document.querySelector('#scr-login h1').textContent = QUIZ_TITLE;
-updateAudioButtons();
-initFirebaseLeaderboard().finally(async () => {
-    if (authApi && firebaseAuth) {
+    authApi.onAuthStateChanged(firebaseAuth, async user => {
         try {
-            await authApi.getRedirectResult(firebaseAuth);
+            await handleAuthUser(user);
         } catch (error) {
-            document.getElementById('main-auth-status').textContent = `Google redirect error: ${error.message}`;
+            renderAuthState(`Auth error: ${error.message}`);
+            show('scr-auth');
         }
-    }
-    updateMainAuthUi();
-    renderLeaderboard();
+    });
+}
+
+$('profile-avatar-file').addEventListener('change', async event => {
+    const file = event.target.files[0];
+    if (!file) return;
+    avatarDataUrl = await fileToAvatarDataUrl(file);
+    renderAvatar($('profile-avatar-preview'), $('profile-avatar-fallback'), avatarDataUrl);
+    renderDefaultAvatarPicker();
 });
+
+$('chat-input').addEventListener('keydown', event => {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        sendChatMessage();
+    }
+});
+
+populateRoomPlayerLimitOptions();
+populateRoomQuestionCountOptions();
+start();
+renderDefaultAvatarPicker();
 </script>
 </body>
 </html>
-

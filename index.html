@@ -1873,6 +1873,12 @@ function updateHintUi(question) {
     hintEl.textContent = hasHint && isVisible ? `💡 Υπόδειξη: ${question.h}` : '';
 }
 
+function resolveQuestionImagePath(imgPath) {
+    if (!imgPath) return '';
+    if (/^(https?:|data:|blob:|\/)/i.test(imgPath)) return imgPath;
+    return imgPath;
+}
+
 function show(id) {
     ['scr-login', 'scr-quiz', 'scr-end', 'scr-leaderboard'].forEach(s => {
         document.getElementById(s).classList.toggle('hidden', s !== id);
@@ -1988,9 +1994,12 @@ function loadQuestion() {
     const imgCont = document.getElementById('q-image-container');
     const imgEl = document.getElementById('q-image');
     if (q.img) {
-        imgEl.src = q.img;
+        imgEl.src = resolveQuestionImagePath(q.img);
+        imgEl.alt = q.q || 'Εικόνα ερώτησης';
         imgCont.classList.remove('hidden');
     } else {
+        imgEl.removeAttribute('src');
+        imgEl.alt = '';
         imgCont.classList.add('hidden');
     }
 
@@ -2120,9 +2129,23 @@ function useAudience() {
     const rivalLeader = rivals[Math.floor(Math.random() * rivals.length)];
     const audienceCount = bumpAudiencePatternCount();
     const shouldMislead = audienceCount % 3 === 0;
-    let leaderPct = Math.floor(Math.random() * 3) + 35;
-    let runnerUpPct = leaderPct - (Math.floor(Math.random() * 2) + 1);
-    if (runnerUpPct < 32) runnerUpPct = 32;
+    if (visible.length === 2) {
+        const leaderPct = Math.floor(Math.random() * 5) + 51;
+        const runnerUpPct = 100 - leaderPct;
+        const correctPct = shouldMislead ? runnerUpPct : leaderPct;
+        const rivalPct = shouldMislead ? leaderPct : runnerUpPct;
+        const correctPctEl = btns[q.a].querySelector('.audience-pct');
+        const rivalPctElSingle = rivalLeader.btn.querySelector('.audience-pct');
+        correctPctEl.textContent = `${correctPct}%`;
+        correctPctEl.style.display = 'inline';
+        rivalPctElSingle.textContent = `${rivalPct}%`;
+        rivalPctElSingle.style.display = 'inline';
+        return;
+    }
+
+    let leaderPct = Math.floor(Math.random() * 5) + 34;
+    let runnerUpPct = leaderPct - (Math.floor(Math.random() * 3) + 1);
+    if (runnerUpPct < 30) runnerUpPct = 30;
 
     let correctPct = shouldMislead ? runnerUpPct : leaderPct;
     let rivalPct = shouldMislead ? leaderPct : runnerUpPct;

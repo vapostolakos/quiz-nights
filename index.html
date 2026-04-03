@@ -913,6 +913,7 @@
 
 <script src="./firebase-config.js"></script>
 <script src="./Quiz12-questions.js"></script>
+<script src="./Quiz12-auto-questions.js"></script>
 <script>
 const QUIZ_TITLE = 'ultimate quiz';
 const FIREBASE_SDK_VERSION = '12.7.0';
@@ -921,7 +922,10 @@ const PROFILE_COLLECTION = 'quiz12_duel_profiles';
 const QUESTION_TIME = 45;
 const DUEL_MODE_URL = 'https://vapostolakos.github.io/quiz12-duel/';
 const ADMIN_CONFIG = window.QUIZ_ADMIN || { username: '', password: '' };
-const QUESTION_POOL = Array.isArray(window.QUIZ12_QUESTIONS) ? window.QUIZ12_QUESTIONS : [];
+const QUESTION_POOL = [
+    ...(Array.isArray(window.QUIZ12_QUESTIONS) ? window.QUIZ12_QUESTIONS : []),
+    ...(Array.isArray(window.QUIZ12_AUTO_QUESTIONS) ? window.QUIZ12_AUTO_QUESTIONS : [])
+];
 const QUESTIONS_PER_GAME = 10;
 const DEFAULT_AVATAR_OPTIONS = [
     { key: 'man-1', emoji: '👨', bg: '#1d4ed8' },

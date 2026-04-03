@@ -338,6 +338,10 @@
             max-height: calc(100vh - 28px);
             overflow-y: auto;
         }
+        .login-auth-panel-shell {
+            position: relative;
+            z-index: 12;
+        }
         .login-auth-panel h3 {
             color: var(--accent);
             font-size: 0.95rem;
@@ -979,6 +983,13 @@
                 margin-bottom: 1rem;
                 box-shadow: none;
             }
+            .login-auth-panel-shell {
+                width: 100%;
+                max-width: 900px;
+                margin: 0 auto 1rem;
+                padding: 0 1rem;
+                z-index: 1;
+            }
             .auth-mini-actions {
                 grid-template-columns: 1fr;
             }
@@ -1031,6 +1042,9 @@
                 left: auto !important;
                 margin: 0 !important;
             }
+            body.login-screen-active .login-auth-panel-shell {
+                display: block !important;
+            }
         }
     </style>
 </head>
@@ -1038,10 +1052,8 @@
 <button class="home-logo-btn" onclick="goToHomePage()" title="Αρχική Σελίδα" aria-label="Αρχική Σελίδα">
     <img src="Quiz Nights-Logo.png" alt="Quiz Nights">
 </button>
-<div class="container">
-
-    <div id="scr-login">
-        <div class="login-auth-panel">
+<div id="main-auth-panel-shell" class="login-auth-panel-shell">
+    <div class="login-auth-panel">
             <h3>Login / Δημιουργία Λογαριασμού</h3>
             <div id="main-auth-form" class="auth-form">
                 <input id="main-auth-email" type="email" placeholder="Email">
@@ -1073,7 +1085,11 @@
                 </div>
                 <div id="main-profile-editor-status" class="profile-editor-status">Μπορείς να αλλάξεις όνομα, nickname και φωτογραφία προφίλ.</div>
             </div>
-        </div>
+    </div>
+</div>
+<div class="container">
+
+    <div id="scr-login">
         <h1>Quiz 12 - General</h1>
         <p class="sub">Quiz Γενικών Γνώσεων Υψηλού Επιπέδου</p>
         <div class="intro-guide">
@@ -1838,6 +1854,71 @@ function shuffleQuestionOptions(question) {
     };
 }
 
+const IMAGE_OPTION_TRANSLATIONS = {
+    'Argentina': 'Αργεντινή',
+    'Australia': 'Αυστραλία',
+    'Brazil': 'Βραζιλία',
+    'France': 'Γαλλία',
+    'Germany': 'Γερμανία',
+    'Greece': 'Ελλάδα',
+    'India': 'Ινδία',
+    'Italy': 'Ιταλία',
+    'Japan': 'Ιαπωνία',
+    'Madagascar': 'Μαδαγασκάρη',
+    'Norway': 'Νορβηγία',
+    'South Africa': 'Νότια Αφρική',
+    'United Kingdom': 'Ηνωμένο Βασίλειο',
+    'Bugs Bunny': 'Μπαγκς Μπάνι',
+    'Tom': 'Τομ',
+    'Jerry': 'Τζέρι',
+    'Scooby-Doo': 'Σκούμπι-Ντου',
+    'Donald Duck': 'Ντόναλντ Ντακ',
+    'Patrick Star': 'Πάτρικ Σταρ',
+    'Mickey Mouse': 'Μίκυ Μάους',
+    'Shrek': 'Σρεκ',
+    'Pikachu': 'Πίκατσου',
+    'Sonic': 'Σόνικ',
+    'SpongeBob SquarePants': 'Μπομπ Σφουγγαράκης',
+    'Captain America': 'Κάπτεν Αμέρικα',
+    'Batman': 'Μπάτμαν',
+    'Thor': 'Θορ',
+    'Loki': 'Λόκι',
+    'Hercules': 'Ηρακλής',
+    'Odin': 'Όντιν',
+    'Green Lantern': 'Πράσινος Φανός',
+    'Doctor Strange': 'Ντόκτορ Στρέιντζ',
+    'Iron Fist': 'Άιρον Φιστ',
+    'Vision': 'Βίζιον',
+    'Iron Man': 'Άιρον Μαν',
+    'Superman': 'Σούπερμαν',
+    'Wonder Woman': 'Γουόντερ Γούμαν',
+    'Flash': 'Φλας',
+    'Hulk': 'Χαλκ',
+    'Wolverine': 'Γούλβεριν',
+    'Spider-Man': 'Σπάιντερ-Μαν',
+    'Apple': 'Άπλ',
+    'Samsung': 'Σάμσουνγκ',
+    'Sony': 'Σόνι',
+    'Toyota': 'Τογιότα',
+    'Spotify': 'Σποτίφαϊ',
+    'Amazon': 'Αμαζόν',
+    'Shell': 'Shell',
+    'BMW': 'BMW',
+    'Adidas': 'Adidas',
+    'Audi': 'Audi',
+    'Mercedes-Benz': 'Mercedes-Benz',
+    'Netflix': 'Netflix',
+    'Instagram': 'Instagram',
+    'Pepsi': 'Pepsi',
+    'YouTube': 'YouTube',
+    "McDonald's": "McDonald's"
+};
+
+function localizeOptionText(question, optionText) {
+    if (!question?.img) return optionText;
+    return IMAGE_OPTION_TRANSLATIONS[optionText] || optionText;
+}
+
 function getQuestionId(question) {
     return question?.id || question?.q || JSON.stringify(question);
 }
@@ -2051,9 +2132,9 @@ function buildAnswerReview() {
             questionIndex: index,
             questionText: question.q,
             selectedIndex,
-            selectedText: selectedIndex >= 0 ? question.o[selectedIndex] : 'Καμία απάντηση',
+            selectedText: selectedIndex >= 0 ? localizeOptionText(question, question.o[selectedIndex]) : 'Καμία απάντηση',
             correctIndex: question.a,
-            correctText: question.o[question.a],
+            correctText: localizeOptionText(question, question.o[question.a]),
             isCorrect: !!answer?.isCorrect,
             rationale: question.r
         };
@@ -2545,6 +2626,10 @@ function show(id) {
         document.getElementById(s).classList.toggle('hidden', s !== id);
     });
     document.body.classList.toggle('login-screen-active', id === 'scr-login');
+    const authShell = document.getElementById('main-auth-panel-shell');
+    if (authShell) {
+        authShell.classList.toggle('hidden', id !== 'scr-login');
+    }
 }
 
 function updateTimerDisplay() {
@@ -2697,7 +2782,7 @@ function loadQuestion() {
         btn.dataset.idx = i;
 
         const label = document.createElement('span');
-        label.textContent = opt;
+        label.textContent = localizeOptionText(q, opt);
         const pct = document.createElement('span');
         pct.className = 'audience-pct';
 

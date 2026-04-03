@@ -534,6 +534,15 @@
             display: flex;
             gap: 10px;
         }
+        .start-mode-actions {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 0.75rem;
+        }
+        .start-mode-actions button {
+            min-height: 58px;
+        }
         .lifeline-container {
             margin-top: 14px;
             display: flex;
@@ -902,6 +911,9 @@
                 line-height: 1.15;
             }
             .summary-grid { grid-template-columns: 1fr; }
+            .start-mode-actions {
+                grid-template-columns: 1fr;
+            }
             .review-summary {
                 grid-template-columns: 1fr;
             }
@@ -974,7 +986,10 @@
             <input type="text" id="fname" placeholder="Όνομα">
             <input type="text" id="lname" placeholder="Επώνυμο">
         </div>
-        <button onclick="startQuiz()">Έναρξη Παιχνιδιού</button>
+        <div class="start-mode-actions">
+            <button onclick="startQuiz('knowledge')">Έναρξη Quiz Γνώσεων</button>
+            <button onclick="startQuiz('image')">Έναρξη Quiz με Εικόνες</button>
+        </div>
         <div class="top-actions" style="margin-top:10px;">
             <button class="secondary duel-btn" onclick="openDuelMode()">Μονομαχία / Room</button>
             <button class="secondary" onclick="openLeaderboard()">Leaderboard</button>
@@ -1166,6 +1181,10 @@ const QUESTION_SEEN_IDS_KEY = 'quiz12_seen_question_ids';
 const QUESTION_HISTORY_KEY = 'quiz12_recent_question_history';
 const QUESTION_CYCLE_QUEUE_KEY = 'quiz12_question_cycle_queue';
 const QUESTION_MEMORY_RECENT_LIMIT = 40;
+const QUIZ_MODE_LABELS = {
+    knowledge: 'Quiz Γνώσεων',
+    image: 'Quiz με Εικόνες'
+};
 const QUESTION_IMAGE_ALIASES = {
     'assets/images/questions/flags/japan.svg': 'assets/images/questions/flags/Flag_of_Japan.svg.png',
     'assets/images/questions/flags/france.svg': 'assets/images/questions/flags/download.jpg',
@@ -1204,6 +1223,7 @@ let reserveQuestions = [];
 let user = { f: "", l: "", id: "" };
 let cur = 0, score = 0, correct = 0;
 let timeLeft = QUESTION_TIME, timer = null;
+let currentQuizMode = 'knowledge';
 let answersStatus = [];
 let revealedHints = [];
 let hintPenaltyUsed = [];
@@ -1872,8 +1892,17 @@ function buildQuestionSelection(questionMap, count) {
     return { selectedIds, updatedSeenIds, updatedRecentIds };
 }
 
-function initializeQuestionSet() {
-    const questionMap = getUniqueQuestionMap();
+function filterQuestionMapByMode(questionMap, mode = currentQuizMode) {
+    const normalizedMode = mode === 'image' ? 'image' : 'knowledge';
+    return new Map(Array.from(questionMap.entries()).filter(([, question]) => {
+        const hasImage = !!(question?.img && String(question.img).trim());
+        return normalizedMode === 'image' ? hasImage : !hasImage;
+    }));
+}
+
+function initializeQuestionSet(mode = currentQuizMode) {
+    currentQuizMode = mode === 'image' ? 'image' : 'knowledge';
+    const questionMap = filterQuestionMapByMode(getUniqueQuestionMap(), currentQuizMode);
     const allIds = Array.from(questionMap.keys());
     const { selectedIds, updatedSeenIds, updatedRecentIds } = buildQuestionSelection(questionMap, QUESTIONS_PER_GAME);
 
@@ -2360,7 +2389,7 @@ async function renderLeaderboard(targetId = user.id) {
     return renderLeaderboardEntries(sortLeaderboard(getLeaderboard()), targetId);
 }
 
-function resetQuizState() {
+function resetQuizState(mode = currentQuizMode) {
     clearInterval(timer);
     cur = 0;
     score = 0;
@@ -2372,7 +2401,7 @@ function resetQuizState() {
     lifeline5050Used = false;
     lifelineAudienceUsed = false;
     lifelineSwapUsed = false;
-    initializeQuestionSet();
+    initializeQuestionSet(mode);
 }
 
 window.toggleHint = function toggleHint() {
@@ -2422,12 +2451,20 @@ function updateTimerDisplay() {
     document.getElementById('timer-count').classList.toggle('urgent', timeLeft <= 5);
 }
 
-function startQuiz() {
+function startQuiz(mode = 'knowledge') {
     const f = (currentAuthProfile?.firstName || document.getElementById('fname').value).trim();
     const l = (currentAuthProfile?.lastName || document.getElementById('lname').value).trim();
     if (f.length < 2 || l.length < 2) { alert('Συμπλήρωσε τα στοιχεία σου.'); return; }
     if (!QUESTION_POOL.length) { alert('Δεν υπάρχουν διαθέσιμες ερωτήσεις για το quiz.'); return; }
-    resetQuizState();
+    const normalizedMode = mode === 'image' ? 'image' : 'knowledge';
+    const availableQuestionCount = filterQuestionMapByMode(getUniqueQuestionMap(), normalizedMode).size;
+    if (!availableQuestionCount) {
+        alert(normalizedMode === 'image'
+            ? 'Δεν υπάρχουν διαθέσιμες ερωτήσεις με εικόνες.'
+            : 'Δεν υπάρχουν διαθέσιμες ερωτήσεις γνώσεων.');
+        return;
+    }
+    resetQuizState(normalizedMode);
     const nickname = (currentAuthProfile?.nickname || '').trim();
     const photoUrl = currentAuthProfile?.photoUrl || '';
     user = {
@@ -2464,7 +2501,7 @@ function openDuelMode() {
 }
 
 function restartQuiz() {
-    resetQuizState();
+    resetQuizState(currentQuizMode);
     document.getElementById('fname').value = currentAuthProfile?.firstName || '';
     document.getElementById('lname').value = currentAuthProfile?.lastName || '';
     document.getElementById('score-display').textContent = '0';

@@ -724,11 +724,23 @@
             .auth-mini-actions {
                 grid-template-columns: 1fr;
             }
-            .quiz-header, .top-actions, .leaderboard-actions, .nav-controls, .lifeline-container {
+            .quiz-header, .top-actions, .leaderboard-actions, .nav-controls {
                 flex-direction: column;
             }
             .lifeline-container {
-                grid-template-columns: 1fr;
+                flex-direction: row;
+                flex-wrap: nowrap;
+                justify-content: space-between;
+                align-items: stretch;
+                gap: 8px;
+            }
+            .lifeline-btn {
+                width: 78px;
+                height: 78px;
+                min-width: 0;
+                padding: 8px;
+                font-size: 0.72rem;
+                line-height: 1.15;
             }
             .summary-grid { grid-template-columns: 1fr; }
         }

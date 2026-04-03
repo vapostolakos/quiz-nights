@@ -1500,23 +1500,46 @@ function initializeQuestionSet() {
     const questionMap = getUniqueQuestionMap();
     const allIds = Array.from(questionMap.keys());
     let queue = getQuestionCycleQueue().filter(id => questionMap.has(id));
+    const imageIds = new Set(allIds.filter(id => {
+        const question = questionMap.get(id);
+        return !!(question?.img && String(question.img).trim());
+    }));
 
     if (!queue.length) {
         queue = shuffleArray(allIds);
     }
 
     const selectedIds = [];
-    while (selectedIds.length < QUESTIONS_PER_GAME && questionMap.size) {
-        if (!queue.length) {
-            const refillIds = allIds.filter(id => !selectedIds.includes(id));
-            if (!refillIds.length) break;
-            queue = shuffleArray(refillIds);
-        }
+    const targetImageCount = Math.min(
+        Math.max(2, Math.ceil(QUESTIONS_PER_GAME * 0.3)),
+        QUESTIONS_PER_GAME,
+        imageIds.size
+    );
 
-        const nextId = queue.shift();
-        if (!nextId || selectedIds.includes(nextId)) continue;
-        selectedIds.push(nextId);
+    function pullIds(limit, predicate = null) {
+        while (selectedIds.length < limit && questionMap.size) {
+            if (!queue.length) {
+                const refillIds = allIds.filter(id => !selectedIds.includes(id));
+                if (!refillIds.length) break;
+                queue = shuffleArray(refillIds);
+            }
+
+            const nextId = queue.shift();
+            if (!nextId || selectedIds.includes(nextId)) continue;
+
+            if (predicate && !predicate(nextId)) {
+                queue.push(nextId);
+                const remainingMatches = queue.some(predicate);
+                if (!remainingMatches) break;
+                continue;
+            }
+
+            selectedIds.push(nextId);
+        }
     }
+
+    pullIds(targetImageCount, id => imageIds.has(id));
+    pullIds(QUESTIONS_PER_GAME);
 
     questions = selectedIds
         .map(id => questionMap.get(id))

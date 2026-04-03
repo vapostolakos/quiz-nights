@@ -32,6 +32,11 @@
             position: relative;
             overflow-x: hidden;
         }
+        body.login-screen-active {
+            align-items: flex-start;
+            padding-top: 136px;
+            padding-bottom: 2rem;
+        }
         body::before {
             content: "?\A \A ?\A \A ?\A \A ?\A \A ?\A \A ?\A \A ?\A \A ?\A \A ?";
             position: fixed;
@@ -102,7 +107,7 @@
             display: block;
         }
         .container {
-            width: min(100%, 720px);
+            width: min(100%, 860px);
             background: rgba(8, 15, 28, 0.8);
             border: 1px solid rgba(148, 163, 184, 0.22);
             border-radius: 24px;
@@ -114,7 +119,7 @@
             transition: margin 0.2s ease;
         }
         body.login-screen-active .container {
-            margin-right: min(370px, 30vw);
+            margin-right: 0;
         }
         #scr-login {
             position: relative;
@@ -319,7 +324,7 @@
         .login-auth-panel {
             position: fixed;
             top: 18px;
-            right: 1.75rem;
+            right: 18px;
             width: min(330px, calc(100vw - 2rem));
             background: rgba(15, 23, 42, 0.92);
             border: 1px solid var(--border);
@@ -949,6 +954,10 @@
             .container {
                 padding: 1rem;
                 padding-top: 4.75rem;
+            }
+            body.login-screen-active {
+                align-items: center;
+                padding-top: 1rem;
             }
             body.login-screen-active .container {
                 margin-right: 0;

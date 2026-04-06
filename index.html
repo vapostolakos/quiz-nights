@@ -1398,31 +1398,18 @@ let currentAuthUser = null;
   let mainProfileEditorOpen = false;
   let selectedEntryId = null;
   let reviewRating = 0;
-let reviewEntriesCache = [];
-let leaderboardEntriesCache = [];
-let adminUnlocked = sessionStorage.getItem(ADMIN_SESSION_KEY) === 'true';
+  let reviewEntriesCache = [];
+  let leaderboardEntriesCache = [];
+  let adminUnlocked = sessionStorage.getItem(ADMIN_SESSION_KEY) === 'true';
 let leaderboardSort = { key: 'score', direction: 'desc' };
 let soundEffectsEnabled = localStorage.getItem('quiz12_sound_enabled') !== 'false';
-const GLOBAL_MUSIC_STORAGE_KEY = 'musicEnabled';
-const LEGACY_MAIN_MUSIC_STORAGE_KEY = 'quiz12_music_enabled';
-const legacyMainMusicValue = localStorage.getItem(LEGACY_MAIN_MUSIC_STORAGE_KEY);
-const storedGlobalMusicValue = localStorage.getItem(GLOBAL_MUSIC_STORAGE_KEY);
-if (storedGlobalMusicValue === null && legacyMainMusicValue !== null) {
-    localStorage.setItem(GLOBAL_MUSIC_STORAGE_KEY, legacyMainMusicValue);
-} else if (storedGlobalMusicValue === null) {
-    localStorage.setItem(GLOBAL_MUSIC_STORAGE_KEY, 'false');
-}
-let musicEnabled = localStorage.getItem(GLOBAL_MUSIC_STORAGE_KEY) === 'true';
+let musicEnabled = localStorage.getItem('quiz12_music_enabled') !== 'false';
 let audioContext = null;
 let audioUnlocked = false;
+let musicLoopTimer = null;
+let radioAudio = null;
 const RADIO_STREAM_URL = 'https://i4.streams.ovh/sc/musicfactory/stream';
 let musicResumeHooksBound = false;
-const musicController = window.__quizGlobalMusicController || (window.__quizGlobalMusicController = {
-    audio: null,
-    targetVolume: 0.35,
-    fadeTimer: null,
-    streamUrl: RADIO_STREAM_URL
-});
 
 function normalizePlayerId(firstName, lastName) {
     return `${firstName.trim().toLowerCase()}::${lastName.trim().toLowerCase()}`;
@@ -1737,61 +1724,28 @@ async function playHelpSound() {
     pulseTone(ctx, 880, startAt + 0.2, 0.09, 'square', 0.028);
 }
 
-function clearMusicFadeTimer() {
-    if (musicController.fadeTimer) {
-        clearInterval(musicController.fadeTimer);
-        musicController.fadeTimer = null;
-    }
-}
-
-function ensureRadioAudio() {
-    if (!musicController.audio) {
-        musicController.audio = new Audio(musicController.streamUrl);
-        musicController.audio.crossOrigin = 'anonymous';
-        musicController.audio.preload = 'none';
-        musicController.audio.autoplay = true;
-        musicController.audio.volume = 0;
-        musicController.audio.setAttribute('playsinline', 'true');
-    } else if (musicController.audio.src !== musicController.streamUrl) {
-        musicController.audio.src = musicController.streamUrl;
-    }
-    return musicController.audio;
-}
-
-function fadeAudioTo(audio, targetVolume, { duration = 350, pauseOnEnd = false } = {}) {
-    if (!audio) return;
-    clearMusicFadeTimer();
-    const startVolume = Number.isFinite(audio.volume) ? audio.volume : 0;
-    const delta = targetVolume - startVolume;
-    if (Math.abs(delta) < 0.01) {
-        audio.volume = Math.max(0, Math.min(1, targetVolume));
-        if (pauseOnEnd && targetVolume <= 0.001) audio.pause();
-        return;
-    }
-    const stepMs = 40;
-    const steps = Math.max(1, Math.round(duration / stepMs));
-    let currentStep = 0;
-    musicController.fadeTimer = setInterval(() => {
-        currentStep += 1;
-        const nextVolume = startVolume + (delta * (currentStep / steps));
-        audio.volume = Math.max(0, Math.min(1, nextVolume));
-        if (currentStep >= steps) {
-            clearMusicFadeTimer();
-            audio.volume = Math.max(0, Math.min(1, targetVolume));
-            if (pauseOnEnd && targetVolume <= 0.001) audio.pause();
-        }
-    }, stepMs);
-}
-
 function stopBackgroundMusic() {
-    const radioAudio = musicController.audio;
-    if (!radioAudio) return;
-    fadeAudioTo(radioAudio, 0, { duration: 260, pauseOnEnd: true });
+    if (musicLoopTimer) {
+        clearTimeout(musicLoopTimer);
+        musicLoopTimer = null;
+    }
+    if (radioAudio) {
+        radioAudio.pause();
+    }
 }
 
 async function startBackgroundMusic(forceRestart = false) {
     if (!musicEnabled) return;
-    const radioAudio = ensureRadioAudio();
+    if (!radioAudio) {
+        radioAudio = new Audio(RADIO_STREAM_URL);
+        radioAudio.crossOrigin = 'anonymous';
+        radioAudio.preload = 'none';
+        radioAudio.autoplay = true;
+        radioAudio.volume = 0.35;
+        radioAudio.setAttribute('playsinline', 'true');
+    } else if (radioAudio.src !== RADIO_STREAM_URL) {
+        radioAudio.src = RADIO_STREAM_URL;
+    }
     if (!forceRestart && !radioAudio.paused && !radioAudio.ended) {
         return;
     }
@@ -1799,9 +1753,7 @@ async function startBackgroundMusic(forceRestart = false) {
         radioAudio.pause();
     }
     try {
-        radioAudio.volume = 0;
         await radioAudio.play();
-        fadeAudioTo(radioAudio, musicController.targetVolume, { duration: 420 });
     } catch (error) {
         console.warn('Radio stream playback blocked or unavailable:', error);
         return;
@@ -1819,31 +1771,17 @@ function bindMusicResumeHooks() {
             retryStart();
         }
     });
-    window.addEventListener('storage', event => {
-        if (event.key !== GLOBAL_MUSIC_STORAGE_KEY) return;
-        musicEnabled = event.newValue === 'true';
-        updateAudioButtons();
-        if (musicEnabled) {
-            startBackgroundMusic();
-        } else {
-            stopBackgroundMusic();
-        }
-    });
 }
 
 function updateAudioButtons() {
     const soundBtn = document.getElementById('btn-sound-toggle');
     const musicBtn = document.getElementById('btn-music-toggle');
     if (soundBtn) {
-        soundBtn.textContent = currentLanguage === 'en'
-            ? `${soundEffectsEnabled ? '🔊' : '🔇'} Sound: ${soundEffectsEnabled ? 'On' : 'Off'}`
-            : `${soundEffectsEnabled ? '🔊' : '🔇'} Ήχοι: ${soundEffectsEnabled ? 'On' : 'Off'}`;
+        soundBtn.textContent = `${soundEffectsEnabled ? '🔊' : '🔇'} Ήχοι ${soundEffectsEnabled ? 'On' : 'Off'}`;
         soundBtn.classList.toggle('active', soundEffectsEnabled);
     }
     if (musicBtn) {
-        musicBtn.textContent = currentLanguage === 'en'
-            ? `${musicEnabled ? '🎵' : '🎼'} Music: ${musicEnabled ? 'On' : 'Off'}`
-            : `${musicEnabled ? '🎵' : '🎼'} Μουσική: ${musicEnabled ? 'On' : 'Off'}`;
+        musicBtn.textContent = `${musicEnabled ? '🎵' : '🎼'} Μουσική ${musicEnabled ? 'On' : 'Off'}`;
         musicBtn.classList.toggle('active', musicEnabled);
     }
 }
@@ -1857,11 +1795,10 @@ window.toggleSoundEffects = async function toggleSoundEffects() {
 
 window.toggleMusic = async function toggleMusic() {
     musicEnabled = !musicEnabled;
-    localStorage.setItem(GLOBAL_MUSIC_STORAGE_KEY, String(musicEnabled));
-    localStorage.setItem(LEGACY_MAIN_MUSIC_STORAGE_KEY, String(musicEnabled));
+    localStorage.setItem('quiz12_music_enabled', String(musicEnabled));
     updateAudioButtons();
     if (musicEnabled) {
-        await startBackgroundMusic(true);
+        await startBackgroundMusic();
     } else {
         stopBackgroundMusic();
     }

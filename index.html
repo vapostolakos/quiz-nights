@@ -66,7 +66,7 @@
             pointer-events: none;
         }
         body::after {
-            content: "QUIZ K-NIGHTS";
+            content: "QUIZ NIGHTS";
             position: fixed;
             top: 2vh;
             left: 0;
@@ -267,6 +267,31 @@
         .review-card textarea::placeholder {
             color: #64748b;
         }
+        .lang-switcher {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.88);
+            border: 1px solid rgba(148, 163, 184, 0.22);
+        }
+        .lang-btn {
+            min-width: 54px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--muted);
+            font-weight: 800;
+            letter-spacing: 0.04em;
+        }
+        .lang-btn.active {
+            background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+            color: #eff6ff;
+            border-color: rgba(125, 211, 252, 0.45);
+            box-shadow: 0 10px 24px rgba(14, 165, 233, 0.22);
+        }
         .review-actions {
             display: flex;
             gap: 10px;
@@ -446,6 +471,18 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+        .auth-panel-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        .auth-panel-title {
+            color: var(--accent);
+            font-size: 1.2rem;
+            font-weight: 800;
         }
         .profile-editor {
             margin-top: 0.35rem;
@@ -1003,6 +1040,17 @@
                 width: 100%;
                 margin-bottom: 0;
             }
+            .auth-panel-topbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .lang-switcher {
+                justify-content: center;
+                width: 100%;
+            }
+            .lang-btn {
+                flex: 1 1 0;
+            }
             .auth-mini-actions {
                 grid-template-columns: 1fr;
             }
@@ -1070,13 +1118,19 @@
 </button>
 <div id="main-auth-panel-shell" class="login-auth-panel-shell">
     <div class="login-auth-panel">
-            <h3>Login / Δημιουργία Λογαριασμού</h3>
+            <div class="auth-panel-topbar">
+                <h3 id="auth-panel-title" class="auth-panel-title">Login / Δημιουργία Λογαριασμού</h3>
+                <div class="lang-switcher" aria-label="Language selector">
+                    <button id="btn-lang-el" type="button" class="lang-btn active" onclick="setLanguage('el')">ΕΛ</button>
+                    <button id="btn-lang-en" type="button" class="lang-btn" onclick="setLanguage('en')">EN</button>
+                </div>
+            </div>
             <div id="main-auth-form" class="auth-form">
                 <input id="main-auth-email" type="email" placeholder="Email">
                 <input id="main-auth-password" type="password" placeholder="Password">
                 <div class="auth-mini-actions">
-                    <button onclick="registerMainAccount()">Register</button>
-                    <button class="salmon-btn" onclick="loginMainAccount()">Login</button>
+                    <button id="btn-auth-register" onclick="registerMainAccount()">Register</button>
+                    <button id="btn-auth-login" class="salmon-btn" onclick="loginMainAccount()">Login</button>
                     <button class="google-btn" onclick="loginMainWithGoogle()">Google</button>
                 </div>
             </div>
@@ -1107,9 +1161,9 @@
 
     <div id="scr-login">
         <div id="main-auth-mobile-anchor" class="hidden"></div>
-        <h1>Quiz 12 - General</h1>
-        <p class="sub">Quiz Γενικών Γνώσεων Υψηλού Επιπέδου</p>
-        <div class="intro-guide">
+        <h1 id="login-main-title">Quiz 12 - General</h1>
+        <p id="login-main-sub" class="sub">Quiz Γενικών Γνώσεων Υψηλού Επιπέδου</p>
+        <div id="intro-guide" class="intro-guide">
             <strong>Οδηγίες:</strong> Σε κάθε ερώτηση υπάρχει προαιρετική υπόδειξη και διαθέσιμες βοήθειες.
             Η <strong>Υπόδειξη</strong> κοστίζει 20% της αξίας της ερώτησης,
             Το <strong>50:50</strong> κοστίζει το 50% της αξίας της ερώτησης, το <strong>Κοινό</strong> κοστίζει 75%
@@ -1122,39 +1176,39 @@
             <input type="text" id="lname" placeholder="Επώνυμο">
         </div>
         <div class="start-mode-actions">
-            <button onclick="startQuiz('knowledge')">Έναρξη Quiz Γνώσεων</button>
-            <button onclick="startQuiz('image')">Έναρξη Quiz με Εικόνες</button>
+            <button id="btn-start-knowledge" onclick="startQuiz('knowledge')">Έναρξη Quiz Γνώσεων</button>
+            <button id="btn-start-image" onclick="startQuiz('image')">Έναρξη Quiz με Εικόνες</button>
         </div>
         <div class="top-actions" style="margin-top:10px;">
-            <button class="secondary duel-btn" onclick="openDuelMode()">Μονομαχία / Room</button>
-            <button class="leaderboard-main-btn" onclick="openLeaderboard()">Leaderboard</button>
-            <button class="reviews-main-btn" onclick="openReviews()">Reviews</button>
+            <button id="btn-open-duel" class="secondary duel-btn" onclick="openDuelMode()">Μονομαχία / Room</button>
+            <button id="btn-open-leaderboard-main" class="leaderboard-main-btn" onclick="openLeaderboard()">Leaderboard</button>
+            <button id="btn-open-reviews-main" class="reviews-main-btn" onclick="openReviews()">Reviews</button>
         </div>
         <div class="review-entry">
             <div class="review-entry-header">
                 <div>
-                    <div class="review-entry-title">Βαθμολόγησε το Quiz Nights</div>
-                    <div class="review-entry-copy">Δώσε από 1 έως 5 αστέρια και γράψε τι αλλαγές ή βελτιώσεις θα ήθελες να δεις. Το feedback σου μας βοηθά να κάνουμε το παιχνίδι πιο elegant και πιο δυνατό.</div>
+                    <div id="review-entry-title" class="review-entry-title">Βαθμολόγησε το Quiz Nights</div>
+                    <div id="review-entry-copy" class="review-entry-copy">Δώσε από 1 έως 5 αστέρια και γράψε τι αλλαγές ή βελτιώσεις θα ήθελες να δεις. Το feedback σου μας βοηθά να κάνουμε το παιχνίδι πιο elegant και πιο δυνατό.</div>
                 </div>
             </div>
-            <button class="review-open-btn" onclick="openReviews()">Άνοιγμα αξιολόγησης</button>
+            <button id="btn-open-review-entry" class="review-open-btn" onclick="openReviews()">Άνοιγμα αξιολόγησης</button>
         </div>
-        <p class="leaderboard-note">Παίξε solo ή μπες σε room για online μονομαχία.</p>
+        <p id="login-leaderboard-note" class="leaderboard-note">Παίξε solo ή μπες σε room για online μονομαχία.</p>
     </div>
 
     <div id="scr-reviews" class="hidden">
-        <h1>Reviews</h1>
-        <p class="sub">Βαθμολόγησε το quiz και πες μας τι θα ήθελες να αλλάξει.</p>
+        <h1 id="reviews-title">Reviews</h1>
+        <p id="reviews-sub" class="sub">Βαθμολόγησε το quiz και πες μας τι θα ήθελες να αλλάξει.</p>
         <div class="review-layout">
             <div class="review-card">
                 <div class="review-summary">
-                    <div class="review-summary-card"><strong id="review-average">-</strong><span>Μέσος Όρος</span></div>
-                    <div class="review-summary-card"><strong id="review-total">0</strong><span>Σύνολο Reviews</span></div>
-                    <div class="review-summary-card"><strong id="review-last">-</strong><span>Τελευταίο Review</span></div>
+                    <div class="review-summary-card"><strong id="review-average">-</strong><span id="review-average-label">Μέσος Όρος</span></div>
+                    <div class="review-summary-card"><strong id="review-total">0</strong><span id="review-total-label">Σύνολο Reviews</span></div>
+                    <div class="review-summary-card"><strong id="review-last">-</strong><span id="review-last-label">Τελευταίο Review</span></div>
                 </div>
             </div>
             <div class="review-card">
-                <div class="review-helper">Διάλεξε αστέρια και γράψε ελεύθερα γνώμη, παρατηρήσεις ή αλλαγές που θα ήθελες στο παιχνίδι.</div>
+                <div id="review-helper-copy" class="review-helper">Διάλεξε αστέρια και γράψε ελεύθερα γνώμη, παρατηρήσεις ή αλλαγές που θα ήθελες στο παιχνίδι.</div>
                 <div id="review-star-picker" class="star-picker">
                     <button type="button" class="star-btn" data-value="1" onclick="setReviewRating(1)">★</button>
                     <button type="button" class="star-btn" data-value="2" onclick="setReviewRating(2)">★</button>
@@ -1166,13 +1220,13 @@
                 <textarea id="review-comment" placeholder="Τι σου άρεσε ή τι σε δυσκόλεψε στο quiz;"></textarea>
                 <textarea id="review-suggestion" placeholder="Τι αλλαγές, προσθήκες ή βελτιώσεις θα ήθελες να γίνουν;"></textarea>
                 <div class="review-actions">
-                    <button onclick="submitReview()">Υποβολή Review</button>
-                    <button class="secondary" onclick="show('scr-login')">Επιστροφή</button>
+                    <button id="btn-submit-review" onclick="submitReview()">Υποβολή Review</button>
+                    <button id="btn-back-from-reviews" class="secondary" onclick="show('scr-login')">Επιστροφή</button>
                 </div>
                 <div id="review-status" class="review-status">Μπορείς να αφήσεις feedback είτε παίζεις ως επισκέπτης είτε με συνδεδεμένο προφίλ.</div>
             </div>
             <div class="review-card">
-                <h2 style="text-align:center; color: var(--accent); font-size: 1.05rem;">Πρόσφατα σχόλια</h2>
+                <h2 id="review-list-title" style="text-align:center; color: var(--accent); font-size: 1.05rem;">Πρόσφατα σχόλια</h2>
                 <div id="review-list" class="review-list">
                     <div class="review-empty">Δεν υπάρχουν reviews ακόμα.</div>
                 </div>
@@ -1183,7 +1237,7 @@
     <div id="scr-quiz" class="hidden">
         <div class="quiz-header">
             <span id="user-display"></span>
-            <span>Ερώτηση <span id="q-num">1</span>/<span id="q-total"></span> · <span id="score-display">0</span> πόντοι</span>
+            <span id="quiz-progress-label">Ερώτηση <span id="q-num">1</span>/<span id="q-total"></span> · <span id="score-display">0</span> πόντοι</span>
         </div>
 
         <div class="timer-info">
@@ -1215,37 +1269,39 @@
     </div>
 
     <div id="scr-end" class="hidden">
-        <h1>Αποτελέσματα</h1>
+        <h1 id="end-title">Αποτελέσματα</h1>
         <h2 id="final-msg" style="text-align:center; margin:1rem 0;"></h2>
         <div class="summary-grid">
-            <div class="summary-card"><strong id="summary-score">0</strong><span>Score</span></div>
-            <div class="summary-card"><strong id="summary-correct">0</strong><span>Correct</span></div>
-            <div class="summary-card"><strong id="summary-rank">-</strong><span>Rank</span></div>
+            <div class="summary-card"><strong id="summary-score">0</strong><span id="summary-score-label">Score</span></div>
+            <div class="summary-card"><strong id="summary-correct">0</strong><span id="summary-correct-label">Correct</span></div>
+            <div class="summary-card"><strong id="summary-rank">-</strong><span id="summary-rank-label">Rank</span></div>
         </div>
         <div class="table-wrap">
             <table>
-                <thead><tr><th>#</th><th>Παίκτης</th><th>Score</th><th>Accuracy</th><th>Date</th></tr></thead>
+                    <thead><tr><th>#</th><th>Παίκτης</th><th>Total Score</th><th>Games</th><th>Accuracy</th><th>Date</th></tr></thead>
                 <tbody id="lb-body"></tbody>
             </table>
         </div>
         <div class="leaderboard-actions" style="margin-top:14px;">
-            <button class="secondary" onclick="openLeaderboard()">Full Leaderboard</button>
-            <button onclick="restartQuiz()">Νέο Παιχνίδι</button>
+            <button id="btn-full-leaderboard-end" class="secondary" onclick="openLeaderboard()">Full Leaderboard</button>
+            <button id="btn-new-game-end" onclick="restartQuiz()">Νέο Παιχνίδι</button>
         </div>
     </div>
 
     <div id="scr-leaderboard" class="hidden">
-        <h1>Leaderboard</h1>
-        <p class="leaderboard-note">Top Players</p>
+        <h1 id="leaderboard-title">Leaderboard</h1>
+        <p id="leaderboard-sub" class="leaderboard-note">Top Players</p>
         <div class="table-wrap">
             <table>
                 <thead>
                     <tr>
                         <th>#</th>
                         <th class="sortable" onclick="changeSort('name')">Player</th>
-                        <th class="sortable" onclick="changeSort('score')">Score</th>
+                        <th class="sortable" onclick="changeSort('score')">Total Score</th>
+                        <th class="sortable" onclick="changeSort('games')">Games</th>
                         <th class="sortable" onclick="changeSort('accValue')">Accuracy</th>
                         <th class="sortable" onclick="changeSort('lastPlayedTs')">Last Played</th>
+                        <th>Friend</th>
                         <th class="delete-cell">Admin</th>
                     </tr>
                 </thead>
@@ -1253,14 +1309,18 @@
             </table>
         </div>
         <div id="details-panel" class="details-panel">
-            <h3>Ανάλυση Συμμετοχής</h3>
-            <div id="details-content" class="details-empty">Πάτησε μια συμμετοχή από τον πίνακα για να δεις ποιες ερωτήσεις απαντήθηκαν σωστά και ποιες λάθος.</div>
+            <h3 id="details-panel-title">Ανάλυση Παίκτη</h3>
+            <div id="details-content" class="details-empty">Πάτησε έναν παίκτη από τον πίνακα για να δεις το συνολικό του προφίλ και το τελευταίο παιχνίδι του.</div>
+        </div>
+        <div id="friends-panel" class="details-panel">
+            <h3 id="friends-panel-title">Οι Φίλοι Μου</h3>
+            <div id="friends-content" class="details-empty">Συνδέσου για να αποθηκεύεις φίλους και να ξεκινάς γρήγορα μονομαχία μαζί τους.</div>
         </div>
         <div class="leaderboard-actions" style="margin-top:14px;">
-            <button class="secondary" onclick="show('scr-login')">Back</button>
+            <button id="btn-back-from-leaderboard" class="secondary" onclick="show('scr-login')">Back</button>
             <button class="secondary" onclick="unlockAdmin()" id="btn-admin-unlock">Admin Unlock</button>
             <button class="secondary admin-btn" onclick="clearLeaderboard()" id="btn-admin-reset">Καθαρισμός Leaderboard</button>
-            <button onclick="restartQuiz()">New Game</button>
+            <button id="btn-new-game-leaderboard" onclick="restartQuiz()">New Game</button>
         </div>
     </div>
 
@@ -1277,6 +1337,8 @@ const FIREBASE_SDK_VERSION = '12.7.0';
 const FIREBASE_COLLECTION = 'quiz12_leaderboard';
 const PROFILE_COLLECTION = 'quiz12_duel_profiles';
 const REVIEW_COLLECTION = 'quiz12_reviews';
+const ADMIN_EMAIL = 'vapostolakos@gmail.com';
+const ADMIN_SESSION_KEY = 'quiz12_admin_unlocked';
 const QUESTION_TIME = 45;
 const DUEL_MODE_URL = 'https://vapostolakos.github.io/quiz12-duel/';
 const ADMIN_CONFIG = window.QUIZ_ADMIN || { username: '', password: '' };
@@ -1328,6 +1390,274 @@ const QUIZ_MODE_LABELS = {
     knowledge: 'Quiz Γνώσεων',
     image: 'Quiz με Εικόνες'
 };
+const LANGUAGE_STORAGE_KEY = 'quiz12_language';
+let currentLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY) === 'en' ? 'en' : 'el';
+const UI_TEXT = {
+    el: {
+        pageTitle: 'Quiz 12 - General',
+        homeTitle: 'Αρχική Σελίδα',
+        authPanelTitle: 'Login / Δημιουργία Λογαριασμού',
+        authConnected: 'Συνδεδεμένο προφίλ',
+        authEditProfile: 'Επεξεργασία Προφίλ',
+        authLogout: 'Logout',
+        authRegisterFill: 'Συμπλήρωσε email και password για register.',
+        authLoginFill: 'Συμπλήρωσε email και password για login.',
+        authLoggedStatus: 'Το προφίλ σου είναι συνδεδεμένο. Μπορείς να ξεκινήσεις αμέσως παιχνίδι ή μονομαχία.',
+        authGuestStatus: 'Συνδέσου για να παίξεις με το αποθηκευμένο προφίλ σου χωρίς να ξαναγράψεις στοιχεία.',
+        authRegisterError: 'Register error',
+        authLoginError: 'Login error',
+        authGoogleError: 'Google login error',
+        saveProfileSuccess: 'Το προφίλ σου αποθηκεύτηκε.',
+        saveProfileError: 'Σφάλμα αποθήκευσης',
+        profileInvalid: 'Συμπλήρωσε σωστά όνομα, επώνυμο και nickname.',
+        profileSave: 'Αποθήκευση',
+        profileClose: 'Κλείσιμο',
+        profileInfo: 'Μπορείς να αλλάξεις όνομα, nickname και φωτογραφία προφίλ.',
+        profileAvatarLabel: 'Διάλεξε ένα από τα default avatars ή ανέβασε δική σου φωτογραφία.',
+        mainTitle: 'ultimate quiz',
+        mainSub: 'Quiz Γενικών Γνώσεων Υψηλού Επιπέδου',
+        emailPlaceholder: 'Email',
+        passwordPlaceholder: 'Password',
+        nicknamePlaceholder: 'Nickname',
+        authRegister: 'Register',
+        authLogin: 'Login',
+        introGuide: '<strong>Οδηγίες:</strong> Σε κάθε ερώτηση υπάρχει προαιρετική υπόδειξη και διαθέσιμες βοήθειες. Η <strong>Υπόδειξη</strong> κοστίζει 20% της αξίας της ερώτησης, Το <strong>50:50</strong> κοστίζει το 50% της αξίας της ερώτησης, το <strong>Κοινό</strong> κοστίζει 75% και η <strong>Αλλαγή Ερώτησης</strong> κοστίζει 25%. Οι ποινές αφαιρούνται αμέσως από το σκορ σου, οπότε μπορεί να πέσεις και σε αρνητικό σκορ αν χρησιμοποιήσεις βοήθεια πολύ νωρίς.',
+        firstName: 'Όνομα',
+        lastName: 'Επώνυμο',
+        startKnowledge: 'Έναρξη Quiz Γνώσεων',
+        startImage: 'Έναρξη Quiz με Εικόνες',
+        duelButton: 'Μονομαχία / Room',
+        reviewEntryTitle: 'Βαθμολόγησε το Quiz Nights',
+        reviewEntryCopy: 'Δώσε από 1 έως 5 αστέρια και γράψε τι αλλαγές ή βελτιώσεις θα ήθελες να δεις. Το feedback σου μας βοηθά να κάνουμε το παιχνίδι πιο elegant και πιο δυνατό.',
+        openReview: 'Άνοιγμα αξιολόγησης',
+        loginNote: 'Παίξε solo ή μπες σε room για online μονομαχία.',
+        reviewsTitle: 'Reviews',
+        reviewsSub: 'Βαθμολόγησε το quiz και πες μας τι θα ήθελες να αλλάξει.',
+        reviewAverage: 'Μέσος Όρος',
+        reviewTotal: 'Σύνολο Reviews',
+        reviewLast: 'Τελευταίο Review',
+        reviewHelper: 'Διάλεξε αστέρια και γράψε ελεύθερα γνώμη, παρατηρήσεις ή αλλαγές που θα ήθελες στο παιχνίδι.',
+        reviewCommentPlaceholder: 'Τι σου άρεσε ή τι σε δυσκόλεψε στο quiz;',
+        reviewSuggestionPlaceholder: 'Τι αλλαγές, προσθήκες ή βελτιώσεις θα ήθελες να γίνουν;',
+        submitReview: 'Υποβολή Review',
+        back: 'Επιστροφή',
+        reviewGuestInfo: 'Μπορείς να αφήσεις feedback είτε παίζεις ως επισκέπτης είτε με συνδεδεμένο προφίλ.',
+        recentComments: 'Πρόσφατα σχόλια',
+        noReviews: 'Δεν υπάρχουν reviews ακόμα.',
+        noExtraComment: 'Χωρίς επιπλέον σχόλιο.',
+        reviewChangePrefix: 'Θα ήθελα να αλλάξει:',
+        reviewNeedStars: 'Διάλεξε πρώτα από 1 έως 5 αστέρια.',
+        reviewNeedText: 'Γράψε είτε ένα σχόλιο είτε μια πρόταση αλλαγής.',
+        reviewSaved: 'Το review σου αποθηκεύτηκε. Ευχαριστούμε πολύ για το feedback.',
+        reviewSavedLocal: 'Το review αποθηκεύτηκε τοπικά στη συσκευή σου, γιατί το online storage δεν επέτρεψε εγγραφή.',
+        ratingEmpty: 'Δεν έχεις διαλέξει ακόμη βαθμολογία.',
+        rating1: '1 αστέρι: Χρειάζεται πολλή δουλειά.',
+        rating2: '2 αστέρια: Υπάρχει βάση αλλά θέλει βελτίωση.',
+        rating3: '3 αστέρια: Καλό, με περιθώριο για upgrade.',
+        rating4: '4 αστέρια: Πολύ δυνατό quiz.',
+        rating5: '5 αστέρια: Εξαιρετικό, premium εμπειρία.',
+        quizQuestion: 'Ερώτηση',
+        points: 'πόντοι',
+        hintShow: 'Εμφάνιση Υπόδειξης',
+        hintHide: 'Απόκρυψη Υπόδειξης',
+        hintPrefix: '💡 Υπόδειξη:',
+        lifelineAudience: 'Κοινό',
+        lifelineSwap: 'Αλλαγή',
+        prev: 'Πίσω',
+        next: 'Επόμενο',
+        results: 'Αποτελέσματα',
+        summaryScore: 'Score',
+        summaryCorrect: 'Correct',
+        summaryRank: 'Rank',
+        fullLeaderboard: 'Full Leaderboard',
+        newGame: 'Νέο Παιχνίδι',
+        leaderboardSub: 'Top Players',
+        playerAnalysis: 'Ανάλυση Παίκτη',
+        friendsTitle: 'Οι Φίλοι Μου',
+        friendsLoginPrompt: 'Συνδέσου για να αποθηκεύεις φίλους και να ξεκινάς γρήγορα μονομαχία μαζί τους.',
+        noFriends: 'Δεν έχεις προσθέσει φίλους ακόμα.',
+        duelWithFriend: 'Μονομαχία',
+        removeFriend: 'Αφαίρεση',
+        addFriend: 'Φίλος +',
+        adminUnlock: 'Admin Unlock',
+        adminLock: 'Admin Lock',
+        adminReset: 'Καθαρισμός Leaderboard',
+        emptyPlayerDetails: 'Πάτησε έναν παίκτη από τον πίνακα για να δεις το συνολικό του προφίλ και το τελευταίο παιχνίδι του.',
+        noLeaderboardPlayers6: 'Δεν υπάρχουν παίκτες ακόμα.',
+        noLeaderboardPlayers8: 'Δεν υπάρχουν παίκτες ακόμα.',
+        totalScore: 'Total Score',
+        games: 'Games',
+        accuracy: 'Accuracy',
+        lastPlayed: 'Last Played',
+        playerLabel: 'Παίκτης',
+        dateLabel: 'Ημερομηνία',
+        friendLabel: 'Φίλος',
+        adminLabel: 'Admin',
+        latestGame: 'Τελευταίο Παιχνίδι',
+        correctPlural: 'σωστές',
+        correctStatus: 'Σωστό',
+        wrongStatus: 'Λάθος',
+        yourAnswer: 'Δική του απάντηση',
+        correctAnswer: 'Σωστή απάντηση',
+        noAnswer: 'Καμία απάντηση',
+        noEntryDetails: 'Δεν υπάρχουν διαθέσιμες λεπτομέρειες για αυτή τη συμμετοχή.',
+        playingAs: 'Παίζεις ως',
+        guestPlayer: 'Guest Player',
+        fillDetails: 'Συμπλήρωσε τα στοιχεία σου.',
+        noQuizQuestions: 'Δεν υπάρχουν διαθέσιμες ερωτήσεις για το quiz.',
+        noImageQuestions: 'Δεν υπάρχουν διαθέσιμες ερωτήσεις με εικόνες.',
+        noKnowledgeQuestions: 'Δεν υπάρχουν διαθέσιμες ερωτήσεις γνώσεων.',
+        quizEndMessage: 'Τέλος! Σκορ: {score} πόντοι',
+        adminOnlyReset: 'Μόνο ο διαχειριστής μπορεί να κάνει εκκαθάριση leaderboard.',
+        adminOnlyDelete: 'Μόνο ο διαχειριστής μπορεί να διαγράψει εγγραφές.',
+        adminOnlyVisible: 'Η διαχείριση εμφανίζεται μόνο στο admin προφίλ.',
+        confirmReset: 'Θέλεις σίγουρα εκκαθάριση leaderboard;',
+        confirmDelete: 'Θέλεις να διαγραφεί αυτή η συμμετοχή;',
+        leaderboardCleared: 'Το online leaderboard καθαρίστηκε.',
+        adminEnabled: 'Admin ενεργοποιήθηκε.',
+        adminDisabled: 'Admin κλειδώθηκε.',
+        adminWrong: 'Λάθος στοιχεία admin.',
+        adminUsernamePrompt: 'Admin username:',
+        adminPasswordPrompt: 'Admin password:',
+        friendLoginNeeded: 'Συνδέσου για να προσθέτεις φίλους.',
+        soundOn: 'Ήχοι On',
+        soundOff: 'Ήχοι Off',
+        musicOn: 'Μουσική On',
+        musicOff: 'Μουσική Off'
+    },
+    en: {
+        pageTitle: 'Quiz 12 - General',
+        homeTitle: 'Home',
+        authPanelTitle: 'Login / Create Account',
+        authConnected: 'Connected profile',
+        authEditProfile: 'Edit Profile',
+        authLogout: 'Logout',
+        authRegisterFill: 'Fill in email and password to register.',
+        authLoginFill: 'Fill in email and password to log in.',
+        authLoggedStatus: 'Your profile is connected. You can start a game or a duel right away.',
+        authGuestStatus: 'Sign in to play with your saved profile without retyping your details.',
+        authRegisterError: 'Register error',
+        authLoginError: 'Login error',
+        authGoogleError: 'Google login error',
+        saveProfileSuccess: 'Your profile has been saved.',
+        saveProfileError: 'Save error',
+        profileInvalid: 'Please fill in first name, last name, and nickname correctly.',
+        profileSave: 'Save',
+        profileClose: 'Close',
+        profileInfo: 'You can change your name, nickname, and profile photo.',
+        profileAvatarLabel: 'Choose one of the default avatars or upload your own photo.',
+        mainTitle: 'ultimate quiz',
+        mainSub: 'High-Level General Knowledge Quiz',
+        emailPlaceholder: 'Email',
+        passwordPlaceholder: 'Password',
+        nicknamePlaceholder: 'Nickname',
+        authRegister: 'Register',
+        authLogin: 'Login',
+        introGuide: '<strong>Rules:</strong> Each question includes an optional hint and available lifelines. The <strong>Hint</strong> costs 20% of the question value. <strong>50:50</strong> costs 50%, the <strong>Audience</strong> costs 75%, and <strong>Swap Question</strong> costs 25%. Penalties are deducted immediately from your score, so you can even drop into a negative score if you use help too early.',
+        firstName: 'First name',
+        lastName: 'Last name',
+        startKnowledge: 'Start Knowledge Quiz',
+        startImage: 'Start Image Quiz',
+        duelButton: 'Duel / Room',
+        reviewEntryTitle: 'Rate Quiz Nights',
+        reviewEntryCopy: 'Give from 1 to 5 stars and tell us what changes or improvements you would like to see. Your feedback helps us make the game more elegant and stronger.',
+        openReview: 'Open Review',
+        loginNote: 'Play solo or join a room for an online duel.',
+        reviewsTitle: 'Reviews',
+        reviewsSub: 'Rate the quiz and tell us what you would like to change.',
+        reviewAverage: 'Average',
+        reviewTotal: 'Total Reviews',
+        reviewLast: 'Latest Review',
+        reviewHelper: 'Pick stars and freely write your opinion, notes, or changes you would like in the game.',
+        reviewCommentPlaceholder: 'What did you like or what challenged you in the quiz?',
+        reviewSuggestionPlaceholder: 'What changes, additions, or improvements would you like to see?',
+        submitReview: 'Submit Review',
+        back: 'Back',
+        reviewGuestInfo: 'You can leave feedback whether you are playing as a guest or with a connected profile.',
+        recentComments: 'Recent Comments',
+        noReviews: 'There are no reviews yet.',
+        noExtraComment: 'No additional comment.',
+        reviewChangePrefix: 'I would like this to change:',
+        reviewNeedStars: 'Choose from 1 to 5 stars first.',
+        reviewNeedText: 'Write either a comment or a suggested change.',
+        reviewSaved: 'Your review has been saved. Thank you very much for your feedback.',
+        reviewSavedLocal: 'Your review was saved locally on your device because online storage did not allow writing.',
+        ratingEmpty: 'You have not selected a rating yet.',
+        rating1: '1 star: Needs a lot of work.',
+        rating2: '2 stars: Good base, but it needs improvement.',
+        rating3: '3 stars: Good, with room for an upgrade.',
+        rating4: '4 stars: Very strong quiz.',
+        rating5: '5 stars: Excellent, premium experience.',
+        quizQuestion: 'Question',
+        points: 'points',
+        hintShow: 'Show Hint',
+        hintHide: 'Hide Hint',
+        hintPrefix: '💡 Hint:',
+        lifelineAudience: 'Audience',
+        lifelineSwap: 'Swap',
+        prev: 'Previous',
+        next: 'Next',
+        results: 'Results',
+        summaryScore: 'Score',
+        summaryCorrect: 'Correct',
+        summaryRank: 'Rank',
+        fullLeaderboard: 'Full Leaderboard',
+        newGame: 'New Game',
+        leaderboardSub: 'Top Players',
+        playerAnalysis: 'Player Analysis',
+        friendsTitle: 'My Friends',
+        friendsLoginPrompt: 'Sign in to save friends and quickly start a duel with them.',
+        noFriends: 'You have not added any friends yet.',
+        duelWithFriend: 'Duel',
+        removeFriend: 'Remove',
+        addFriend: 'Friend +',
+        adminUnlock: 'Admin Unlock',
+        adminLock: 'Admin Lock',
+        adminReset: 'Clear Leaderboard',
+        emptyPlayerDetails: 'Click a player from the table to view their overall profile and latest game.',
+        noLeaderboardPlayers6: 'There are no players yet.',
+        noLeaderboardPlayers8: 'There are no players yet.',
+        totalScore: 'Total Score',
+        games: 'Games',
+        accuracy: 'Accuracy',
+        lastPlayed: 'Last Played',
+        playerLabel: 'Player',
+        dateLabel: 'Date',
+        friendLabel: 'Friend',
+        adminLabel: 'Admin',
+        latestGame: 'Latest Game',
+        correctPlural: 'correct',
+        correctStatus: 'Correct',
+        wrongStatus: 'Wrong',
+        yourAnswer: 'Selected answer',
+        correctAnswer: 'Correct answer',
+        noAnswer: 'No answer',
+        noEntryDetails: 'There are no details available for this entry.',
+        playingAs: 'Playing as',
+        guestPlayer: 'Guest Player',
+        fillDetails: 'Fill in your details.',
+        noQuizQuestions: 'There are no available questions for the quiz.',
+        noImageQuestions: 'There are no available image questions.',
+        noKnowledgeQuestions: 'There are no available knowledge questions.',
+        quizEndMessage: 'Finished! Score: {score} points',
+        adminOnlyReset: 'Only the administrator can clear the leaderboard.',
+        adminOnlyDelete: 'Only the administrator can delete entries.',
+        adminOnlyVisible: 'Admin controls are visible only on the admin profile.',
+        confirmReset: 'Are you sure you want to clear the leaderboard?',
+        confirmDelete: 'Do you want to delete this entry?',
+        leaderboardCleared: 'The online leaderboard was cleared.',
+        adminEnabled: 'Admin enabled.',
+        adminDisabled: 'Admin locked.',
+        adminWrong: 'Wrong admin credentials.',
+        adminUsernamePrompt: 'Admin username:',
+        adminPasswordPrompt: 'Admin password:',
+        friendLoginNeeded: 'Sign in to add friends.',
+        soundOn: 'Sound On',
+        soundOff: 'Sound Off',
+        musicOn: 'Music On',
+        musicOff: 'Music Off'
+    }
+};
 const QUESTION_IMAGE_ALIASES = {
     'assets/images/questions/flags/japan.svg': 'assets/images/questions/flags/Flag_of_Japan.svg.png',
     'assets/images/questions/flags/france.svg': 'assets/images/questions/flags/download.jpg',
@@ -1367,6 +1697,213 @@ const QUESTION_IMAGE_ALIASES = {
     'assets/images/questions/logos/pepsi-circle.svg': 'assets/images/questions/logos/pepsi-circle.webp'
 };
 
+const ENGLISH_NAME_PRESERVE_SET = new Set([
+    'Doctor Strange', 'Wonder Woman', 'Doctor Fate', 'Captain Marvel', 'Thanos', 'Deadpool',
+    'Jean Grey', 'Black Panther', 'Doctor Manhattan', 'Spider-Man', 'Batman', 'Iron Man',
+    'Captain America', 'Thor', 'Hulk', 'Superman', 'Flash', 'Wolverine', 'Shrek', 'Sonic',
+    'Pikachu', 'Mickey Mouse', 'Tom', 'Jerry', 'Scooby-Doo', 'Donald Duck', 'Bugs Bunny',
+    'Netflix', 'YouTube', 'Spotify', 'Instagram', 'Apple', 'Amazon', 'BMW', 'Audi',
+    'Mercedes-Benz', "McDonald's", 'Samsung', 'Sony', 'Shell', 'Toyota'
+]);
+
+const EL_TO_EN_OPTION_TRANSLATIONS = Object.fromEntries(
+    Object.entries(IMAGE_OPTION_TRANSLATIONS).map(([en, el]) => [el, en])
+);
+
+const EL_TO_EN_TEXT_REPLACEMENTS = [
+    ['Ποια είναι η πρωτεύουσα της', 'What is the capital of'],
+    ['Ποια είναι η πρωτεύουσα του', 'What is the capital of'],
+    ['Ποια είναι η πρωτεύουσα των', 'What is the capital of'],
+    ['Ποια χώρα έχει πρωτεύουσα', 'Which country has the capital'],
+    ['Ποια χώρα', 'Which country'],
+    ['Ποιο είναι το εθνικό άθλημα', 'What is the national sport'],
+    ['Ποιος ήταν', 'Who was'],
+    ['Ποιος είναι', 'Who is'],
+    ['Ποια ήταν', 'Which was'],
+    ['Ποια είναι', 'Which is'],
+    ['Ποιο είναι', 'What is'],
+    ['Πόσοι', 'How many'],
+    ['Πόσες', 'How many'],
+    ['Πόσους', 'How many'],
+    ['Από ποια χώρα', 'From which country'],
+    ['Σε ποια χώρα', 'In which country'],
+    ['Σε ποιο περιβάλλον', 'In which environment'],
+    ['Ποια από τις παρακάτω', 'Which of the following'],
+    ['Ποιο από τα παρακάτω', 'Which of the following'],
+    ['Ποιος από τους παρακάτω', 'Which of the following'],
+    ['Ποια από τους παρακάτω', 'Which of the following'],
+    ['Με ποιο είδος υπηρεσίας συνδέεται κυρίως το brand της εικόνας', 'What type of service is the brand in the image mainly associated with'],
+    ['Σε ποια χώρα κυβέρνησε η δυναστεία των Παχλεβί', 'In which country did the Pahlavi dynasty rule'],
+    ['Από ποια χώρα υιοθέτησαν οι Ρωμαίοι το ημερολόγιο τους', 'From which country did the Romans adopt their calendar'],
+    ['Σε ποια χώρα κυριάρχησε η δυναστεία των Παχλεβί', 'In which country did the Pahlavi dynasty rule'],
+    ['Τι ρυθμού είναι ο ναός του Ποσειδώνα στο Σούνιο', 'What architectural order is the Temple of Poseidon at Sounion'],
+    ['Πόσες όπερες αποτελούν τον "ΚΥΚΛΟ" του Βάγκνερ', 'How many operas make up Wagner’s Ring Cycle'],
+    ['Ποια ήταν η μεγαλύτερη σε έκταση αυτοκρατορία', 'Which empire was the largest by land area'],
+    ['Πόσους πειρασμούς αντιμετώπισε ο Ιησούς Χριστός', 'How many temptations did Jesus Christ face'],
+    ['Τι εννοεί', 'What does'],
+    ['σωστές', 'correct'],
+    ['πόντοι', 'points']
+];
+
+function t(key, params = {}) {
+    const template = UI_TEXT[currentLanguage]?.[key] ?? UI_TEXT.el[key] ?? key;
+    return Object.entries(params).reduce((acc, [paramKey, paramValue]) => acc.replaceAll(`{${paramKey}}`, String(paramValue)), template);
+}
+
+function escapeRegExp(value) {
+    return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function autoTranslateText(text) {
+    if (!text || currentLanguage === 'el') return text || '';
+    let translated = String(text);
+    EL_TO_EN_TEXT_REPLACEMENTS.forEach(([el, en]) => {
+        translated = translated.replace(new RegExp(escapeRegExp(el), 'g'), en);
+    });
+    Object.entries(EL_TO_EN_OPTION_TRANSLATIONS).forEach(([el, en]) => {
+        if (ENGLISH_NAME_PRESERVE_SET.has(en)) {
+            translated = translated.replace(new RegExp(escapeRegExp(el), 'g'), en);
+        }
+    });
+    translated = translated
+        .replace(/Σωστή απάντηση:/g, 'Correct answer:')
+        .replace(/Δική του απάντηση:/g, 'Selected answer:')
+        .replace(/Τελευταίο Παιχνίδι:/g, 'Latest Game:')
+        .replace(/Δεν υπάρχουν διαθέσιμες λεπτομέρειες για αυτή τη συμμετοχή\./g, t('noEntryDetails'))
+        .replace(/Δεν υπάρχουν reviews ακόμα\./g, t('noReviews'));
+    return translated;
+}
+
+function getQuestionText(question) {
+    return currentLanguage === 'en'
+        ? (question?.q_en || autoTranslateText(question?.q || ''))
+        : (question?.q || '');
+}
+
+function getQuestionHint(question) {
+    return currentLanguage === 'en'
+        ? (question?.h_en || autoTranslateText(question?.h || ''))
+        : (question?.h || '');
+}
+
+function getQuestionRationale(question) {
+    return currentLanguage === 'en'
+        ? (question?.r_en || autoTranslateText(question?.r || ''))
+        : (question?.r || '');
+}
+
+function localizeFreeText(text) {
+    return currentLanguage === 'en' ? autoTranslateText(text) : text;
+}
+
+function localizeModeLabel(mode) {
+    return currentLanguage === 'en'
+        ? (mode === 'image' ? 'Image Quiz' : 'Knowledge Quiz')
+        : (QUIZ_MODE_LABELS[mode] || QUIZ_MODE_LABELS.knowledge);
+}
+
+function applyLanguage() {
+    document.documentElement.lang = currentLanguage;
+    document.title = t('pageTitle');
+    document.querySelector('.home-logo-btn')?.setAttribute('title', t('homeTitle'));
+    document.querySelector('.home-logo-btn')?.setAttribute('aria-label', t('homeTitle'));
+    document.getElementById('auth-panel-title').textContent = t('authPanelTitle');
+    document.getElementById('btn-lang-el')?.classList.toggle('active', currentLanguage === 'el');
+    document.getElementById('btn-lang-en')?.classList.toggle('active', currentLanguage === 'en');
+    document.getElementById('main-auth-email').placeholder = t('emailPlaceholder');
+    document.getElementById('main-auth-password').placeholder = t('passwordPlaceholder');
+    document.getElementById('btn-auth-register').textContent = t('authRegister');
+    document.getElementById('btn-auth-login').textContent = t('authLogin');
+    document.getElementById('login-main-title').textContent = t('mainTitle');
+    document.getElementById('login-main-sub').textContent = t('mainSub');
+    document.getElementById('intro-guide').innerHTML = t('introGuide');
+    document.getElementById('fname').placeholder = t('firstName');
+    document.getElementById('lname').placeholder = t('lastName');
+    document.getElementById('btn-start-knowledge').textContent = t('startKnowledge');
+    document.getElementById('btn-start-image').textContent = t('startImage');
+    document.getElementById('btn-open-duel').textContent = t('duelButton');
+    document.getElementById('review-entry-title').textContent = t('reviewEntryTitle');
+    document.getElementById('review-entry-copy').textContent = t('reviewEntryCopy');
+    document.getElementById('btn-open-review-entry').textContent = t('openReview');
+    document.getElementById('login-leaderboard-note').textContent = t('loginNote');
+    document.getElementById('reviews-title').textContent = t('reviewsTitle');
+    document.getElementById('reviews-sub').textContent = t('reviewsSub');
+    document.getElementById('review-average-label').textContent = t('reviewAverage');
+    document.getElementById('review-total-label').textContent = t('reviewTotal');
+    document.getElementById('review-last-label').textContent = t('reviewLast');
+    document.getElementById('review-helper-copy').textContent = t('reviewHelper');
+    document.getElementById('review-comment').placeholder = t('reviewCommentPlaceholder');
+    document.getElementById('review-suggestion').placeholder = t('reviewSuggestionPlaceholder');
+    document.getElementById('btn-submit-review').textContent = t('submitReview');
+    document.getElementById('btn-back-from-reviews').textContent = t('back');
+    document.getElementById('review-list-title').textContent = t('recentComments');
+    document.getElementById('end-title').textContent = t('results');
+    document.getElementById('summary-score-label').textContent = t('summaryScore');
+    document.getElementById('summary-correct-label').textContent = t('summaryCorrect');
+    document.getElementById('summary-rank-label').textContent = t('summaryRank');
+    document.getElementById('btn-full-leaderboard-end').textContent = t('fullLeaderboard');
+    document.getElementById('btn-new-game-end').textContent = t('newGame');
+    document.getElementById('leaderboard-title').textContent = 'Leaderboard';
+    document.getElementById('leaderboard-sub').textContent = t('leaderboardSub');
+    document.getElementById('details-panel-title').textContent = t('playerAnalysis');
+    document.getElementById('friends-panel-title').textContent = t('friendsTitle');
+    document.getElementById('btn-back-from-leaderboard').textContent = t('back');
+    document.getElementById('btn-new-game-leaderboard').textContent = t('newGame');
+    document.getElementById('main-profile-first').placeholder = t('firstName');
+    document.getElementById('main-profile-last').placeholder = t('lastName');
+    document.getElementById('main-profile-nickname').placeholder = t('nicknamePlaceholder');
+    const avatarChoiceLabel = document.querySelector('.avatar-choice-label');
+    if (avatarChoiceLabel) avatarChoiceLabel.textContent = t('profileAvatarLabel');
+    const profileEditorStatus = document.getElementById('main-profile-editor-status');
+    if (profileEditorStatus) profileEditorStatus.textContent = t('profileInfo');
+    const profileEditorActions = document.querySelectorAll('.profile-editor-actions button');
+    if (profileEditorActions[0]) profileEditorActions[0].textContent = t('profileSave');
+    if (profileEditorActions[1]) profileEditorActions[1].textContent = t('profileClose');
+    const endHeaders = document.querySelectorAll('#scr-end thead th');
+    if (endHeaders[1]) endHeaders[1].textContent = t('playerLabel');
+    if (endHeaders[2]) endHeaders[2].textContent = t('totalScore');
+    if (endHeaders[3]) endHeaders[3].textContent = t('games');
+    if (endHeaders[4]) endHeaders[4].textContent = t('accuracy');
+    if (endHeaders[5]) endHeaders[5].textContent = t('dateLabel');
+    const fullHeaders = document.querySelectorAll('#scr-leaderboard thead th');
+    if (fullHeaders[1]) fullHeaders[1].textContent = t('playerLabel');
+    if (fullHeaders[2]) fullHeaders[2].textContent = t('totalScore');
+    if (fullHeaders[3]) fullHeaders[3].textContent = t('games');
+    if (fullHeaders[4]) fullHeaders[4].textContent = t('accuracy');
+    if (fullHeaders[5]) fullHeaders[5].textContent = t('lastPlayed');
+    if (fullHeaders[6]) fullHeaders[6].textContent = t('friendLabel');
+    if (fullHeaders[7]) fullHeaders[7].textContent = t('adminLabel');
+    updateAudioButtons();
+    updateQuizProgressLabel();
+    updateMainAuthUi();
+    setReviewRatingLabel();
+    renderReviewList(reviewEntriesCache);
+    renderFriendsPanel();
+    if (leaderboardEntriesCache.length) {
+        renderLeaderboardEntries(leaderboardEntriesCache, selectedEntryId || user.id);
+    } else {
+        renderDetailsPanel(null);
+    }
+    if (!document.getElementById('scr-quiz').classList.contains('hidden') && questions[cur]) {
+        loadQuestion();
+    }
+    if (!document.getElementById('scr-end').classList.contains('hidden')) {
+        document.getElementById('final-msg').textContent = t('quizEndMessage', { score });
+    }
+}
+
+window.setLanguage = function setLanguage(lang) {
+    currentLanguage = lang === 'en' ? 'en' : 'el';
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, currentLanguage);
+    applyLanguage();
+};
+
+function updateQuizProgressLabel() {
+    const label = document.getElementById('quiz-progress-label');
+    if (!label) return;
+    label.innerHTML = `${t('quizQuestion')} <span id="q-num">${cur + 1}</span>/<span id="q-total">${questions.length}</span> · <span id="score-display">${score}</span> ${t('points')}`;
+}
+
 const LEADERBOARD_KEY = FIREBASE_COLLECTION;
 const REVIEW_STORAGE_KEY = 'quiz12_reviews_local';
   let questions = [];
@@ -1391,7 +1928,8 @@ let currentAuthUser = null;
   let selectedEntryId = null;
   let reviewRating = 0;
   let reviewEntriesCache = [];
-  let adminUnlocked = sessionStorage.getItem('quiz11_admin_unlocked') === 'true';
+  let leaderboardEntriesCache = [];
+  let adminUnlocked = sessionStorage.getItem(ADMIN_SESSION_KEY) === 'true';
 let leaderboardSort = { key: 'score', direction: 'desc' };
 let soundEffectsEnabled = localStorage.getItem('quiz12_sound_enabled') !== 'false';
 let musicEnabled = localStorage.getItem('quiz12_music_enabled') !== 'false';
@@ -1436,14 +1974,93 @@ function updateAdminUi() {
     const resetBtn = document.getElementById('btn-admin-reset');
     const unlockBtn = document.getElementById('btn-admin-unlock');
     if (!resetBtn || !unlockBtn) return;
-    resetBtn.classList.toggle('visible', adminUnlocked);
-    unlockBtn.textContent = adminUnlocked ? 'Admin Active' : 'Admin Unlock';
+    const allowed = isAdminUser();
+    if (!allowed) {
+        adminUnlocked = false;
+        sessionStorage.removeItem(ADMIN_SESSION_KEY);
+    }
+    resetBtn.classList.toggle('visible', allowed && adminUnlocked);
+    unlockBtn.style.display = allowed ? '' : 'none';
+    unlockBtn.textContent = adminUnlocked ? t('adminLock') : t('adminUnlock');
+    resetBtn.textContent = t('adminReset');
+}
+
+function isAdminUser() {
+    return String(currentAuthUser?.email || '').trim().toLowerCase() === ADMIN_EMAIL;
+}
+
+function getEntryPlayerKey(entry = {}) {
+    const authUid = String(entry.authUid || entry.auth_uid || '').trim();
+    if (authUid) return `uid:${authUid}`;
+    const playerId = String(entry.player_id || '').trim();
+    if (playerId) return `pid:${playerId}`;
+    const firstName = String(entry.firstName || entry.first_name || '').trim();
+    const lastName = String(entry.lastName || entry.last_name || '').trim();
+    if (firstName || lastName) return `name:${normalizePlayerId(firstName || '?', lastName || '?')}`;
+    return `fallback:${String(entry.name || '').trim().toLowerCase()}`;
+}
+
+function normalizeFriendsList(list) {
+    if (!Array.isArray(list)) return [];
+    const seen = new Set();
+    return list
+        .map(friend => ({
+            uid: String(friend?.uid || '').trim(),
+            nickname: String(friend?.nickname || '').trim(),
+            fullName: String(friend?.fullName || '').trim(),
+            photoUrl: String(friend?.photoUrl || '').trim()
+        }))
+        .filter(friend => friend.uid)
+        .filter(friend => {
+            if (seen.has(friend.uid)) return false;
+            seen.add(friend.uid);
+            return true;
+        });
+}
+
+function getCurrentFriends() {
+    return normalizeFriendsList(currentAuthProfile?.friends || []);
+}
+
+function isFriendAuthUid(uid) {
+    return !!uid && getCurrentFriends().some(friend => friend.uid === uid);
+}
+
+function renderFriendsPanel() {
+    const mount = document.getElementById('friends-content');
+    if (!mount) return;
+    if (!currentAuthUser || !firebaseReady) {
+        mount.className = 'details-empty';
+        mount.innerHTML = t('friendsLoginPrompt');
+        return;
+    }
+    const friends = getCurrentFriends();
+    if (!friends.length) {
+        mount.className = 'details-empty';
+        mount.innerHTML = t('noFriends');
+        return;
+    }
+    mount.className = '';
+    mount.innerHTML = friends.map(friend => `
+        <div class="question-review-item">
+            <div class="question-review-text">${friend.nickname || friend.fullName || (currentLanguage === 'en' ? 'Player' : 'Παίκτης')}</div>
+            <div class="question-review-meta" style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
+                <button class="secondary" onclick="startFriendDuel('${friend.uid}')">${t('duelWithFriend')}</button>
+                <button class="secondary" onclick="removeFriend('${friend.uid}')">${t('removeFriend')}</button>
+            </div>
+        </div>
+    `).join('');
 }
 
 async function fetchMainProfile(uid) {
     if (!firebaseReady || !uid) return null;
     const snap = await firebaseApi.getDoc(firebaseApi.doc(firebaseDb, PROFILE_COLLECTION, uid));
-    return snap.exists() ? snap.data() : null;
+    if (!snap.exists()) return null;
+    const data = snap.data();
+    return {
+        ...data,
+        friends: normalizeFriendsList(data.friends || [])
+    };
 }
 
 function deriveProfileFromAuth(userAccount) {
@@ -1465,7 +2082,7 @@ function getPreferredDisplayName(entry = {}) {
     const nickname = String(entry.nickname || '').trim();
     if (nickname) return nickname;
     const fullName = String(entry.name || `${entry.firstName || ''} ${entry.lastName || ''}`).trim();
-    return fullName || 'Παίκτης';
+    return fullName || (currentLanguage === 'en' ? 'Player' : 'Παίκτης');
 }
 
 function getSecondaryDisplayName(entry = {}) {
@@ -1484,7 +2101,7 @@ function getInitials(name) {
 }
 
 function renderPlayerCell(entry) {
-    const fullName = entry.name || `${entry.firstName || ''} ${entry.lastName || ''}`.trim() || 'Παίκτης';
+    const fullName = entry.name || `${entry.firstName || ''} ${entry.lastName || ''}`.trim() || (currentLanguage === 'en' ? 'Player' : 'Παίκτης');
     const preferredName = getPreferredDisplayName(entry);
     const secondaryName = getSecondaryDisplayName(entry);
     const avatar = entry.photoUrl
@@ -1690,11 +2307,11 @@ function updateAudioButtons() {
     const soundBtn = document.getElementById('btn-sound-toggle');
     const musicBtn = document.getElementById('btn-music-toggle');
     if (soundBtn) {
-        soundBtn.textContent = `${soundEffectsEnabled ? '🔊' : '🔇'} Ήχοι ${soundEffectsEnabled ? 'On' : 'Off'}`;
+        soundBtn.textContent = `${soundEffectsEnabled ? '🔊' : '🔇'} ${soundEffectsEnabled ? t('soundOn') : t('soundOff')}`;
         soundBtn.classList.toggle('active', soundEffectsEnabled);
     }
     if (musicBtn) {
-        musicBtn.textContent = `${musicEnabled ? '🎵' : '🎼'} Μουσική ${musicEnabled ? 'On' : 'Off'}`;
+        musicBtn.textContent = `${musicEnabled ? '🎵' : '🎼'} ${musicEnabled ? t('musicOn') : t('musicOff')}`;
         musicBtn.classList.toggle('active', musicEnabled);
     }
 }
@@ -1744,19 +2361,19 @@ function updateMainAuthUi() {
             ${currentAuthProfile.photoUrl ? `<img class="player-avatar" src="${currentAuthProfile.photoUrl}" alt="${currentAuthProfile.nickname || currentAuthProfile.firstName}">` : `<span class="player-avatar-fallback">${getInitials(currentAuthProfile.nickname || `${currentAuthProfile.firstName} ${currentAuthProfile.lastName}`)}</span>`}
             <div class="auth-user-meta">
                 <div class="auth-user-name">${currentAuthProfile.nickname || currentAuthProfile.firstName}</div>
-                <div class="auth-user-sub">Συνδεδεμένο προφίλ</div>
+                <div class="auth-user-sub">${t('authConnected')}</div>
             </div>
         `;
         profileBanner.innerHTML = `
             <div class="playing-as">
                 ${currentAuthProfile.photoUrl ? `<img class="player-avatar" src="${currentAuthProfile.photoUrl}" alt="${currentAuthProfile.nickname || currentAuthProfile.firstName}">` : `<span class="player-avatar-fallback">${getInitials(currentAuthProfile.nickname || `${currentAuthProfile.firstName} ${currentAuthProfile.lastName}`)}</span>`}
                 <div class="playing-as-meta">
-                    <div class="playing-as-label">Παίζεις ως</div>
+                    <div class="playing-as-label">${t('playingAs')}</div>
                     <div class="playing-as-name">${currentAuthProfile.nickname || currentAuthProfile.firstName}</div>
                 </div>
             </div>
         `;
-        status.textContent = 'Το προφίλ σου είναι συνδεδεμένο. Μπορείς να ξεκινήσεις αμέσως παιχνίδι ή μονομαχία.';
+        status.textContent = t('authLoggedStatus');
         logoutBtn.classList.remove('hidden');
         editBtn.classList.remove('hidden');
     } else {
@@ -1766,12 +2383,16 @@ function updateMainAuthUi() {
         authForm.classList.remove('hidden');
         authUserCard.classList.add('hidden');
         authUserCard.innerHTML = '';
-        status.textContent = 'Συνδέσου για να παίξεις με το αποθηκευμένο προφίλ σου χωρίς να ξαναγράψεις στοιχεία.';
+        status.textContent = t('authGuestStatus');
         logoutBtn.classList.add('hidden');
         editBtn.classList.add('hidden');
         mainProfileEditorOpen = false;
         document.getElementById('main-profile-editor')?.classList.add('hidden');
     }
+    editBtn.textContent = t('authEditProfile');
+    logoutBtn.textContent = t('authLogout');
+    updateAdminUi();
+    renderFriendsPanel();
 }
 
 async function handleMainAuthUser(userAccount) {
@@ -1794,13 +2415,13 @@ window.registerMainAccount = async function registerMainAccount() {
     const email = document.getElementById('main-auth-email').value.trim();
     const password = document.getElementById('main-auth-password').value;
     if (!email || !password) {
-        document.getElementById('main-auth-status').textContent = 'Συμπλήρωσε email και password για register.';
+        document.getElementById('main-auth-status').textContent = t('authRegisterFill');
         return;
     }
     try {
         await authApi.createUserWithEmailAndPassword(firebaseAuth, email, password);
     } catch (error) {
-        document.getElementById('main-auth-status').textContent = `Register error: ${error.message}`;
+        document.getElementById('main-auth-status').textContent = `${t('authRegisterError')}: ${error.message}`;
     }
 };
 
@@ -1809,13 +2430,13 @@ window.loginMainAccount = async function loginMainAccount() {
     const email = document.getElementById('main-auth-email').value.trim();
     const password = document.getElementById('main-auth-password').value;
     if (!email || !password) {
-        document.getElementById('main-auth-status').textContent = 'Συμπλήρωσε email και password για login.';
+        document.getElementById('main-auth-status').textContent = t('authLoginFill');
         return;
     }
     try {
         await authApi.signInWithEmailAndPassword(firebaseAuth, email, password);
     } catch (error) {
-        document.getElementById('main-auth-status').textContent = `Login error: ${error.message}`;
+        document.getElementById('main-auth-status').textContent = `${t('authLoginError')}: ${error.message}`;
     }
 };
 
@@ -1833,7 +2454,7 @@ window.loginMainWithGoogle = async function loginMainWithGoogle() {
             await authApi.signInWithRedirect(firebaseAuth, provider);
             return;
         }
-        document.getElementById('main-auth-status').textContent = `Google login error: ${error.message}`;
+        document.getElementById('main-auth-status').textContent = `${t('authGoogleError')}: ${error.message}`;
     }
 };
 
@@ -1850,7 +2471,7 @@ window.saveMainProfile = async function saveMainProfile() {
     const photoFile = document.getElementById('main-profile-photo').files?.[0];
 
     if (firstName.length < 2 || lastName.length < 2 || nickname.length < 2) {
-        status.textContent = 'Συμπλήρωσε σωστά όνομα, επώνυμο και nickname.';
+        status.textContent = t('profileInvalid');
         return;
     }
 
@@ -1875,10 +2496,10 @@ window.saveMainProfile = async function saveMainProfile() {
         document.getElementById('lname').value = lastName;
         updateMainAuthUi();
         renderMainDefaultAvatarPicker();
-        status.textContent = 'Το προφίλ σου αποθηκεύτηκε.';
+        status.textContent = t('saveProfileSuccess');
         await renderLeaderboard(selectedEntryId || user.id);
     } catch (error) {
-        status.textContent = `Σφάλμα αποθήκευσης: ${error.message}`;
+        status.textContent = `${t('saveProfileError')}: ${error.message}`;
     }
 };
 
@@ -2011,6 +2632,10 @@ const KEEP_IMAGE_OPTION_NAMES_IN_ENGLISH = new Set([
 ]);
 
 function localizeOptionText(question, optionText) {
+    if (currentLanguage === 'en') {
+        if (ENGLISH_NAME_PRESERVE_SET.has(optionText)) return optionText;
+        return EL_TO_EN_OPTION_TRANSLATIONS[optionText] || autoTranslateText(optionText);
+    }
     if (!question?.img) return optionText;
     if (KEEP_IMAGE_OPTION_NAMES_IN_ENGLISH.has(optionText)) return optionText;
     return IMAGE_OPTION_TRANSLATIONS[optionText] || optionText;
@@ -2206,7 +2831,7 @@ function getCurrentQuestionPoints() {
 function applyLifelinePenalty(rate) {
     const penalty = Math.round(getCurrentQuestionPoints() * rate);
     score -= penalty;
-    document.getElementById('score-display').textContent = score;
+    updateQuizProgressLabel();
     return penalty;
 }
 
@@ -2227,13 +2852,13 @@ function buildAnswerReview() {
         const selectedIndex = answer ? answer.selectedIndex : -1;
         return {
             questionIndex: index,
-            questionText: question.q,
+            questionText: getQuestionText(question),
             selectedIndex,
-            selectedText: selectedIndex >= 0 ? localizeOptionText(question, question.o[selectedIndex]) : 'Καμία απάντηση',
+            selectedText: selectedIndex >= 0 ? localizeOptionText(question, question.o[selectedIndex]) : t('noAnswer'),
             correctIndex: question.a,
             correctText: localizeOptionText(question, question.o[question.a]),
             isCorrect: !!answer?.isCorrect,
-            rationale: question.r
+            rationale: getQuestionRationale(question)
         };
     });
 }
@@ -2259,9 +2884,11 @@ function sortLeaderboard(entries) {
         let primary = 0;
 
         if (key === 'name') {
-            primary = (a.name || '').localeCompare(b.name || '', 'el');
+            primary = (a.name || '').localeCompare(b.name || '', currentLanguage === 'en' ? 'en' : 'el');
         } else if (key === 'score') {
             primary = (a.score || 0) - (b.score || 0);
+        } else if (key === 'games') {
+            primary = (a.games || 0) - (b.games || 0);
         } else if (key === 'accValue') {
             primary = (a.accValue || 0) - (b.accValue || 0);
         } else if (key === 'lastPlayedTs') {
@@ -2273,8 +2900,71 @@ function sortLeaderboard(entries) {
         if ((b.score || 0) !== (a.score || 0)) return (b.score || 0) - (a.score || 0);
         if ((b.accValue || 0) !== (a.accValue || 0)) return (b.accValue || 0) - (a.accValue || 0);
         if ((b.lastPlayedTs || 0) !== (a.lastPlayedTs || 0)) return (b.lastPlayedTs || 0) - (a.lastPlayedTs || 0);
-        return (a.name || '').localeCompare(b.name || '', 'el');
+        return (a.name || '').localeCompare(b.name || '', currentLanguage === 'en' ? 'en' : 'el');
     });
+}
+
+function buildPlayerLeaderboard(entries) {
+    const grouped = new Map();
+    entries.forEach(entry => {
+        const key = getEntryPlayerKey(entry);
+        const totalCorrect = Number(entry.total_correct || 0);
+        const totalWrong = Number(entry.total_wrong || 0);
+        const lastPlayedTs = Number(entry.lastPlayedTs || entry.lastPlayed || 0);
+        const existing = grouped.get(key);
+        if (!existing) {
+            grouped.set(key, {
+                ...entry,
+                id: key,
+                playerKey: key,
+                score: Number(entry.score || 0),
+                games: Number(entry.games || 1) || 1,
+                total_correct: totalCorrect,
+                total_wrong: totalWrong,
+                latestAnswers: Array.isArray(entry.answers) ? entry.answers : [],
+                latestCorrect: totalCorrect,
+                latestWrong: totalWrong,
+                latestScore: Number(entry.score || 0),
+                lastPlayed: entry.lastPlayed,
+                lastPlayedTs
+            });
+            return;
+        }
+        existing.score += Number(entry.score || 0);
+        existing.games += Number(entry.games || 1) || 1;
+        existing.total_correct += totalCorrect;
+        existing.total_wrong += totalWrong;
+        if (lastPlayedTs >= existing.lastPlayedTs) {
+            existing.name = entry.name || existing.name;
+            existing.firstName = entry.firstName || existing.firstName;
+            existing.lastName = entry.lastName || existing.lastName;
+            existing.nickname = entry.nickname || existing.nickname;
+            existing.photoUrl = entry.photoUrl || existing.photoUrl;
+            existing.authUid = entry.authUid || existing.authUid;
+            existing.latestAnswers = Array.isArray(entry.answers) ? entry.answers : [];
+            existing.latestCorrect = totalCorrect;
+            existing.latestWrong = totalWrong;
+            existing.latestScore = Number(entry.score || 0);
+            existing.lastPlayed = entry.lastPlayed;
+            existing.lastPlayedTs = lastPlayedTs;
+        }
+    });
+
+    return Array.from(grouped.values()).map(entry => {
+        const totalAnswers = Number(entry.total_correct || 0) + Number(entry.total_wrong || 0);
+        const accValue = totalAnswers ? Math.round((Number(entry.total_correct || 0) / totalAnswers) * 100) : 0;
+        return {
+            ...entry,
+            accValue,
+            acc: `${accValue}%`
+        };
+    });
+}
+
+function renderFriendActionCell(entry) {
+    if (!currentAuthUser || !firebaseReady || !entry.authUid || entry.authUid === currentAuthUser.uid) return '—';
+    const isFriend = isFriendAuthUid(entry.authUid);
+    return `<button class="secondary" onclick="event.stopPropagation(); toggleFriend('${entry.id}')">${isFriend ? t('removeFriend') : t('addFriend')}</button>`;
 }
 
 function changeSort(key) {
@@ -2327,7 +3017,7 @@ function showHelpBadge() {
 
 function formatDate(ts) {
     if (!ts) return '-';
-    return new Date(ts).toLocaleString('el-GR', {
+    return new Date(ts).toLocaleString(currentLanguage === 'en' ? 'en-GB' : 'el-GR', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
@@ -2341,7 +3031,7 @@ function getReviewDisplayName() {
     const fullName = `${currentAuthProfile?.firstName || ''} ${currentAuthProfile?.lastName || ''}`.trim();
     if (fullName) return fullName;
     const manualName = `${document.getElementById('fname')?.value || ''} ${document.getElementById('lname')?.value || ''}`.trim();
-    return manualName || 'Guest Player';
+    return manualName || t('guestPlayer');
 }
 
 function getLocalReviews() {
@@ -2398,7 +3088,7 @@ function renderReviewList(entries) {
     const listEl = document.getElementById('review-list');
     if (!listEl) return;
     if (!entries.length) {
-        listEl.innerHTML = '<div class="review-empty">Δεν υπάρχουν reviews ακόμα.</div>';
+        listEl.innerHTML = `<div class="review-empty">${t('noReviews')}</div>`;
         updateReviewSummary([]);
         return;
     }
@@ -2410,8 +3100,8 @@ function renderReviewList(entries) {
                 <div class="review-item-date">${formatDate(entry.createdAt)}</div>
             </div>
             <div class="review-item-stars">${renderReviewStars(entry.rating)}</div>
-            <div class="review-item-text">${escapeHtml(entry.comment || 'Χωρίς επιπλέον σχόλιο.')}</div>
-            ${entry.suggestion ? `<div class="review-item-suggestion" style="margin-top:8px;"><strong>Θα ήθελα να αλλάξει:</strong> ${escapeHtml(entry.suggestion)}</div>` : ''}
+            <div class="review-item-text">${escapeHtml(entry.comment || t('noExtraComment'))}</div>
+            ${entry.suggestion ? `<div class="review-item-suggestion" style="margin-top:8px;"><strong>${t('reviewChangePrefix')}</strong> ${escapeHtml(entry.suggestion)}</div>` : ''}
         </div>
     `).join('');
     updateReviewSummary(entries);
@@ -2444,13 +3134,13 @@ function setReviewRatingLabel() {
     if (!label) return;
     const copy = [
         '',
-        '1 αστέρι: Χρειάζεται πολλή δουλειά.',
-        '2 αστέρια: Υπάρχει βάση αλλά θέλει βελτίωση.',
-        '3 αστέρια: Καλό, με περιθώριο για upgrade.',
-        '4 αστέρια: Πολύ δυνατό quiz.',
-        '5 αστέρια: Εξαιρετικό, premium εμπειρία.'
+        t('rating1'),
+        t('rating2'),
+        t('rating3'),
+        t('rating4'),
+        t('rating5')
     ];
-    label.textContent = reviewRating ? copy[reviewRating] : 'Δεν έχεις διαλέξει ακόμη βαθμολογία.';
+    label.textContent = reviewRating ? copy[reviewRating] : t('ratingEmpty');
 }
 
 window.setReviewRating = function setReviewRating(value) {
@@ -2465,7 +3155,7 @@ function resetReviewForm() {
     reviewRating = 0;
     document.getElementById('review-comment').value = '';
     document.getElementById('review-suggestion').value = '';
-    document.getElementById('review-status').textContent = 'Μπορείς να αφήσεις feedback είτε παίζεις ως επισκέπτης είτε με συνδεδεμένο προφίλ.';
+    document.getElementById('review-status').textContent = t('reviewGuestInfo');
     window.setReviewRating(0);
 }
 
@@ -2480,12 +3170,12 @@ window.submitReview = async function submitReview() {
     const suggestion = document.getElementById('review-suggestion').value.trim();
 
     if (!reviewRating) {
-        statusEl.textContent = 'Διάλεξε πρώτα από 1 έως 5 αστέρια.';
+        statusEl.textContent = t('reviewNeedStars');
         return;
     }
 
     if (!comment && !suggestion) {
-        statusEl.textContent = 'Γράψε είτε ένα σχόλιο είτε μια πρόταση αλλαγής.';
+        statusEl.textContent = t('reviewNeedText');
         return;
     }
 
@@ -2507,13 +3197,13 @@ window.submitReview = async function submitReview() {
             saveLocalReviews(next);
         }
         resetReviewForm();
-        statusEl.textContent = 'Το review σου αποθηκεύτηκε. Ευχαριστούμε πολύ για το feedback.';
+        statusEl.textContent = t('reviewSaved');
         await fetchReviews();
     } catch (error) {
         const next = [payload, ...getLocalReviews()].slice(0, 60);
         saveLocalReviews(next);
         resetReviewForm();
-        statusEl.textContent = 'Το review αποθηκεύτηκε τοπικά στη συσκευή σου, γιατί το online storage δεν επέτρεψε εγγραφή.';
+        statusEl.textContent = t('reviewSavedLocal');
         await fetchReviews();
     }
 };
@@ -2580,27 +3270,31 @@ async function deleteRemoteEntry(entryId) {
 function renderLeaderboardEntries(entries, targetId = user.id) {
     const medals = ['🥇', '🥈', '🥉'];
     const previewRows = entries.slice(0, Math.min(entries.length, 10));
+    leaderboardEntriesCache = entries;
 
     document.getElementById('lb-body').innerHTML = previewRows.length ? previewRows.map((p, i) => `
         <tr class="${p.id === targetId ? 'highlight' : ''}">
             <td><span class="rank-badge">${medals[i] || (i + 1)}</span></td>
             <td>${renderPlayerCell(p)}</td>
             <td>${p.score}</td>
+            <td>${p.games}</td>
             <td>${p.acc}</td>
             <td>${formatDate(p.lastPlayed)}</td>
-        </tr>`).join('') : '<tr><td colspan="5">Δεν υπάρχουν παίκτες ακόμα.</td></tr>';
+        </tr>`).join('') : `<tr><td colspan="6">${t('noLeaderboardPlayers6')}</td></tr>`;
 
     document.getElementById('leaderboard-full-body').innerHTML = entries.length ? entries.map((p, i) => `
         <tr class="entry-row ${p.id === targetId ? 'highlight' : ''}" onclick="showEntryDetails('${p.id}')">
             <td><span class="rank-badge">${medals[i] || (i + 1)}</span></td>
             <td>${renderPlayerCell(p)}</td>
             <td>${p.score}</td>
+            <td>${p.games}</td>
             <td>${p.acc}</td>
             <td>${formatDate(p.lastPlayed)}</td>
+            <td>${renderFriendActionCell(p)}</td>
             <td class="delete-cell">
-                <button class="delete-entry-btn ${adminUnlocked ? 'visible' : ''}" onclick="event.stopPropagation(); deleteLeaderboardEntry('${p.id}')">🗑</button>
+                <button class="delete-entry-btn ${(adminUnlocked && isAdminUser()) ? 'visible' : ''}" onclick="event.stopPropagation(); deleteLeaderboardEntry('${p.id}')">🗑</button>
             </td>
-        </tr>`).join('') : '<tr><td colspan="5">Δεν υπάρχουν παίκτες ακόμα.</td></tr>';
+        </tr>`).join('') : `<tr><td colspan="8">${t('noLeaderboardPlayers8')}</td></tr>`;
 
     if (!selectedEntryId && entries.length) {
         selectedEntryId = targetId && entries.some(entry => entry.id === targetId) ? targetId : entries[0].id;
@@ -2610,6 +3304,7 @@ function renderLeaderboardEntries(entries, targetId = user.id) {
 
     renderDetailsPanel(entries.find(entry => entry.id === selectedEntryId) || null);
     updateAdminUi();
+    renderFriendsPanel();
 
     return entries;
 }
@@ -2620,32 +3315,32 @@ function renderDetailsPanel(entry) {
 
     if (!entry) {
         detailsContent.className = 'details-empty';
-        detailsContent.innerHTML = 'Πάτησε μια συμμετοχή από τον πίνακα για να δεις ποιες ερωτήσεις απαντήθηκαν σωστά και ποιες λάθος.';
+        detailsContent.innerHTML = t('emptyPlayerDetails');
         return;
     }
 
-    const answers = Array.isArray(entry.answers) ? entry.answers : [];
+    const answers = Array.isArray(entry.latestAnswers || entry.answers) ? (entry.latestAnswers || entry.answers) : [];
     const correctAnswers = answers.filter(answer => answer.isCorrect).length;
-    const totalQuestions = answers.length || (Number(entry.total_correct || 0) + Number(entry.total_wrong || 0));
+    const totalQuestions = answers.length || (Number(entry.latestCorrect || 0) + Number(entry.latestWrong || 0));
     const entryDisplayName = getPreferredDisplayName(entry);
     detailsContent.className = '';
     detailsContent.innerHTML = `
         <div class="question-review-meta">
             <strong>${entryDisplayName}</strong><br>
-            Score: ${entry.score} | Accuracy: ${entry.acc} | Correct: ${correctAnswers}/${totalQuestions}<br>
-            Played: ${formatDate(entry.lastPlayed)}
+            ${t('totalScore')}: ${entry.score} | ${t('games')}: ${entry.games} | ${t('accuracy')}: ${entry.acc}<br>
+            ${t('latestGame')}: ${correctAnswers}/${totalQuestions} ${t('correctPlural')} | ${t('lastPlayed')}: ${formatDate(entry.lastPlayed)}
         </div>
         <div class="question-review">
             ${answers.length ? answers.map((answer, index) => `
                 <div class="question-review-item ${answer.isCorrect ? 'correct-review' : 'wrong-review'}">
-                    <div class="question-review-status">${answer.isCorrect ? 'Σωστό' : 'Λάθος'}</div>
+                    <div class="question-review-status">${answer.isCorrect ? t('correctStatus') : t('wrongStatus')}</div>
                     <div class="question-review-text">${index + 1}. ${answer.questionText}</div>
                     <div class="question-review-meta">
-                        Δική του απάντηση: ${answer.selectedText}<br>
-                        Σωστή απάντηση: ${answer.correctText}
+                        ${t('yourAnswer')}: ${answer.selectedText}<br>
+                        ${t('correctAnswer')}: ${answer.correctText}
                     </div>
                 </div>
-            `).join('') : '<div class="details-empty">Δεν υπάρχουν διαθέσιμες λεπτομέρειες για αυτή τη συμμετοχή.</div>'}
+            `).join('') : `<div class="details-empty">${t('noEntryDetails')}</div>`}
         </div>
     `;
 }
@@ -2656,28 +3351,39 @@ function showEntryDetails(entryId) {
 }
 
 function unlockAdmin() {
-    const username = prompt('Admin username:');
+    if (!isAdminUser()) {
+        alert(t('adminOnlyVisible'));
+        return;
+    }
+    if (adminUnlocked) {
+        adminUnlocked = false;
+        sessionStorage.removeItem(ADMIN_SESSION_KEY);
+        updateAdminUi();
+        alert(t('adminDisabled'));
+        return;
+    }
+    const username = prompt(t('adminUsernamePrompt'));
     if (username === null) return;
-    const password = prompt('Admin password:');
+    const password = prompt(t('adminPasswordPrompt'));
     if (password === null) return;
 
     if (username === ADMIN_CONFIG.username && password === ADMIN_CONFIG.password) {
         adminUnlocked = true;
-        sessionStorage.setItem('quiz11_admin_unlocked', 'true');
+        sessionStorage.setItem(ADMIN_SESSION_KEY, 'true');
         updateAdminUi();
-        alert('Admin ενεργοποιήθηκε.');
+        alert(t('adminEnabled'));
         return;
     }
 
-    alert('Λάθος στοιχεία admin.');
+    alert(t('adminWrong'));
 }
 
 async function renderLeaderboard(targetId = user.id) {
     if (firebaseReady) {
-        const remoteEntries = normalizeRemoteEntries(await fetchRemoteLeaderboard());
+        const remoteEntries = buildPlayerLeaderboard(normalizeRemoteEntries(await fetchRemoteLeaderboard()));
         return renderLeaderboardEntries(sortLeaderboard(remoteEntries), targetId);
     }
-    return renderLeaderboardEntries(sortLeaderboard(getLeaderboard()), targetId);
+    return renderLeaderboardEntries(sortLeaderboard(buildPlayerLeaderboard(getLeaderboard())), targetId);
 }
 
 function resetQuizState(mode = currentQuizMode) {
@@ -2711,16 +3417,17 @@ window.toggleHint = function toggleHint() {
 function updateHintUi(question) {
     const hintEl = document.getElementById('q-hint');
     const hintBtn = document.getElementById('btn-hint-toggle');
-    const hasHint = !!question?.h;
+    const localizedHint = getQuestionHint(question);
+    const hasHint = !!localizedHint;
     const isVisible = !!revealedHints[cur];
     const penaltyLabel = '(-20%)';
 
     hintBtn.classList.toggle('hidden', !hasHint);
     hintBtn.classList.toggle('active', hasHint && isVisible);
-    hintBtn.textContent = hasHint ? (isVisible ? 'Απόκρυψη Υπόδειξης' : `Εμφάνιση Υπόδειξης ${penaltyLabel}`) : '';
+    hintBtn.textContent = hasHint ? (isVisible ? t('hintHide') : `${t('hintShow')} ${penaltyLabel}`) : '';
 
     hintEl.classList.toggle('hidden', !hasHint || !isVisible);
-    hintEl.textContent = hasHint && isVisible ? `💡 Υπόδειξη: ${question.h}` : '';
+    hintEl.textContent = hasHint && isVisible ? `${t('hintPrefix')} ${localizedHint}` : '';
 }
 
 function resolveQuestionImagePath(imgPath) {
@@ -2765,14 +3472,14 @@ function updateTimerDisplay() {
 function startQuiz(mode = 'knowledge') {
     const f = (currentAuthProfile?.firstName || document.getElementById('fname').value).trim();
     const l = (currentAuthProfile?.lastName || document.getElementById('lname').value).trim();
-    if (f.length < 2 || l.length < 2) { alert('Συμπλήρωσε τα στοιχεία σου.'); return; }
-    if (!QUESTION_POOL.length) { alert('Δεν υπάρχουν διαθέσιμες ερωτήσεις για το quiz.'); return; }
+    if (f.length < 2 || l.length < 2) { alert(t('fillDetails')); return; }
+    if (!QUESTION_POOL.length) { alert(t('noQuizQuestions')); return; }
     const normalizedMode = mode === 'image' ? 'image' : 'knowledge';
     const availableQuestionCount = filterQuestionMapByMode(getUniqueQuestionMap(), normalizedMode).size;
     if (!availableQuestionCount) {
         alert(normalizedMode === 'image'
-            ? 'Δεν υπάρχουν διαθέσιμες ερωτήσεις με εικόνες.'
-            : 'Δεν υπάρχουν διαθέσιμες ερωτήσεις γνώσεων.');
+            ? t('noImageQuestions')
+            : t('noKnowledgeQuestions'));
         return;
     }
     resetQuizState(normalizedMode);
@@ -2790,13 +3497,13 @@ function startQuiz(mode = 'knowledge') {
         <div class="playing-as">
             ${photoUrl ? `<img class="player-avatar" src="${photoUrl}" alt="${nickname || f}">` : `<span class="player-avatar-fallback">${getInitials(nickname || `${f} ${l}`)}</span>`}
             <div class="playing-as-meta">
-                <div class="playing-as-label">Παίζεις ως</div>
+                <div class="playing-as-label">${t('playingAs')}</div>
                 <div class="playing-as-name">${nickname || `${f} ${l}`}</div>
             </div>
         </div>
     `;
     document.getElementById('q-total').textContent = questions.length;
-    document.getElementById('score-display').textContent = '0';
+    updateQuizProgressLabel();
     startBackgroundMusic();
     show('scr-quiz');
     loadQuestion();
@@ -2819,23 +3526,23 @@ function restartQuiz() {
     resetQuizState(currentQuizMode);
     document.getElementById('fname').value = currentAuthProfile?.firstName || '';
     document.getElementById('lname').value = currentAuthProfile?.lastName || '';
-    document.getElementById('score-display').textContent = '0';
+    updateQuizProgressLabel();
     document.getElementById('timer-count').textContent = `${QUESTION_TIME}s`;
     document.getElementById('timer-count').classList.remove('urgent');
     show('scr-login');
 }
 
 async function clearLeaderboard() {
-    if (!adminUnlocked) {
-        alert('Μόνο ο διαχειριστής μπορεί να κάνει εκκαθάριση leaderboard.');
+    if (!adminUnlocked || !isAdminUser()) {
+        alert(t('adminOnlyReset'));
         return;
     }
-    if (!confirm('Θέλεις σίγουρα εκκαθάριση leaderboard;')) return;
+    if (!confirm(t('confirmReset'))) return;
     if (firebaseReady) {
         await resetRemoteLeaderboard();
         selectedEntryId = null;
         await renderLeaderboard();
-        alert('Το online leaderboard καθαρίστηκε.');
+        alert(t('leaderboardCleared'));
         return;
     }
     localStorage.removeItem(LEADERBOARD_KEY);
@@ -2844,24 +3551,73 @@ async function clearLeaderboard() {
 }
 
 async function deleteLeaderboardEntry(entryId) {
-    if (!adminUnlocked) {
-        alert('Μόνο ο διαχειριστής μπορεί να διαγράψει εγγραφές.');
+    if (!adminUnlocked || !isAdminUser()) {
+        alert(t('adminOnlyDelete'));
         return;
     }
-    if (!confirm('Θέλεις να διαγραφεί αυτή η συμμετοχή;')) return;
+    if (!confirm(t('confirmDelete'))) return;
 
     if (firebaseReady) {
-        await deleteRemoteEntry(entryId);
+        const allEntries = normalizeRemoteEntries(await fetchRemoteLeaderboard());
+        const matchingEntries = allEntries.filter(entry => getEntryPlayerKey(entry) === entryId);
+        await Promise.all(matchingEntries.map(entry => deleteRemoteEntry(entry.id)));
         if (selectedEntryId === entryId) selectedEntryId = null;
         await renderLeaderboard();
         return;
     }
 
-    const filtered = getLeaderboard().filter(entry => entry.id !== entryId);
+    const filtered = getLeaderboard().filter(entry => getEntryPlayerKey(entry) !== entryId);
     saveLeaderboard(filtered);
     if (selectedEntryId === entryId) selectedEntryId = null;
-    renderLeaderboardEntries(sortLeaderboard(filtered), user.id);
+    renderLeaderboardEntries(sortLeaderboard(buildPlayerLeaderboard(filtered)), user.id);
 }
+
+window.toggleFriend = async function toggleFriend(entryId) {
+    if (!firebaseReady || !currentAuthUser) {
+        alert(t('friendLoginNeeded'));
+        return;
+    }
+    const target = leaderboardEntriesCache.find(entry => entry.id === entryId);
+    if (!target || !target.authUid || target.authUid === currentAuthUser.uid) return;
+    const friends = getCurrentFriends();
+    const exists = friends.some(friend => friend.uid === target.authUid);
+    const nextFriends = exists
+        ? friends.filter(friend => friend.uid !== target.authUid)
+        : [...friends, {
+            uid: target.authUid,
+            nickname: target.nickname || '',
+            fullName: target.name || `${target.firstName || ''} ${target.lastName || ''}`.trim(),
+            photoUrl: target.photoUrl || ''
+        }];
+    currentAuthProfile = { ...(currentAuthProfile || {}), friends: nextFriends };
+    await firebaseApi.setDoc(firebaseApi.doc(firebaseDb, PROFILE_COLLECTION, currentAuthUser.uid), {
+        friends: nextFriends,
+        updatedAt: new Date().toISOString()
+    }, { merge: true });
+    renderFriendsPanel();
+    renderLeaderboardEntries(leaderboardEntriesCache, selectedEntryId || user.id);
+};
+
+window.removeFriend = async function removeFriend(uid) {
+    if (!firebaseReady || !currentAuthUser) return;
+    const nextFriends = getCurrentFriends().filter(friend => friend.uid !== uid);
+    currentAuthProfile = { ...(currentAuthProfile || {}), friends: nextFriends };
+    await firebaseApi.setDoc(firebaseApi.doc(firebaseDb, PROFILE_COLLECTION, currentAuthUser.uid), {
+        friends: nextFriends,
+        updatedAt: new Date().toISOString()
+    }, { merge: true });
+    renderFriendsPanel();
+    renderLeaderboardEntries(leaderboardEntriesCache, selectedEntryId || user.id);
+};
+
+window.startFriendDuel = function startFriendDuel(uid) {
+    const friend = getCurrentFriends().find(item => item.uid === uid);
+    if (!friend) return;
+    try {
+        localStorage.setItem('quiz12_duel_friend_target', JSON.stringify(friend));
+    } catch {}
+    window.location.href = DUEL_MODE_URL;
+};
 
 function loadQuestion() {
     clearInterval(timer);
@@ -2869,15 +3625,15 @@ function loadQuestion() {
     const isAnswered = answersStatus[cur] !== undefined;
     const answeredState = answersStatus[cur];
 
-    document.getElementById('q-num').textContent = cur + 1;
-    document.getElementById('q-text').textContent = q.q;
+    updateQuizProgressLabel();
+    document.getElementById('q-text').textContent = getQuestionText(q);
     updateHintUi(q);
 
     const imgCont = document.getElementById('q-image-container');
     const imgEl = document.getElementById('q-image');
     if (q.img) {
         imgEl.src = resolveQuestionImagePath(q.img);
-        imgEl.alt = q.q || 'Εικόνα ερώτησης';
+        imgEl.alt = getQuestionText(q) || 'Question image';
         imgCont.classList.remove('hidden');
     } else {
         imgEl.removeAttribute('src');
@@ -2925,7 +3681,7 @@ function loadQuestion() {
     if (isAnswered) {
         timeLeft = 0;
         updateTimerDisplay();
-        showRationale(q.r);
+        showRationale(getQuestionRationale(q));
         btnNext.disabled = false;
         btnNext.classList.add('next-active');
     } else {
@@ -2964,8 +3720,8 @@ function checkAnswer(idx) {
         playWrongSound();
     }
 
-    document.getElementById('score-display').textContent = score;
-    showRationale(q.r);
+    updateQuizProgressLabel();
+    showRationale(getQuestionRationale(q));
     if (btnPrev) {
         const canGoBack = cur > 0;
         btnPrev.disabled = !canGoBack;
@@ -2977,7 +3733,7 @@ function checkAnswer(idx) {
 
 function showRationale(text) {
     const box = document.getElementById('rationale-box');
-    box.textContent = text;
+    box.textContent = localizeFreeText(text);
     box.classList.remove('hidden');
 }
 
@@ -3084,7 +3840,7 @@ function goBack() {
 async function endQuiz() {
     clearInterval(timer);
     show('scr-end');
-    document.getElementById('final-msg').textContent = `Τέλος! Σκορ: ${score} πόντοι`;
+    document.getElementById('final-msg').textContent = t('quizEndMessage', { score });
     const accuracyValue = Math.round((correct / questions.length) * 100);
     const acc = `${accuracyValue}%`;
     const answers = buildAnswerReview();
@@ -3126,18 +3882,23 @@ async function endQuiz() {
             answers
         });
 
-        sorted = sortLeaderboard(lb);
-        saveLeaderboard(sorted);
-        selectedEntryId = attemptId;
-        renderLeaderboardEntries(sorted, attemptId);
+        saveLeaderboard(lb);
+        sorted = sortLeaderboard(buildPlayerLeaderboard(lb));
+        selectedEntryId = getEntryPlayerKey({
+            authUid: user.authUid || '',
+            firstName: user.f,
+            lastName: user.l
+        });
+        renderLeaderboardEntries(sorted, selectedEntryId);
     }
 
     if (firebaseReady) {
-        const matchedEntry = sorted.find(item =>
-            item.name === `${user.f} ${user.l}` &&
-            item.score === score &&
-            item.lastPlayedTs && Math.abs(item.lastPlayedTs - lastPlayed) < 10000
-        );
+        const targetPlayerKey = getEntryPlayerKey({
+            authUid: currentAuthUser?.uid || '',
+            firstName: user.f,
+            lastName: user.l
+        });
+        const matchedEntry = sorted.find(item => item.id === targetPlayerKey);
         selectedEntryId = matchedEntry ? matchedEntry.id : (sorted[0]?.id || null);
     }
 
@@ -3147,23 +3908,21 @@ async function endQuiz() {
     document.getElementById('summary-rank').textContent = rank ? `#${rank}` : '-';
 }
 
-document.title = QUIZ_TITLE;
-document.querySelector('#scr-login h1').textContent = QUIZ_TITLE;
 document.body.classList.add('login-screen-active');
 syncMainAuthPanelLayout();
 window.addEventListener('resize', syncMainAuthPanelLayout);
-updateAudioButtons();
 bindMusicResumeHooks();
 if (musicEnabled) {
     startBackgroundMusic();
 }
 resetReviewForm();
+applyLanguage();
 initFirebaseLeaderboard().finally(async () => {
     if (authApi && firebaseAuth) {
         try {
             await authApi.getRedirectResult(firebaseAuth);
         } catch (error) {
-            document.getElementById('main-auth-status').textContent = `Google redirect error: ${error.message}`;
+            document.getElementById('main-auth-status').textContent = `${t('authGoogleError')}: ${error.message}`;
         }
     }
     updateMainAuthUi();
